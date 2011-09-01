@@ -18,6 +18,22 @@ Available Scrapy components:
 * Duplication Filter
 * Item Pipeline
 
+Usage
+-----
+
+In your settings.py:
+
+# enables scheduling storing requests queue in redis
+SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+
+# don't cleanup redis queues, allows to pause/resume crawls
+SCHEDULER_PERSIST = True
+
+# store scraped item in redis for post-processing
+ITEM_PIPELINES = [
+    'scrapy_redis.pipelines.RedisPipeline',
+]
+
 
 Running the example project
 ---------------------------
