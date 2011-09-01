@@ -44,8 +44,9 @@ You can test the funcionality following the next steps:
 
 2. Run the crawler for first time then stop it
 
-  $ cd examples
+  $ cd example-project
   $ scrapy crawl dmoz
+  ... [dmoz] ...
   ^C
 
 3. Run the crawler again to resume stopped crawling
