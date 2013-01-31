@@ -31,6 +31,11 @@ class Scheduler(object):
         server = redis.Redis(host, port)
         return cls(server, persist, queue_key)
 
+    @classmethod
+    def from_crawler(cls, crawler):
+        settings = crawler.settings
+        return cls.from_settings(settings)
+
     def open(self, spider):
         self.spider = spider
         self.queue = SpiderQueue(self.server, spider, self.queue_key)
