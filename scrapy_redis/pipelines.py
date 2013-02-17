@@ -17,6 +17,10 @@ class RedisPipeline(object):
         port = settings.get('REDIS_PORT', 6379)
         return cls(host, port)
 
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls.from_settings(crawler)
+
     def process_item(self, item, spider):
         return deferToThread(self._process_item, item, spider)
 
@@ -29,4 +33,3 @@ class RedisPipeline(object):
     def item_key(self, item, spider):
         """Returns redis key based on given spider"""
         return "%s:items" % spider.name
-
