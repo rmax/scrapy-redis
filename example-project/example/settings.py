@@ -10,6 +10,9 @@ NEWSPIDER_MODULE = 'example.spiders'
 
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 SCHEDULER_PERSIST = True
+#SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderPriorityQueue"
+#SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderQueue"
+#SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderStack"
 
 ITEM_PIPELINES = [
     'example.pipelines.ExamplePipeline',
