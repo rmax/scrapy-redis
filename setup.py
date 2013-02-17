@@ -1,5 +1,5 @@
 import os
-from distutils.core import setup
+from setuptools import setup
 
 
 LONG_DESC = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
