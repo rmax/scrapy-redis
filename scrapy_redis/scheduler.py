@@ -1,4 +1,6 @@
 import redis
+
+from scrapy.utils.misc import load_object
 from scrapy_redis.queue import SpiderQueue
 from scrapy_redis.dupefilter import RFPDupeFilter
 
@@ -8,16 +10,29 @@ REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 SCHEDULER_PERSIST = False
 QUEUE_KEY = '%(spider)s:requests'
+QUEUE_CLASS = 'scrapy_redis.queue.SpiderPriorityQueue'
 DUPEFILTER_KEY = '%(spider)s:dupefilter'
 
 
 class Scheduler(object):
     """Redis-based scheduler"""
 
-    def __init__(self, server, persist, queue_key):
+    def __init__(self, server, persist, queue_key, queue_cls, dupefilter_key):
+        """Initialize scheduler.
+
+        Parameters
+        ----------
+        server : Redis instance
+        persist : bool
+        queue_key : str
+        queue_cls : queue class
+        dupefilter_key : str
+        """
         self.server = server
         self.persist = persist
         self.queue_key = queue_key
+        self.queue_cls = queue_cls
+        self.dupefilter_key = dupefilter_key
 
     def __len__(self):
         return len(self.queue)
@@ -28,8 +43,10 @@ class Scheduler(object):
         port = settings.get('REDIS_PORT', REDIS_PORT)
         persist = settings.get('SCHEDULER_PERSIST', SCHEDULER_PERSIST)
         queue_key = settings.get('SCHEDULER_QUEUE_KEY', QUEUE_KEY)
+        queue_cls = load_object(settings.get('SCHEDULER_QUEUE_CLASS', QUEUE_CLASS))
+        dupefilter_key = settings.get('DUPEFILTER_KEY', DUPEFILTER_KEY)
         server = redis.Redis(host, port)
-        return cls(server, persist, queue_key)
+        return cls(server, persist, queue_key, queue_cls, dupefilter_key)
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -39,8 +56,8 @@ class Scheduler(object):
     def open(self, spider):
         self.spider = spider
         self.queue = SpiderQueue(self.server, spider, self.queue_key)
-        self.df = RFPDupeFilter(self.server, DUPEFILTER_KEY % {'spider': spider.name})
-        # notice if there are requests already in the queue
+        self.df = RFPDupeFilter(self.server, self.dupefilter_key % {'spider': spider.name})
+        # notice if there are requests already in the queue to resume the crawl
         if len(self.queue):
             spider.log("Resuming crawl (%d requests scheduled)" % len(self.queue))
 
@@ -59,4 +76,3 @@ class Scheduler(object):
 
     def has_pending_requests(self):
         return len(self) > 0
-
