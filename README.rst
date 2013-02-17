@@ -31,10 +31,24 @@ In your settings.py:
   # don't cleanup redis queues, allows to pause/resume crawls
   SCHEDULER_PERSIST = True
 
+  # Schedule requests using a priority queue. (default)
+  SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderPriorityQueue'
+
+  # Schedule requests using a queue (FIFO).
+  SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderQueue'
+
+  # Schedule requests using a stack (LIFO).
+  SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderStack'
+
   # store scraped item in redis for post-processing
   ITEM_PIPELINES = [
       'scrapy_redis.pipelines.RedisPipeline',
   ]
+
+.. note::
+
+  Version 0.3 changed the requests serialization from `marshal` to `cPickle`,
+  therefore persisted requests using version 0.2 will not able to work on 0.3.
 
 
 Running the example project
