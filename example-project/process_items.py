@@ -7,7 +7,8 @@ import redis
 def main():
     r = redis.Redis()
     while True:
-        source, data = r.brpop(["dmoz:items"])
+        # process queue as FIFO, change `blpop` to `brpop` to process as LIFO
+        source, data = r.blpop(["dmoz:items"])
         item = json.loads(data)
         try:
             print u"Processing: %(name)s <%(link)s>" % item
