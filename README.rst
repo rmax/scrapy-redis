@@ -22,10 +22,24 @@ Available Scrapy components:
 * Item Pipeline
 
 
+Installation
+------------
+
+From `pypi`::
+
+  $ pip install scrapy-redis
+
+From `github`::
+
+  $ git clone https://github.com/darkrho/scrapy-redis.git
+  $ cd scrapy-redis
+  $ python setup.py install
+
+
 Usage
 -----
 
-In your settings.py:
+Enable the components in your `settings.py`:
 
 .. code-block:: python
 
