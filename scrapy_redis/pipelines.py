@@ -19,7 +19,7 @@ class RedisPipeline(object):
 
     @classmethod
     def from_crawler(cls, crawler):
-        return cls.from_settings(crawler)
+        return cls.from_settings(crawler.settings)
 
     def process_item(self, item, spider):
         return deferToThread(self._process_item, item, spider)
