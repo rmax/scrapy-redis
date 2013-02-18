@@ -26,7 +26,7 @@ class RedisPipeline(object):
 
     def _process_item(self, item, spider):
         key = self.item_key(item, spider)
-        data = self.encoder.encode(dict(item))
+        data = self.encoder.encode(item)
         self.server.rpush(key, data)
         return item
 
