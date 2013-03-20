@@ -101,3 +101,9 @@ You can test the funcionality following the next steps:
     ...
 
 That's it.
+
+
+.. image:: https://d2weczhvl823v0.cloudfront.net/darkrho/scrapy-redis/trend.png
+   :alt: Bitdeli badge
+   :target: https://bitdeli.com/free
+
