@@ -1,7 +1,6 @@
 import redis
 
 from scrapy.utils.misc import load_object
-from scrapy_redis.queue import SpiderQueue
 from scrapy_redis.dupefilter import RFPDupeFilter
 
 
@@ -51,11 +50,12 @@ class Scheduler(object):
     @classmethod
     def from_crawler(cls, crawler):
         settings = crawler.settings
+        cls.stats = crawler.stats
         return cls.from_settings(settings)
 
     def open(self, spider):
         self.spider = spider
-        self.queue = SpiderQueue(self.server, spider, self.queue_key)
+        self.queue = self.queue_cls(self.server, spider, self.queue_key)
         self.df = RFPDupeFilter(self.server, self.dupefilter_key % {'spider': spider.name})
         # notice if there are requests already in the queue to resume the crawl
         if len(self.queue):
@@ -69,10 +69,14 @@ class Scheduler(object):
     def enqueue_request(self, request):
         if not request.dont_filter and self.df.request_seen(request):
             return
+        self.stats.inc_value('scheduler/enqueued/redis', spider=self.spider)
         self.queue.push(request)
 
     def next_request(self):
-        return self.queue.pop()
+        request = self.queue.pop()
+        if request:
+            self.stats.inc_value('scheduler/dequeued/redis', spider=self.spider)
+        return request
 
     def has_pending_requests(self):
         return len(self) > 0
