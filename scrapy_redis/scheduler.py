@@ -55,7 +55,7 @@ class Scheduler(object):
 
     def open(self, spider):
         self.spider = spider
-        self.queue = SpiderQueue(self.server, spider, self.queue_key)
+        self.queue = self.queue_cls(self.server, spider, self.queue_key)
         self.df = RFPDupeFilter(self.server, self.dupefilter_key % {'spider': spider.name})
         # notice if there are requests already in the queue to resume the crawl
         if len(self.queue):
