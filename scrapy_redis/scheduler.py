@@ -32,6 +32,7 @@ class Scheduler(object):
         self.queue_key = queue_key
         self.queue_cls = queue_cls
         self.dupefilter_key = dupefilter_key
+        self.stats = None
 
     def __len__(self):
         return len(self.queue)
@@ -49,9 +50,10 @@ class Scheduler(object):
 
     @classmethod
     def from_crawler(cls, crawler):
-        settings = crawler.settings
-        cls.stats = crawler.stats
-        return cls.from_settings(settings)
+        instance = cls.from_settings(crawler.settings)
+        # FIXME: for now, stats are only supported from this constructor
+        instance.stats = crawler.stats
+        return instance
 
     def open(self, spider):
         self.spider = spider
@@ -69,12 +71,13 @@ class Scheduler(object):
     def enqueue_request(self, request):
         if not request.dont_filter and self.df.request_seen(request):
             return
-        self.stats.inc_value('scheduler/enqueued/redis', spider=self.spider)
+        if self.stats:
+            self.stats.inc_value('scheduler/enqueued/redis', spider=self.spider)
         self.queue.push(request)
 
     def next_request(self):
         request = self.queue.pop()
-        if request:
+        if request and self.stats:
             self.stats.inc_value('scheduler/dequeued/redis', spider=self.spider)
         return request
 
