@@ -20,6 +20,7 @@ Available Scrapy components:
 * Scheduler
 * Duplication Filter
 * Item Pipeline
+* Base Spider
 
 
 Installation
@@ -72,7 +73,8 @@ Enable the components in your `settings.py`:
 Running the example project
 ---------------------------
 
-You can test the funcionality following the next steps:
+This example illustrates how to share a spider's requests queue
+across multiple spider instances, highly suitable for broad crawls.
 
 1. Setup scrapy_redis package in your PYTHONPATH
 
@@ -100,7 +102,39 @@ You can test the funcionality following the next steps:
     Processing: NinjaGizmos.com (http://www.dmoz.org/Computers/Shopping/Gifts/)
     ...
 
-That's it.
+
+Feeding a Spider from Redis
+---------------------------
+
+The class `scrapy_redis.spiders.RedisSpider` enables a spider to read the
+urls from redis. The urls in the redis queue will be processed one
+after another, if the first request yields more requests, the spider
+will process those requests before fetching another url from redis.
+
+For example, create a file `myspider.py` with the code below:
+
+.. code-block:: python
+
+    from scrapy_redis.spiders import RedisSpider
+
+    class MySpider(RedisSpider):
+        name = 'myspider'
+
+        def parse(self, response):
+            # do stuff
+            pass
+
+
+Then:
+
+1. run the spider::
+
+    scrapy runspider myspider.py
+
+2. push urls to redis::
+
+    redis-cli lpush myspider:start_urls http://google.com
+
 
 
 .. image:: https://d2weczhvl823v0.cloudfront.net/darkrho/scrapy-redis/trend.png
