@@ -59,6 +59,12 @@ Enable the components in your `settings.py`:
   # Schedule requests using a stack (LIFO).
   SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderStack'
 
+  # Max idle time to prevent the spider from being closed when distributed crawling
+  # this only work if queue class is SpiderQueue or SpiderStack
+  # and may also block the same time when your spider start at the first time (because the queue is empty).
+  SCHEDULER_IDLE_BEFORE_CLOSE = 10
+
+
   # store scraped item in redis for post-processing
   ITEM_PIPELINES = [
       'scrapy_redis.pipelines.RedisPipeline',
