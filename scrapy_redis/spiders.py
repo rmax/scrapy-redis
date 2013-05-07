@@ -28,8 +28,8 @@ class RedisMixin(object):
     def next_request(self):
         """Returns a request to be scheduled or none."""
         url = self.server.lpop(self.redis_key)
-        parsed_url = urlparse(url if url else "")
         if url:
+            parsed_url = urlparse(url if url else "")
             for u in self.allowed_Domains:
                 if parsed_url.netloc.endswith(u):
                     break;
