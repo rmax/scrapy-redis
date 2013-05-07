@@ -1,5 +1,5 @@
 import redis
-
+from urlparse import urlparse
 from scrapy import signals
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spider import BaseSpider
@@ -28,7 +28,10 @@ class RedisMixin(object):
     def next_request(self):
         """Returns a request to be scheduled or none."""
         url = self.server.lpop(self.redis_key)
-        if url:
+        print "URL = [%s]" % url
+        parsed_url = urlparse(url if url else "")
+        print "DOMAIN = [%s]" % parsed_url.netloc
+        if url and [True for u in self.allowed_Domains if parsed_url.netloc.endswith(u)]:
             return self.make_requests_from_url(url)
 
     def spider_idle(self):
