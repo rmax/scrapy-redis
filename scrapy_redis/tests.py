@@ -131,8 +131,10 @@ class SchedulerTest(TestCase):
         self.key_prefix = 'scrapy_redis:tests:'
         self.queue_key = self.key_prefix + '%(spider)s:requests'
         self.dupefilter_key = self.key_prefix + '%(spider)s:dupefilter'
+        self.idle_before_close = 0
         self.scheduler = Scheduler(self.server, False, self.queue_key,
-                                   SpiderQueue, self.dupefilter_key)
+                                   SpiderQueue, self.dupefilter_key,
+                                   self.idle_before_close)
 
     def tearDown(self):
         for key in self.server.keys(self.key_prefix):
