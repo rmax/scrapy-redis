@@ -1,4 +1,5 @@
 import redis
+import connection
 
 from twisted.internet.threads import deferToThread
 from scrapy.utils.serialize import ScrapyJSONEncoder
@@ -7,15 +8,14 @@ from scrapy.utils.serialize import ScrapyJSONEncoder
 class RedisPipeline(object):
     """Pushes serialized item into a redis list/queue"""
 
-    def __init__(self, host, port):
-        self.server = redis.Redis(host, port)
+    def __init__(self, server):
+        self.server = server
         self.encoder = ScrapyJSONEncoder()
 
     @classmethod
     def from_settings(cls, settings):
-        host = settings.get('REDIS_HOST', 'localhost')
-        port = settings.get('REDIS_PORT', 6379)
-        return cls(host, port)
+        server = connection.from_settings(settings)
+        return cls(server)
 
     @classmethod
     def from_crawler(cls, crawler):

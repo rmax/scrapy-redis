@@ -1,5 +1,6 @@
 import os
 import redis
+import connection
 
 from scrapy.http import Request
 from scrapy.spider import BaseSpider
@@ -191,3 +192,79 @@ class SchedulerTest(TestCase):
         self.scheduler.close('finish')
 
         self.assertEqual(len(self.scheduler), 0)
+
+
+class ConnectionTest(TestCase):
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    # We can get a connection from just REDIS_URL.
+    def test_redis_url(self):
+        settings = dict(
+            REDIS_URL = 'redis://foo:bar@localhost:9001/42'
+        )
+
+        server = connection.from_settings(settings)
+        connect_args = server.connection_pool.connection_kwargs
+
+        self.assertEqual(connect_args['host'], 'localhost')
+        self.assertEqual(connect_args['port'], 9001)
+        self.assertEqual(connect_args['password'], 'bar')
+        self.assertEqual(connect_args['db'], 42)
+
+    # We can get a connection from REDIS_HOST/REDIS_PORT.
+    def test_redis_host_port(self):
+        settings = dict(
+            REDIS_HOST = 'localhost',
+            REDIS_PORT = 9001
+        )
+
+        server = connection.from_settings(settings)
+        connect_args = server.connection_pool.connection_kwargs
+
+        self.assertEqual(connect_args['host'], 'localhost')
+        self.assertEqual(connect_args['port'], 9001)
+
+    # REDIS_URL takes precedence over REDIS_HOST/REDIS_PORT.
+    def test_redis_url_precedence(self):
+        settings = dict(
+            REDIS_HOST = 'baz',
+            REDIS_PORT = 1337,
+            REDIS_URL = 'redis://foo:bar@localhost:9001/42'
+        )
+
+        server = connection.from_settings(settings)
+        connect_args = server.connection_pool.connection_kwargs
+
+        self.assertEqual(connect_args['host'], 'localhost')
+        self.assertEqual(connect_args['port'], 9001)
+        self.assertEqual(connect_args['password'], 'bar')
+        self.assertEqual(connect_args['db'], 42)
+
+    # We fallback to REDIS_HOST/REDIS_PORT if REDIS_URL is None.
+    def test_redis_host_port_fallback(self):
+        settings = dict(
+            REDIS_HOST = 'baz',
+            REDIS_PORT = 1337,
+            REDIS_URL = None
+        )
+
+        server = connection.from_settings(settings)
+        connect_args = server.connection_pool.connection_kwargs
+
+        self.assertEqual(connect_args['host'], 'baz')
+        self.assertEqual(connect_args['port'], 1337)
+
+    # We use default values for REDIS_HOST/REDIS_PORT.
+    def test_redis_default(self):
+        settings = dict()
+
+        server = connection.from_settings(settings)
+        connect_args = server.connection_pool.connection_kwargs
+
+        self.assertEqual(connect_args['host'], 'localhost')
+        self.assertEqual(connect_args['port'], 6397)
