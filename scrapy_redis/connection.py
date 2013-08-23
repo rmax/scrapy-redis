@@ -4,7 +4,7 @@ import redis
 # Default values.
 REDIS_URL = None
 REDIS_HOST = 'localhost'
-REDIS_PORT = 6397
+REDIS_PORT = 6379
 
 
 def from_settings(settings):

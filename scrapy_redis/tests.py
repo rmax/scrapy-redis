@@ -267,4 +267,4 @@ class ConnectionTest(TestCase):
         connect_args = server.connection_pool.connection_kwargs
 
         self.assertEqual(connect_args['host'], 'localhost')
-        self.assertEqual(connect_args['port'], 6397)
+        self.assertEqual(connect_args['port'], 6379)

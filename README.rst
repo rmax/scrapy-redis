@@ -71,7 +71,7 @@ Enable the components in your `settings.py`:
   
   # Specify the host and port to use when connecting to Redis (optional).
   REDIS_HOST = 'localhost'
-  REDIS_PORT = 6397
+  REDIS_PORT = 6379
   
   # Specify the full Redis URL for connecting (optional).
   # If set, this takes precedence over the REDIS_HOST and REDIS_PORT settings.
