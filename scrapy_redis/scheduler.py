@@ -1,12 +1,10 @@
-import redis
+import connection
 
 from scrapy.utils.misc import load_object
 from scrapy_redis.dupefilter import RFPDupeFilter
 
 
 # default values
-REDIS_HOST = 'localhost'
-REDIS_PORT = 6379
 SCHEDULER_PERSIST = False
 QUEUE_KEY = '%(spider)s:requests'
 QUEUE_CLASS = 'scrapy_redis.queue.SpiderPriorityQueue'
@@ -42,14 +40,12 @@ class Scheduler(object):
 
     @classmethod
     def from_settings(cls, settings):
-        host = settings.get('REDIS_HOST', REDIS_HOST)
-        port = settings.get('REDIS_PORT', REDIS_PORT)
         persist = settings.get('SCHEDULER_PERSIST', SCHEDULER_PERSIST)
         queue_key = settings.get('SCHEDULER_QUEUE_KEY', QUEUE_KEY)
         queue_cls = load_object(settings.get('SCHEDULER_QUEUE_CLASS', QUEUE_CLASS))
         dupefilter_key = settings.get('DUPEFILTER_KEY', DUPEFILTER_KEY)
         idle_before_close = settings.get('SCHEDULER_IDLE_BEFORE_CLOSE', IDLE_BEFORE_CLOSE)
-        server = redis.Redis(host, port)
+        server = connection.from_settings(settings)
         return cls(server, persist, queue_key, queue_cls, dupefilter_key, idle_before_close)
 
     @classmethod

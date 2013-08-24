@@ -1,6 +1,5 @@
-import redis
-
 import time
+import connection
 
 from scrapy.dupefilter import BaseDupeFilter
 from scrapy.utils.request import request_fingerprint
@@ -23,9 +22,7 @@ class RFPDupeFilter(BaseDupeFilter):
 
     @classmethod
     def from_settings(cls, settings):
-        host = settings.get('REDIS_HOST', 'localhost')
-        port = settings.get('REDIS_PORT', 6379)
-        server = redis.Redis(host, port)
+        server = connection.from_settings(settings)
         # create one-time key. needed to support to use this
         # class as standalone dupefilter with scrapy's default scheduler
         # if scrapy passes spider on open() method this wouldn't be needed
