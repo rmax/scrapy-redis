@@ -44,10 +44,10 @@ Enable the components in your `settings.py`:
 
 .. code-block:: python
 
-  # enables scheduling storing requests queue in redis
+  # Enables scheduling storing requests queue in redis.
   SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 
-  # don't cleanup redis queues, allows to pause/resume crawls
+  # Don't cleanup redis queues, allows to pause/resume crawls.
   SCHEDULER_PERSIST = True
 
   # Schedule requests using a priority queue. (default)
@@ -59,16 +59,23 @@ Enable the components in your `settings.py`:
   # Schedule requests using a stack (LIFO).
   SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderStack'
 
-  # Max idle time to prevent the spider from being closed when distributed crawling
-  # this only work if queue class is SpiderQueue or SpiderStack
+  # Max idle time to prevent the spider from being closed when distributed crawling.
+  # This only works if queue class is SpiderQueue or SpiderStack,
   # and may also block the same time when your spider start at the first time (because the queue is empty).
   SCHEDULER_IDLE_BEFORE_CLOSE = 10
 
-
-  # store scraped item in redis for post-processing
+  # Store scraped item in redis for post-processing.
   ITEM_PIPELINES = [
       'scrapy_redis.pipelines.RedisPipeline',
   ]
+  
+  # Specify the host and port to use when connecting to Redis (optional).
+  REDIS_HOST = 'localhost'
+  REDIS_PORT = 6379
+  
+  # Specify the full Redis URL for connecting (optional).
+  # If set, this takes precedence over the REDIS_HOST and REDIS_PORT settings.
+  REDIS_URL = 'redis://user:pass@hostname:9001'
 
 .. note::
 
