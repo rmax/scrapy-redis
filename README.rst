@@ -1,19 +1,22 @@
 Redis-based components for Scrapy
 =================================
 
-This is a initial work on Scrapy-Redis integration, not production-tested.
-Use it at your own risk!
+This project attempts to provide Redis-backed components for Scrapy.
 
 Features:
 
 * Distributed crawling/scraping
+    You can start multiple spider instances that share a single redis queue.
+    Best suitable for broad multi-domain crawls.
 * Distributed post-processing
+    Scraped items gets pushed into a redis queued meaning that you can start as
+    many as needed post-processing processes sharing the items queue.
 
 Requirements:
 
-* Scrapy >= 0.13 (development version)
+* Scrapy >= 0.14
 * redis-py (tested on 2.4.9)
-* redis server (tested on 2.2-2.4)
+* redis server (tested on 2.4-2.6)
 
 Available Scrapy components:
 
@@ -148,6 +151,32 @@ Then:
 
     redis-cli lpush myspider:start_urls http://google.com
 
+
+Changelog
+---------
+
+0.5
+  * Added `REDIS_URL` setting to support Redis connection string.
+  * Added `SCHEDULER_IDLE_BEFORE_CLOSE` setting to prevent the spider closing too
+    quickly when the queue is empty. Default value is zero keeping the previous
+    behavior.
+
+0.4
+  * Added `RedisSpider` and `RedisMixin` classes as building blocks for spiders
+    to be fed through a redis queue.
+  * Added redis queue stats.
+  * Let the encoder handle the item as it comes instead converting it to a dict.
+
+0.3
+  * Added support for different queue classes.
+  * Changed requests serialization from `marshal` to `cPickle`.
+
+0.2
+  * Improved backward compatibility.
+  * Added example project.
+
+0.1
+  * Initial version.
 
 
 .. image:: https://d2weczhvl823v0.cloudfront.net/darkrho/scrapy-redis/trend.png
