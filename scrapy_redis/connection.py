@@ -10,7 +10,7 @@ REDIS_PORT = 6379
 def from_settings(settings):
     url = settings.get('REDIS_URL',  REDIS_URL)
     host = settings.get('REDIS_HOST', REDIS_HOST)
-    port = settings.get('REDIS_PORT', REDIS_PORT)
+    port = settings.getint('REDIS_PORT', REDIS_PORT)
 
     # REDIS_URL takes precedence over host/port specification.
     if url:
