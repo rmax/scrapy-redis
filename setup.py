@@ -6,7 +6,7 @@ LONG_DESC = open(os.path.join(os.path.dirname(__file__), 'README.rst')).read()
 
 
 setup(name='scrapy-redis',
-      version='0.5',
+      version='0.5.1',
       description='Redis-based components for Scrapy',
       long_description=LONG_DESC,
       author='Rolando Espinoza La fuente',
