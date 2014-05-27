@@ -2,7 +2,7 @@ import connection
 
 from scrapy import signals
 from scrapy.exceptions import DontCloseSpider
-from scrapy.spider import BaseSpider
+from scrapy.spider import Spider
 
 
 class RedisMixin(object):
@@ -46,7 +46,7 @@ class RedisMixin(object):
         self.schedule_next_request()
 
 
-class RedisSpider(RedisMixin, BaseSpider):
+class RedisSpider(RedisMixin, Spider):
     """Spider that reads urls from redis queue when idle."""
 
     def set_crawler(self, crawler):

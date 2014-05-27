@@ -68,9 +68,9 @@ Enable the components in your `settings.py`:
   SCHEDULER_IDLE_BEFORE_CLOSE = 10
 
   # Store scraped item in redis for post-processing.
-  ITEM_PIPELINES = [
-      'scrapy_redis.pipelines.RedisPipeline',
-  ]
+  ITEM_PIPELINES = {
+      'scrapy_redis.pipelines.RedisPipeline': 300
+  }
   
   # Specify the host and port to use when connecting to Redis (optional).
   REDIS_HOST = 'localhost'
