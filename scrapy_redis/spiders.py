@@ -26,11 +26,11 @@ class RedisMixin(object):
 
     def next_request(self):
         """Returns a request to be scheduled or none."""
-        useSet = settings.get('REDIS_SET',  False)
+        useSet = self.crawler.settings.get('REDIS_SET',  False)
 
         if useSet:
             url = self.server.spop(self.redis_key)
-        else
+        else:
             url = self.server.lpop(self.redis_key)
 
         if url:
