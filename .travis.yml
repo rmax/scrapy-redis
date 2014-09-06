@@ -4,3 +4,6 @@ python:
   - "2.7"
   - "3.2"
   - "3.3"
+install:
+  - "pip install scrapy"
+  - "pip install redis"
