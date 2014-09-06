@@ -1,4 +1,4 @@
-from scrapy.selector import HtmlXPathSelector
+from scrapy.selector import Selector
 from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
 from scrapy.contrib.spiders import CrawlSpider, Rule
 from example.items import ExampleLoader
@@ -15,8 +15,8 @@ class DmozSpider(CrawlSpider):
     )
 
     def parse_directory(self, response):
-        hxs = HtmlXPathSelector(response)
-        for li in hxs.select('//ul[@class="directory-url"]/li'):
+        hxs = Selector(response)
+        for li in hxs.xpath('//ul[@class="directory-url"]/li'):
             el = ExampleLoader(selector=li)
             el.add_xpath('name', 'a/text()')
             el.add_xpath('description', 'text()')

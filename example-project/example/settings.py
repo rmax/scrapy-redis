@@ -14,7 +14,7 @@ SCHEDULER_PERSIST = True
 #SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderQueue"
 #SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderStack"
 
-ITEM_PIPELINES = [
-    'example.pipelines.ExamplePipeline',
-    'scrapy_redis.pipelines.RedisPipeline',
-]
+ITEM_PIPELINES = {
+    'example.pipelines.ExamplePipeline': 300,
+    'scrapy_redis.pipelines.RedisPipeline': 400,
+    }
