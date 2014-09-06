@@ -6,4 +6,3 @@ python:
   - "3.3"
 install:
   - "pip install scrapy"
-  - "pip install redis"
