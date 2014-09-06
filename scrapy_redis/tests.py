@@ -3,7 +3,7 @@ import redis
 import connection
 
 from scrapy.http import Request
-from scrapy.spider import BaseSpider
+from scrapy.spider import Spider
 from unittest import TestCase
 
 from .dupefilter import RFPDupeFilter
@@ -40,10 +40,10 @@ class QueueTestMixin(object):
     queue_cls = None
 
     def setUp(self):
-        self.spider = BaseSpider('myspider')
+        self.spider = Spider('myspider')
         self.key = 'scrapy_redis:tests:%s:queue' % self.spider.name
         self.server = redis.Redis(REDIS_HOST, REDIS_PORT)
-        self.q = self.queue_cls(self.server, BaseSpider('myspider'), self.key)
+        self.q = self.queue_cls(self.server, Spider('myspider'), self.key)
 
     def tearDown(self):
         self.server.delete(self.key)
@@ -145,7 +145,7 @@ class SchedulerTest(TestCase):
         # default no persist
         self.assertFalse(self.scheduler.persist)
 
-        spider = BaseSpider('myspider')
+        spider = Spider('myspider')
         self.scheduler.open(spider)
         self.assertEqual(len(self.scheduler), 0)
 
@@ -168,7 +168,7 @@ class SchedulerTest(TestCase):
 
     def test_scheduler_persistent(self):
         messages = []
-        spider = BaseSpider('myspider')
+        spider = Spider('myspider')
         spider.log = lambda *args, **kwargs: messages.append([args, kwargs])
 
         self.scheduler.persist = True
