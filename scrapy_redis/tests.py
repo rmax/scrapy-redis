@@ -3,8 +3,7 @@ import os
 import mock
 import redis
 
-from scrapy.http import Request
-from scrapy.spider import Spider
+from scrapy import Request, Spider
 from unittest import TestCase
 
 from . import connection

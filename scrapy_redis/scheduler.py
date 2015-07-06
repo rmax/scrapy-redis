@@ -1,7 +1,7 @@
-import connection
-
 from scrapy.utils.misc import load_object
-from scrapy_redis.dupefilter import RFPDupeFilter
+
+from . import connection
+from .dupefilter import RFPDupeFilter
 
 
 # default values

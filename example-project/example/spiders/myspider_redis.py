@@ -1,4 +1,5 @@
 from scrapy_redis.spiders import RedisSpider
+
 from example.items import ExampleLoader
 
 

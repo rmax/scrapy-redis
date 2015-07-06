@@ -1,8 +1,7 @@
-import connection
-
-from scrapy import signals
+from scrapy import Spider, signals
 from scrapy.exceptions import DontCloseSpider
-from scrapy.spider import Spider
+
+from . import connection
 
 
 class RedisMixin(object):
