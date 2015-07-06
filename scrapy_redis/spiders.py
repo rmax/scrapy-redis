@@ -49,6 +49,6 @@ class RedisMixin(object):
 class RedisSpider(RedisMixin, Spider):
     """Spider that reads urls from redis queue when idle."""
 
-    def set_crawler(self, crawler):
-        super(RedisSpider, self).set_crawler(crawler)
+    def _set_crawler(self, crawler):
+        super(RedisSpider, self)._set_crawler(crawler)
         self.setup_redis()
