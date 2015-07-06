@@ -14,9 +14,9 @@ Features:
 
 Requirements:
 
-* Scrapy >= 0.24.0
-* redis-py >= 2.8.0
-* redis server >= 2.6.0
+* Scrapy >= 1.0.0
+* redis-py >= 2.10.0
+* redis server >= 2.8.0
 
 Available Scrapy components:
 
@@ -71,11 +71,11 @@ Enable the components in your `settings.py`:
   ITEM_PIPELINES = [
       'scrapy_redis.pipelines.RedisPipeline',
   ]
-  
+
   # Specify the host and port to use when connecting to Redis (optional).
   REDIS_HOST = 'localhost'
   REDIS_PORT = 6379
-  
+
   # Specify the full Redis URL for connecting (optional).
   # If set, this takes precedence over the REDIS_HOST and REDIS_PORT settings.
   REDIS_URL = 'redis://user:pass@hostname:9001'
@@ -154,6 +154,10 @@ Then:
 
 Changelog
 ---------
+
+0.6
+  * Updated code to be compatible with Scrapy 1.0.
+  * Added `-a domain=...` option for example spiders.
 
 0.5
   * Added `REDIS_URL` setting to support Redis connection string.
