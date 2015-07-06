@@ -16,6 +16,11 @@ class MyCrawler(RedisMixin, CrawlSpider):
         Rule(LinkExtractor(), callback='parse_page', follow=True),
     )
 
+    def __init__(self, *args, **kwargs):
+        domain = kwargs.pop('domain', '')
+        self.alowed_domains = filter(None, domain.split(','))
+        super(MyCrawler, self).__init__(*args, **kwargs)
+
     def _set_crawler(self, crawler):
         CrawlSpider._set_crawler(self, crawler)
         RedisMixin.setup_redis(self)

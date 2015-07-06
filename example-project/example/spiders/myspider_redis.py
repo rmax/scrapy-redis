@@ -8,6 +8,11 @@ class MySpider(RedisSpider):
     name = 'myspider_redis'
     redis_key = 'myspider:start_urls'
 
+    def __init__(self, *args, **kwargs):
+        domain = kwargs.pop('domain', '')
+        self.alowed_domains = filter(None, domain.split(','))
+        super(MySpider, self).__init__(*args, **kwargs)
+
     def parse(self, response):
         el = ExampleLoader(response=response)
         el.add_xpath('name', '//title[1]/text()')
