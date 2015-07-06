@@ -1,5 +1,4 @@
 from scrapy.linkextractors import LinkExtractor
-from scrapy.selector import Selector
 from scrapy.spiders import CrawlSpider, Rule
 
 from example.items import ExampleLoader
@@ -19,11 +18,10 @@ class DmozSpider(CrawlSpider):
     )
 
     def parse_directory(self, response):
-        hxs = Selector(response)
-        for li in hxs.xpath('//ul[@class="directory-url"]/li'):
+        for li in response.css('ul.directory-url > li'):
             el = ExampleLoader(selector=li)
-            el.add_xpath('name', 'a/text()')
-            el.add_xpath('description', 'text()')
-            el.add_xpath('link', 'a/@href')
+            el.add_css('name', 'a::text')
+            el.add_css('description', '::text')
+            el.add_css('link', 'a::attr(href)')
             el.add_value('url', response.url)
             yield el.load_item()
