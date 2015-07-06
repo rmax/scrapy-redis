@@ -1,11 +1,12 @@
 import os
-import redis
-import connection
 
-from scrapy.http import Request
-from scrapy.spider import BaseSpider
+import mock
+import redis
+
+from scrapy import Request, Spider
 from unittest import TestCase
 
+from . import connection
 from .dupefilter import RFPDupeFilter
 from .queue import SpiderQueue, SpiderPriorityQueue, SpiderStack
 from .scheduler import Scheduler
@@ -16,15 +17,28 @@ REDIS_HOST = os.environ.get('REDIST_HOST', 'localhost')
 REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
 
 
-class DupeFilterTest(TestCase):
+class RedisTestMixin(object):
+
+    @property
+    def server(self):
+        if not hasattr(self, '_redis'):
+            self._redis = redis.Redis(REDIS_HOST, REDIS_PORT)
+        return self._redis
+
+    def clear_keys(self, prefix):
+        keys = self.server.keys(prefix + '*')
+        if keys:
+            self.server.delete(*keys)
+
+
+class DupeFilterTest(RedisTestMixin, TestCase):
 
     def setUp(self):
-        self.server = redis.Redis(REDIS_HOST, REDIS_PORT)
         self.key = 'scrapy_redis:tests:dupefilter:'
         self.df = RFPDupeFilter(self.server, self.key)
 
     def tearDown(self):
-        self.server.delete(self.key)
+        self.clear_keys(self.key)
 
     def test_dupe_filter(self):
         req = Request('http://example.com')
@@ -35,18 +49,17 @@ class DupeFilterTest(TestCase):
         self.df.close('nothing')
 
 
-class QueueTestMixin(object):
+class QueueTestMixin(RedisTestMixin):
 
     queue_cls = None
 
     def setUp(self):
-        self.spider = BaseSpider('myspider')
+        self.spider = Spider('myspider')
         self.key = 'scrapy_redis:tests:%s:queue' % self.spider.name
-        self.server = redis.Redis(REDIS_HOST, REDIS_PORT)
-        self.q = self.queue_cls(self.server, BaseSpider('myspider'), self.key)
+        self.q = self.queue_cls(self.server, Spider('myspider'), self.key)
 
     def tearDown(self):
-        self.server.delete(self.key)
+        self.clear_keys(self.key)
 
     def test_clear(self):
         self.assertEqual(len(self.q), 0)
@@ -125,28 +138,27 @@ class SpiderStackTest(QueueTestMixin, TestCase):
         self.assertEqual(out2.url, req1.url)
 
 
-class SchedulerTest(TestCase):
+class SchedulerTest(RedisTestMixin, TestCase):
 
     def setUp(self):
-        self.server = redis.Redis(REDIS_HOST, REDIS_PORT)
+        self.persist = False
         self.key_prefix = 'scrapy_redis:tests:'
         self.queue_key = self.key_prefix + '%(spider)s:requests'
         self.dupefilter_key = self.key_prefix + '%(spider)s:dupefilter'
         self.idle_before_close = 0
-        self.scheduler = Scheduler(self.server, False, self.queue_key,
+        self.scheduler = Scheduler(self.server, self.persist, self.queue_key,
                                    SpiderQueue, self.dupefilter_key,
                                    self.idle_before_close)
+        self.spider = Spider('myspider')
 
     def tearDown(self):
-        for key in self.server.keys(self.key_prefix):
-            self.server.delete(key)
+        self.clear_keys(self.key_prefix)
 
     def test_scheduler(self):
         # default no persist
         self.assertFalse(self.scheduler.persist)
 
-        spider = BaseSpider('myspider')
-        self.scheduler.open(spider)
+        self.scheduler.open(self.spider)
         self.assertEqual(len(self.scheduler), 0)
 
         req = Request('http://example.com')
@@ -167,14 +179,13 @@ class SchedulerTest(TestCase):
         self.scheduler.close('finish')
 
     def test_scheduler_persistent(self):
-        messages = []
-        spider = BaseSpider('myspider')
-        spider.log = lambda *args, **kwargs: messages.append([args, kwargs])
+        # TODO: Improve this test to avoid the need to check for log messages.
+        self.spider.log = mock.Mock(spec=self.spider.log)
 
         self.scheduler.persist = True
-        self.scheduler.open(spider)
+        self.scheduler.open(self.spider)
 
-        self.assertEqual(messages, [])
+        self.assertEqual(self.spider.log.call_count, 0)
 
         self.scheduler.enqueue_request(Request('http://example.com/page1'))
         self.scheduler.enqueue_request(Request('http://example.com/page2'))
@@ -182,9 +193,9 @@ class SchedulerTest(TestCase):
         self.assertTrue(self.scheduler.has_pending_requests())
         self.scheduler.close('finish')
 
-        self.scheduler.open(spider)
-        self.assertEqual(messages, [
-            [('Resuming crawl (2 requests scheduled)',), {}],
+        self.scheduler.open(self.spider)
+        self.spider.log.assert_has_calls([
+            mock.call("Resuming crawl (2 requests scheduled)"),
         ])
         self.assertEqual(len(self.scheduler), 2)
 
@@ -195,12 +206,6 @@ class SchedulerTest(TestCase):
 
 
 class ConnectionTest(TestCase):
-
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
 
     # We can get a connection from just REDIS_URL.
     def test_redis_url(self):
