@@ -1,7 +1,7 @@
-from scrapy_redis.spiders import RedisMixin
+from scrapy.spiders import CrawlSpider, Rule
+from scrapy.linkextractors import LinkExtractor
 
-from scrapy.contrib.spiders import CrawlSpider, Rule
-from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
+from scrapy_redis.spiders import RedisMixin
 
 from example.items import ExampleLoader
 
@@ -13,11 +13,16 @@ class MyCrawler(RedisMixin, CrawlSpider):
 
     rules = (
         # follow all links
-        Rule(SgmlLinkExtractor(), callback='parse_page', follow=True),
+        Rule(LinkExtractor(), callback='parse_page', follow=True),
     )
 
-    def set_crawler(self, crawler):
-        CrawlSpider.set_crawler(self, crawler)
+    def __init__(self, *args, **kwargs):
+        domain = kwargs.pop('domain', '')
+        self.alowed_domains = filter(None, domain.split(','))
+        super(MyCrawler, self).__init__(*args, **kwargs)
+
+    def _set_crawler(self, crawler):
+        CrawlSpider._set_crawler(self, crawler)
         RedisMixin.setup_redis(self)
 
     def parse_page(self, response):

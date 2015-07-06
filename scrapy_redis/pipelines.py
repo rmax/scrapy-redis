@@ -1,8 +1,7 @@
-import redis
-import connection
-
-from twisted.internet.threads import deferToThread
 from scrapy.utils.serialize import ScrapyJSONEncoder
+from twisted.internet.threads import deferToThread
+
+from . import connection
 
 
 class RedisPipeline(object):
