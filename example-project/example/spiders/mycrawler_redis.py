@@ -16,8 +16,8 @@ class MyCrawler(RedisMixin, CrawlSpider):
         Rule(LinkExtractor(), callback='parse_page', follow=True),
     )
 
-    def set_crawler(self, crawler):
-        CrawlSpider.set_crawler(self, crawler)
+    def _set_crawler(self, crawler):
+        CrawlSpider._set_crawler(self, crawler)
         RedisMixin.setup_redis(self)
 
     def parse_page(self, response):
