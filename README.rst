@@ -14,9 +14,9 @@ Features:
 
 Requirements:
 
-* Scrapy >= 0.14
-* redis-py (tested on 2.4.9)
-* redis server (tested on 2.4-2.6)
+* Scrapy >= 0.24.0
+* redis-py >= 2.8.0
+* redis server >= 2.6.0
 
 Available Scrapy components:
 
@@ -160,6 +160,8 @@ Changelog
   * Added `SCHEDULER_IDLE_BEFORE_CLOSE` setting to prevent the spider closing too
     quickly when the queue is empty. Default value is zero keeping the previous
     behavior.
+  * Schedule preemptively requests on item scraped.
+  * This version is the latest release compatible with Scrapy 0.24.x.
 
 0.4
   * Added `RedisSpider` and `RedisMixin` classes as building blocks for spiders
