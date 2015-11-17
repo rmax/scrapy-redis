@@ -152,6 +152,23 @@ Then:
     redis-cli lpush myspider:start_urls http://google.com
 
 
+Docker version of example-project
+---------------------------------
+It's suppose to have installed:
+
+* docker (https://docs.docker.com/installation/)
+* docker-compose (https://docs.docker.com/compose/install/)
+
+For implementation details see `Dockerfile` and `docker-compose.yml` and read official docker documentation.
+
+1. To start sample `example-project` (`-d` for daemon)::
+
+    $ docker-compose up
+
+2. To scale `crawler` (4 instances for example)::
+
+    $ docker-compose scale crawler=4
+
 Changelog
 ---------
 
