@@ -10,7 +10,7 @@ class MySpider(RedisSpider):
 
     def __init__(self, *args, **kwargs):
         domain = kwargs.pop('domain', '')
-        self.alowed_domains = filter(None, domain.split(','))
+        self.allowed_domains = filter(None, domain.split(','))
         super(MySpider, self).__init__(*args, **kwargs)
 
     def parse(self, response):

@@ -18,7 +18,7 @@ class MyCrawler(RedisMixin, CrawlSpider):
 
     def __init__(self, *args, **kwargs):
         domain = kwargs.pop('domain', '')
-        self.alowed_domains = filter(None, domain.split(','))
+        self.allowed_domains = filter(None, domain.split(','))
         super(MyCrawler, self).__init__(*args, **kwargs)
 
     def _set_crawler(self, crawler):
