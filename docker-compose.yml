@@ -1,0 +1,10 @@
+redis:
+  image: redis
+  ports:
+   - "6379:6379" # added port for external db provisioning
+
+crawler:
+  build: .
+  command: -s LOG_LEVEL=INFO -s CONCURRENT_REQUESTS=32 # for CMD overriding
+  links:
+    - redis:localhost
