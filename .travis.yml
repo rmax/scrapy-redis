@@ -1,13 +1,23 @@
-sudo: false
 language: python
-python: 2.7
+python: 3.5
+sudo: false
+
 services:
   - redis-server
+
 env:
-  - SCRAPY="scrapy==1.0.0"
-  - SCRAPY="scrapy>=1.0.0"
+  - SCRAPY_VER=10 PYTHON_VER=27
+  - SCRAPY_VER=11 PYTHON_VER=27
+  - SCRAPY_VER=11 PYTHON_VER=34
+  - SCRAPY_VER=11 PYTHON_VER=35
+
+matrix:
+  allow_failures:
+    - env: SCRAPY_VER=11 PYTHON_VER=34
+    - env: SCRAPY_VER=11 PYTHON_VER=35
+
 install:
-  - pip install $SCRAPY
-  - pip install -r requirements.txt
-  - pip install -r requirements-test.txt
-script: py.test
+  - pip install -U tox
+
+script:
+  - tox -v -e py${PYTHON_VER}-scrapy${SCRAPY_VER}
