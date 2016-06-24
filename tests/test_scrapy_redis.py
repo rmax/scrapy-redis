@@ -6,10 +6,10 @@ import redis
 from scrapy import Request, Spider
 from unittest import TestCase
 
-from . import connection
-from .dupefilter import RFPDupeFilter
-from .queue import SpiderQueue, SpiderPriorityQueue, SpiderStack
-from .scheduler import Scheduler
+from scrapy_redis import connection
+from scrapy_redis.dupefilter import RFPDupeFilter
+from scrapy_redis.queue import SpiderQueue, SpiderPriorityQueue, SpiderStack
+from scrapy_redis.scheduler import Scheduler
 
 
 # allow test settings from environment

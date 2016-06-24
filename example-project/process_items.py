@@ -5,6 +5,7 @@ import redis
 
 
 def main():
+    # XXX: Accept host/port as argument.
     r = redis.Redis()
     while True:
         # process queue as FIFO, change `blpop` to `brpop` to process as LIFO
