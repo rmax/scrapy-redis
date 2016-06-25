@@ -5,6 +5,7 @@ import redis
 
 from scrapy import Request, Spider
 from scrapy.settings import Settings
+from scrapy.utils.test import get_crawler
 from unittest import TestCase
 
 from scrapy_redis import connection
@@ -16,6 +17,12 @@ from scrapy_redis.scheduler import Scheduler
 # allow test settings from environment
 REDIS_HOST = os.environ.get('REDIST_HOST', 'localhost')
 REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
+
+
+def get_spider(*args, **kwargs):
+    crawler = get_crawler(spidercls=kwargs.pop('spidercls', None),
+                          settings_dict=kwargs.pop('settings_dict', None))
+    return crawler._create_spider(*args, **kwargs)
 
 
 class RedisTestMixin(object):
@@ -55,7 +62,7 @@ class QueueTestMixin(RedisTestMixin):
     queue_cls = None
 
     def setUp(self):
-        self.spider = Spider('myspider')
+        self.spider = get_spider(name='myspider')
         self.key = 'scrapy_redis:tests:%s:queue' % self.spider.name
         self.q = self.queue_cls(self.server, Spider('myspider'), self.key)
 
@@ -93,7 +100,7 @@ class SpiderQueueTest(QueueTestMixin, TestCase):
         self.q.push(req2)
 
         out1 = self.q.pop()
-        out2 = self.q.pop()
+        out2 = self.q.pop(timeout=1)
 
         self.assertEqual(out1.url, req1.url)
         self.assertEqual(out2.url, req2.url)
@@ -113,8 +120,8 @@ class SpiderPriorityQueueTest(QueueTestMixin, TestCase):
         self.q.push(req3)
 
         out1 = self.q.pop()
-        out2 = self.q.pop()
-        out3 = self.q.pop()
+        out2 = self.q.pop(timeout=0)
+        out3 = self.q.pop(timeout=1)
 
         self.assertEqual(out1.url, req3.url)
         self.assertEqual(out2.url, req1.url)
@@ -133,7 +140,7 @@ class SpiderStackTest(QueueTestMixin, TestCase):
         self.q.push(req2)
 
         out1 = self.q.pop()
-        out2 = self.q.pop()
+        out2 = self.q.pop(timeout=1)
 
         self.assertEqual(out1.url, req2.url)
         self.assertEqual(out2.url, req1.url)
@@ -145,12 +152,16 @@ class SchedulerTest(RedisTestMixin, TestCase):
         self.key_prefix = 'scrapy_redis:tests:'
         self.queue_key = self.key_prefix + '%(spider)s:requests'
         self.dupefilter_key = self.key_prefix + '%(spider)s:dupefilter'
-        self.scheduler = Scheduler(
-            server=self.server,
-            queue_key=self.queue_key,
-            dupefilter_key=self.dupefilter_key,
-        )
-        self.spider = Spider('myspider')
+        self.spider = get_spider(name='myspider', settings_dict={
+            'REDIS_HOST': REDIS_HOST,
+            'REDIS_PORT': REDIS_PORT,
+            'SCHEDULER_QUEUE_KEY': self.queue_key,
+            'SCHEDULER_DUPEFILTER_KEY': self.dupefilter_key,
+            'SCHEDULER_FLUSH_ON_START': False,
+            'SCHEDULER_PERSIST': False,
+            'DUPEFILTER_CLASS': 'scrapy_redis.dupefilter.RFPDupeFilter',
+        })
+        self.scheduler = Scheduler.from_crawler(self.spider.crawler)
 
     def tearDown(self):
         self.clear_keys(self.key_prefix)

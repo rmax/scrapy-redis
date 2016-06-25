@@ -71,8 +71,8 @@ class Scheduler(object):
             # We use the default setting name to keep compatibility.
             'dupefilter_cls': 'DUPEFILTER_CLASS',
         }
-        for name, sname in optional.items():
-            val = settings.get(name)
+        for name, setting_name in optional.items():
+            val = settings.get(setting_name)
             if val:
                 kwargs[name] = val
 
@@ -91,15 +91,27 @@ class Scheduler(object):
 
     def open(self, spider):
         self.spider = spider
-        self.queue = load_object(self.queue_cls)(
-            server=self.server,
-            spider=spider,
-            key=self.queue_key % {'spider': spider.name},
-        )
-        self.df = load_object(self.dupefilter_cls)(
-            server=self.server,
-            key=self.dupefilter_key % {'spider': spider.name},
-        )
+
+        try:
+            self.queue = load_object(self.queue_cls)(
+                server=self.server,
+                spider=spider,
+                key=self.queue_key % {'spider': spider.name},
+            )
+        except TypeError as e:
+            raise ValueError("Failed to instantiate queue class '%s': %s",
+                             self.queue_cls, e)
+
+        try:
+            self.df = load_object(self.dupefilter_cls)(
+                server=self.server,
+                key=self.dupefilter_key % {'spider': spider.name},
+                debug=spider.settings.getbool('DUPEFILTER_DEBUG'),
+            )
+        except TypeError as e:
+            raise ValueError("Failed to instantiate dupefilter class '%s': %s",
+                             self.dupefilter_cls, e)
+
         if self.flush_on_start:
             self.flush()
         # notice if there are requests already in the queue to resume the crawl
@@ -116,10 +128,12 @@ class Scheduler(object):
 
     def enqueue_request(self, request):
         if not request.dont_filter and self.df.request_seen(request):
-            return
+            self.df.log(request, self.spider)
+            return False
         if self.stats:
             self.stats.inc_value('scheduler/enqueued/redis', spider=self.spider)
         self.queue.push(request)
+        return True
 
     def next_request(self):
         block_pop_timeout = self.idle_before_close
