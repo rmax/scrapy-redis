@@ -11,3 +11,5 @@ TODO
   PubsubQueue), allow custom serializers, use enqueue, dequeue methods.
 * Move example project to its own repository. Include different crawling use
   cases (i.e.: producer/consumer).
+* Add pyrebloom dupefilter.
+* Warn and pass unserializable requests.
