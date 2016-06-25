@@ -1,5 +1,5 @@
 ============
-scrapy-redis
+Scrapy-Redis
 ============
 
 .. image:: https://img.shields.io/pypi/v/scrapy-redis.svg
@@ -11,7 +11,6 @@ scrapy-redis
 .. image:: https://readthedocs.org/projects/scrapy-redis/badge/?version=latest
         :target: https://readthedocs.org/projects/scrapy-redis/?badge=latest
         :alt: Documentation Status
-
 
 Redis-based components for Scrapy.
 
@@ -41,21 +40,6 @@ Requirements
 * Redis >= 2.8
 * ``Scrapy`` >= 1.0
 * ``redis-py`` >= 2.10
-
-
-Installation
-------------
-
-From `pypi`::
-
-  $ pip install scrapy-redis
-
-From `github`::
-
-  $ git clone https://github.com/darkrho/scrapy-redis.git
-  $ cd scrapy-redis
-  $ python setup.py install
-
 
 Usage
 -----

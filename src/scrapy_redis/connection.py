@@ -23,13 +23,16 @@ def from_settings(settings):
 
     Parameters
     ----------
-
     settings : Settings
         A scrapy settings object. See the supported settings below.
 
-    Settings
-    --------
+    Returns
+    -------
+    server
+        Redis client instance.
 
+    Other Parameters
+    ----------------
     REDIS_URL : str, optional
         Server connection URL.
     REDIS_HOST : str, optional
@@ -38,11 +41,6 @@ def from_settings(settings):
         Server port.
     REDIS_PARAMS : dict, optional
         Additional client parameters.
-
-    Returns
-    -------
-    server
-        Redis client instance.
 
     """
     params = settings.getdict('REDIS_PARAMS').copy()
