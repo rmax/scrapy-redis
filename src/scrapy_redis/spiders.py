@@ -1,5 +1,6 @@
-from scrapy import Spider, signals
+from scrapy import signals
 from scrapy.exceptions import DontCloseSpider
+from scrapy.spiders import Spider, CrawlSpider
 
 from . import connection
 
@@ -9,23 +10,41 @@ class RedisMixin(object):
     redis_key = None  # If empty, uses default '<spider>:start_urls'.
     # Fetch this amount of start urls when idle.
     redis_batch_size = 100
+    # Redis client instance.
+    server = None
 
-    def setup_redis(self):
+    def start_requests(self):
+        """Returns a batch of start requests from redis."""
+        return self.next_requests()
+
+    def setup_redis(self, crawler=None):
         """Setup redis connection and idle signal.
 
         This should be called after the spider has set its crawler object.
         """
+        if self.server is not None:
+            return
+
+        if crawler is None:
+            # We allow optional crawler argument to keep backwrads
+            # compatibility.
+            # XXX: Raise a deprecation warning.
+            assert self.crawler, "crawler not set"
+            crawler = self.crawler
+
         if not self.redis_key:
             self.redis_key = '%s:start_urls' % self.name
+        self.log("Reading URLs from redis key '%s'" % self.redis_key)
 
-        self.server = connection.from_settings(self.crawler.settings)
-        # idle signal is called when the spider has no requests left,
+        self.redis_batch_size = self.settings.getint(
+            'REDIS_START_URLS_BATCH_SIZE',
+            self.redis_batch_size,
+        )
+
+        self.server = connection.from_settings(crawler.settings)
+        # The idle signal is called when the spider has no requests left,
         # that's when we will schedule new requests from redis queue
-        self.crawler.signals.connect(self.spider_idle, signal=signals.spider_idle)
-        self.crawler.signals.connect(self.item_scraped, signal=signals.item_scraped)
-        self.log("Reading URLs from redis list '%s'" % self.redis_key)
-        # Ensure types as attributes can be overridden via spider argument.
-        self.redis_batch_size = int(self.redis_batch_size)
+        crawler.signals.connect(self.spider_idle, signal=signals.spider_idle)
 
     def next_requests(self):
         """Returns a request to be scheduled or none."""
@@ -40,6 +59,9 @@ class RedisMixin(object):
                 break
             yield self.make_request_from_data(data)
             found += 1
+
+        if found:
+            self.logger.debug("Read %s requests from '%s'", found, self.redis_key)
 
     def make_request_from_data(self, data):
         # By default, data is an URL.
@@ -59,15 +81,22 @@ class RedisMixin(object):
         self.schedule_next_requests()
         raise DontCloseSpider
 
-    def item_scraped(self, *args, **kwargs):
-        """Avoids waiting for the spider to  idle before scheduling the next request"""
-        # XXX: Use a task loop to fetch urls while running.
-        self.schedule_next_requests()
-
 
 class RedisSpider(RedisMixin, Spider):
     """Spider that reads urls from redis queue when idle."""
 
-    def _set_crawler(self, crawler):
-        super(RedisSpider, self)._set_crawler(crawler)
-        self.setup_redis()
+    @classmethod
+    def from_crawler(self, crawler):
+        obj = super(RedisSpider, self).from_crawler(crawler)
+        obj.setup_redis(crawler)
+        return obj
+
+
+class RedisCrawlSpider(RedisMixin, CrawlSpider):
+    """Spider that reads urls from redis queue when idle."""
+
+    @classmethod
+    def from_crawler(self, crawler):
+        obj = super(RedisCrawlSpider, self).from_crawler(crawler)
+        obj.setup_redis(crawler)
+        return obj

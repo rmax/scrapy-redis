@@ -96,6 +96,9 @@ Use the following settings in your project:
   # be added via ``sadd`` command or you will get a type error from redis.
   #REDIS_START_URLS_AS_SET = False
 
+  # How many start urls to fetch at once.
+  #REDIS_START_URLS_BATCH_SIZE = False
+
 .. note::
 
   Version 0.3 changed the requests serialization from `marshal` to `cPickle`,
@@ -180,7 +183,9 @@ Changelog
   * Added ``REDIS_ITEMS_KEY`` setting.
   * Added ``REDIS_ITEMS_SERIALIZER`` setting.
   * Added ``REDIS_PARAMS`` setting.
-  * Added ``redis_batch_size`` spider attribute to read start urls in batches.
+  * Added ``REDIS_START_URLS_BATCH_SIZE`` spider attribute to read start urls
+    in batches.
+  * Added ``RedisCrawlSpider``.
 
 0.6
   * Updated code to be compatible with Scrapy 1.0.
