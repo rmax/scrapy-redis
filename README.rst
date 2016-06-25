@@ -172,6 +172,13 @@ Then:
     redis-cli lpush myspider:start_urls http://google.com
 
 
+.. note::
+
+    These spiders rely on the spider idle signal to fetch start urls, hence it
+    may have a few seconds of delay between the time you push a new url and the
+    spider starts crawling it.
+
+
 Changelog
 ---------
 
