@@ -8,5 +8,5 @@ ADD example-project /var/app
 
 RUN pip install scrapy_redis
 
-ENTRYPOINT ["scrapy", "crawl", "dmoz"]
-CMD ["-s", "LOG_LEVEL=DEBUG", "-s", "CONCURRENT_REQUESTS=8"]
+ENTRYPOINT ["scrapy"]
+CMD ["crawl", "dmoz"]
