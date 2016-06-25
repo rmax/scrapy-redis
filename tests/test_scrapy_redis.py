@@ -159,6 +159,7 @@ class SchedulerTest(RedisTestMixin, TestCase):
             'SCHEDULER_DUPEFILTER_KEY': self.dupefilter_key,
             'SCHEDULER_FLUSH_ON_START': False,
             'SCHEDULER_PERSIST': False,
+            'SCHEDULER_SERIALIZER': 'pickle',
             'DUPEFILTER_CLASS': 'scrapy_redis.dupefilter.RFPDupeFilter',
         })
         self.scheduler = Scheduler.from_crawler(self.spider.crawler)

@@ -1,3 +1,6 @@
+import importlib
+import six
+
 from scrapy.utils.misc import load_object
 
 from . import connection
@@ -14,7 +17,8 @@ class Scheduler(object):
                  queue_cls='scrapy_redis.queue.SpiderPriorityQueue',
                  dupefilter_key='%(spider)s:dupefilter',
                  dupefilter_cls='scrapy_redis.dupefilter.RFPDupeFilter',
-                 idle_before_close=0):
+                 idle_before_close=0,
+                 serializer=None):
         """Initialize scheduler.
 
         Parameters
@@ -48,6 +52,7 @@ class Scheduler(object):
         self.dupefilter_cls = dupefilter_cls
         self.dupefilter_key = dupefilter_key
         self.idle_before_close = idle_before_close
+        self.serializer = serializer
         self.stats = None
 
     def __len__(self):
@@ -70,11 +75,16 @@ class Scheduler(object):
             'dupefilter_key': 'SCHEDULER_DUPEFILTER_KEY',
             # We use the default setting name to keep compatibility.
             'dupefilter_cls': 'DUPEFILTER_CLASS',
+            'serializer': 'SCHEDULER_SERIALIZER',
         }
         for name, setting_name in optional.items():
             val = settings.get(setting_name)
             if val:
                 kwargs[name] = val
+
+        # Support serializer as a path to a module.
+        if isinstance(kwargs.get('serializer'), six.string_types):
+            kwargs['serializer'] = importlib.import_module(kwargs['serializer'])
 
         server = connection.from_settings(settings)
         # Ensure the connection is working.
@@ -97,6 +107,7 @@ class Scheduler(object):
                 server=self.server,
                 spider=spider,
                 key=self.queue_key % {'spider': spider.name},
+                serializer=self.serializer,
             )
         except TypeError as e:
             raise ValueError("Failed to instantiate queue class '%s': %s",

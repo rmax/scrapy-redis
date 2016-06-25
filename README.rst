@@ -54,6 +54,13 @@ Use the following settings in your project:
   # Ensure all spiders share same duplicates filter through redis.
   DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 
+  # Default requests serializer is pickle, but it can be changed to any module
+  # with loads and dumps functions. Note that pickle is not compatible between
+  # python versions.
+  # Caveat: the serializer must return strings keys and support bytes as values.
+  # Because of this reason the json or msgpack module will not work by default.
+  #SCHEDULER_SERIALIZER = "pickle"
+
 
   # Don't cleanup redis queues, allows to pause/resume crawls.
   #SCHEDULER_PERSIST = True
