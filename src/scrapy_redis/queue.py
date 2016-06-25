@@ -11,25 +11,40 @@ except ImportError:
 class Base(object):
     """Per-spider queue/stack base class"""
 
-    def __init__(self, server, spider, key):
+    def __init__(self, server, spider, key, serializer=None):
         """Initialize per-spider redis queue.
 
         Parameters:
             server -- redis connection
             spider -- spider instance
             key -- key for this queue (e.g. "%(spider)s:queue")
+
         """
+        if serializer is None:
+            # Backward compatibility.
+            # TODO: deprecate pickle.
+            serializer = pickle
+        if not hasattr(serializer, 'loads'):
+            raise TypeError("serializer does not implement 'loads' function: %r"
+                            % serializer)
+        if not hasattr(serializer, 'dumps'):
+            raise TypeError("serializer '%s' does not implement 'dumps' function: %r"
+                            % serializer)
+
         self.server = server
         self.spider = spider
         self.key = key % {'spider': spider.name}
+        self.serializer = serializer
 
     def _encode_request(self, request):
         """Encode a request object"""
-        return pickle.dumps(request_to_dict(request, self.spider), protocol=-1)
+        obj = request_to_dict(request, self.spider)
+        return self.serializer.dumps(obj)
 
     def _decode_request(self, encoded_request):
         """Decode an request previously encoded"""
-        return request_from_dict(pickle.loads(encoded_request), self.spider)
+        obj = self.serializer.loads(encoded_request)
+        return request_from_dict(obj, self.spider)
 
     def __len__(self):
         """Return the length of the queue"""

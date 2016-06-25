@@ -15,11 +15,22 @@ class TestBaseQueue(object):
         self.key = 'key'
         self.q = Base(self.server, self.spider, self.key)
 
-    def test_encode_decode_requests(self):
+    def test_encode_decode_requests(self, q=None):
+        if q is None:
+            q = self.q
         req = Request('http://example.com',
                       callback=self.spider.parse,
                       meta={'foo': 'bar'})
-        out = self.q._decode_request(self.q._encode_request(req))
+        out = q._decode_request(q._encode_request(req))
         assert req.url == out.url
         assert req.meta == out.meta
         assert req.callback == out.callback
+
+    def test_custom_serializer(self):
+        serializer = mock.Mock()
+        serializer.dumps = mock.Mock(side_effect=lambda x: x)
+        serializer.loads = mock.Mock(side_effect=lambda x: x)
+        q  = Base(self.server, self.spider, self.key, serializer=serializer)
+        self.test_encode_decode_requests(q)
+        assert serializer.dumps.call_count == 1
+        assert serializer.loads.call_count == 1
