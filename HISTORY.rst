@@ -2,8 +2,8 @@
 History
 =======
 
-0.6.1dev
---------
+0.6.1 (2016-06-25)
+------------------
   * **Backwards incompatible change:** Require explicit ``DUPEFILTER_CLASS``
     setting.
   * Added ``SCHEDULER_FLUSH_ON_START`` setting.
