@@ -1,7 +1,9 @@
+import six
+
 from scrapy.utils.reqser import request_to_dict, request_from_dict
 
 try:
-    import cPickle as pickle
+    import cPickle as pickle  # PY2
 except ImportError:
     import pickle
 
