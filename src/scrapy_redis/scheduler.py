@@ -1,36 +1,51 @@
 from scrapy.utils.misc import load_object
 
 from . import connection
-from .dupefilter import RFPDupeFilter
 
 
-# default values
-SCHEDULER_PERSIST = False
-QUEUE_KEY = '%(spider)s:requests'
-QUEUE_CLASS = 'scrapy_redis.queue.SpiderPriorityQueue'
-DUPEFILTER_KEY = '%(spider)s:dupefilter'
-IDLE_BEFORE_CLOSE = 0
-
-
+# TODO: add SCRAPY_JOB support.
 class Scheduler(object):
     """Redis-based scheduler"""
 
-    def __init__(self, server, persist, queue_key, queue_cls, dupefilter_key, idle_before_close):
+    def __init__(self, server,
+                 persist=False,
+                 flush_on_start=False,
+                 queue_key='%(spider)s:requests',
+                 queue_cls='scrapy_redis.queue.SpiderPriorityQueue',
+                 dupefilter_key='%(spider)s:dupefilter',
+                 dupefilter_cls='scrapy_redis.dupefilter.RFPDupeFilter',
+                 idle_before_close=0):
         """Initialize scheduler.
 
         Parameters
         ----------
-        server : Redis instance
+        server : Redis
+            The redis server instance.
         persist : bool
+            Whether to flush requests when closing. Default is False.
+        flush_on_start : bool
+            Whether to flush requests on start. Default is False.
         queue_key : str
-        queue_cls : queue class
+            Requests queue key.
+        queue_cls : str
+            Importable path to the queue class.
         dupefilter_key : str
+            Duplicates filter key.
+        dupefilter_cls : str
+            Importable path to the dupefilter class.
         idle_before_close : int
+            Timeout before giving up.
+
         """
+        if idle_before_close < 0:
+            raise TypeError("idle_before_close cannot be negative")
+
         self.server = server
         self.persist = persist
+        self.flush_on_start = flush_on_start
         self.queue_key = queue_key
         self.queue_cls = queue_cls
+        self.dupefilter_cls = dupefilter_cls
         self.dupefilter_key = dupefilter_key
         self.idle_before_close = idle_before_close
         self.stats = None
@@ -40,13 +55,29 @@ class Scheduler(object):
 
     @classmethod
     def from_settings(cls, settings):
-        persist = settings.get('SCHEDULER_PERSIST', SCHEDULER_PERSIST)
-        queue_key = settings.get('SCHEDULER_QUEUE_KEY', QUEUE_KEY)
-        queue_cls = load_object(settings.get('SCHEDULER_QUEUE_CLASS', QUEUE_CLASS))
-        dupefilter_key = settings.get('DUPEFILTER_KEY', DUPEFILTER_KEY)
-        idle_before_close = settings.get('SCHEDULER_IDLE_BEFORE_CLOSE', IDLE_BEFORE_CLOSE)
+        kwargs = {
+            'persist': settings.getbool('SCHEDULER_PERSIST'),
+            'flush_on_start': settings.getbool('SCHEDULER_FLUSH_ON_START'),
+            'idle_before_close': settings.getint('SCHEDULER_IDLE_BEFORE_CLOSE'),
+        }
+
+        # If these values are missing, it means we want to use the defaults.
+        optional = {
+            # TODO: Use custom prefixes for this settings to note that are
+            # specific to scrapy-redis.
+            'queue_key': 'SCHEDULER_QUEUE_KEY',
+            'queue_cls': 'SCHEDULER_QUEUE_CLASS',
+            'dupefilter_key': 'SCHEDULER_DUPEFILTER_KEY',
+            # We use the default setting name to keep compatibility.
+            'dupefilter_cls': 'DUPEFILTER_CLASS',
+        }
+        for name, sname in optional.items():
+            val = settings.get(name)
+            if val:
+                kwargs[name] = val
+
         server = connection.from_settings(settings)
-        return cls(server, persist, queue_key, queue_cls, dupefilter_key, idle_before_close)
+        return cls(server=server, **kwargs)
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -57,18 +88,28 @@ class Scheduler(object):
 
     def open(self, spider):
         self.spider = spider
-        self.queue = self.queue_cls(self.server, spider, self.queue_key)
-        self.df = RFPDupeFilter(self.server, self.dupefilter_key % {'spider': spider.name})
-        if self.idle_before_close < 0:
-            self.idle_before_close = 0
+        self.queue = load_object(self.queue_cls)(
+            server=self.server,
+            spider=spider,
+            key=self.queue_key % {'spider': spider.name},
+        )
+        self.df = load_object(self.dupefilter_cls)(
+            server=self.server,
+            key=self.dupefilter_key % {'spider': spider.name},
+        )
+        if self.flush_on_start:
+            self.flush()
         # notice if there are requests already in the queue to resume the crawl
         if len(self.queue):
             spider.log("Resuming crawl (%d requests scheduled)" % len(self.queue))
 
     def close(self, reason):
         if not self.persist:
-            self.df.clear()
-            self.queue.clear()
+            self.flush()
+
+    def flush(self):
+        self.df.clear()
+        self.queue.clear()
 
     def enqueue_request(self, request):
         if not request.dont_filter and self.df.request_seen(request):
