@@ -27,7 +27,7 @@ requirements_setup = [
 
 setup(
     name='scrapy-redis',
-    version='0.6.2dev',
+    version='0.6.2',
     description="Redis-based components for Scrapy.",
     long_description=read_file('README.rst') + '\n\n' + read_file('HISTORY.rst'),
     author="Rolando Espinoza",
