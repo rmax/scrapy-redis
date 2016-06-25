@@ -6,7 +6,9 @@ from . import connection
 
 class RedisMixin(object):
     """Mixin class to implement reading urls from a redis queue."""
-    redis_key = None  # use default '<spider>:start_urls'
+    redis_key = None  # If empty, uses default '<spider>:start_urls'.
+    # Fetch this amount of start urls when idle.
+    redis_batch_size = 100
 
     def setup_redis(self):
         """Setup redis connection and idle signal.
@@ -22,33 +24,45 @@ class RedisMixin(object):
         self.crawler.signals.connect(self.spider_idle, signal=signals.spider_idle)
         self.crawler.signals.connect(self.item_scraped, signal=signals.item_scraped)
         self.log("Reading URLs from redis list '%s'" % self.redis_key)
+        # Ensure types as attributes can be overridden via spider argument.
+        self.redis_batch_size = int(self.redis_batch_size)
 
-    def next_request(self):
+    def next_requests(self):
         """Returns a request to be scheduled or none."""
-        use_set = self.settings.getbool('REDIS_SET')
+        use_set = self.settings.getbool('RANDOMIZE_START_URLS')
+        fetch_one = self.server.spop if use_set else self.server.lpop
+        # XXX: Do we need to use a timeout here?
+        found = 0
+        while found < self.redis_batch_size:
+            data = fetch_one(self.redis_key)
+            if not data:
+                # Queue empty.
+                break
+            yield self.make_request_from_data(data)
+            found += 1
 
-        if use_set:
-            url = self.server.spop(self.redis_key)
+    def make_request_from_data(self, data):
+        # By default, data is an URL.
+        if '://' in data:
+            return self.make_requests_from_url(data)
         else:
-            url = self.server.lpop(self.redis_key)
+            self.logger.error("Unexpected URL from '%s': %r", self.redis_key, data)
 
-        if url:
-            return self.make_requests_from_url(url)
-
-    def schedule_next_request(self):
+    def schedule_next_requests(self):
         """Schedules a request if available"""
-        req = self.next_request()
-        if req:
+        for req in self.next_requests():
             self.crawler.engine.crawl(req, spider=self)
 
     def spider_idle(self):
         """Schedules a request if available, otherwise waits."""
-        self.schedule_next_request()
+        # XXX: Handle a sentinel to close the spider.
+        self.schedule_next_requests()
         raise DontCloseSpider
 
     def item_scraped(self, *args, **kwargs):
         """Avoids waiting for the spider to  idle before scheduling the next request"""
-        self.schedule_next_request()
+        # XXX: Use a task loop to fetch urls while running.
+        self.schedule_next_requests()
 
 
 class RedisSpider(RedisMixin, Spider):
