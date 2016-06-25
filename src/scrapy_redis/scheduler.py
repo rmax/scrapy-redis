@@ -77,6 +77,9 @@ class Scheduler(object):
                 kwargs[name] = val
 
         server = connection.from_settings(settings)
+        # Ensure the connection is working.
+        server.ping()
+
         return cls(server=server, **kwargs)
 
     @classmethod
