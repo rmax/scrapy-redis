@@ -35,9 +35,12 @@ class RFPDupeFilter(BaseDupeFilter):
         return cls.from_settings(crawler.settings)
 
     def request_seen(self, request):
-        fp = request_fingerprint(request)
+        fp = self.request_fingerprint(request)
         added = self.server.sadd(self.key, fp)
         return not added
+
+    def request_fingerprint(self, request):
+        return request_fingerprint(request)
 
     def close(self, reason):
         """Delete data on close. Called by scrapy's scheduler"""
