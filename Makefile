@@ -85,13 +85,11 @@ develop: clean
 test: develop
 	py.test
 
-
 test-all:
 	tox -v
 
 coverage: develop
-	coverage run py.test
-
+	coverage run -m py.test
 	coverage combine
 	coverage report
 	coverage html
