@@ -4,6 +4,7 @@ import mock
 import redis
 
 from scrapy import Request, Spider
+from scrapy.settings import Settings
 from unittest import TestCase
 
 from scrapy_redis import connection
@@ -141,14 +142,14 @@ class SpiderStackTest(QueueTestMixin, TestCase):
 class SchedulerTest(RedisTestMixin, TestCase):
 
     def setUp(self):
-        self.persist = False
         self.key_prefix = 'scrapy_redis:tests:'
         self.queue_key = self.key_prefix + '%(spider)s:requests'
         self.dupefilter_key = self.key_prefix + '%(spider)s:dupefilter'
-        self.idle_before_close = 0
-        self.scheduler = Scheduler(self.server, self.persist, self.queue_key,
-                                   SpiderQueue, self.dupefilter_key,
-                                   self.idle_before_close)
+        self.scheduler = Scheduler(
+            server=self.server,
+            queue_key=self.queue_key,
+            dupefilter_key=self.dupefilter_key,
+        )
         self.spider = Spider('myspider')
 
     def tearDown(self):
@@ -209,9 +210,9 @@ class ConnectionTest(TestCase):
 
     # We can get a connection from just REDIS_URL.
     def test_redis_url(self):
-        settings = dict(
-            REDIS_URL = 'redis://foo:bar@localhost:9001/42'
-        )
+        settings = Settings({
+            'REDIS_URL': 'redis://foo:bar@localhost:9001/42',
+        })
 
         server = connection.from_settings(settings)
         connect_args = server.connection_pool.connection_kwargs
@@ -223,10 +224,10 @@ class ConnectionTest(TestCase):
 
     # We can get a connection from REDIS_HOST/REDIS_PORT.
     def test_redis_host_port(self):
-        settings = dict(
-            REDIS_HOST = 'localhost',
-            REDIS_PORT = 9001
-        )
+        settings = Settings({
+            'REDIS_HOST': 'localhost',
+            'REDIS_PORT': 9001,
+        })
 
         server = connection.from_settings(settings)
         connect_args = server.connection_pool.connection_kwargs
@@ -236,11 +237,11 @@ class ConnectionTest(TestCase):
 
     # REDIS_URL takes precedence over REDIS_HOST/REDIS_PORT.
     def test_redis_url_precedence(self):
-        settings = dict(
-            REDIS_HOST = 'baz',
-            REDIS_PORT = 1337,
-            REDIS_URL = 'redis://foo:bar@localhost:9001/42'
-        )
+        settings = Settings(dict(
+            REDIS_HOST='baz',
+            REDIS_PORT=1337,
+            REDIS_URL='redis://foo:bar@localhost:9001/42'
+        ))
 
         server = connection.from_settings(settings)
         connect_args = server.connection_pool.connection_kwargs
@@ -252,11 +253,11 @@ class ConnectionTest(TestCase):
 
     # We fallback to REDIS_HOST/REDIS_PORT if REDIS_URL is None.
     def test_redis_host_port_fallback(self):
-        settings = dict(
-            REDIS_HOST = 'baz',
-            REDIS_PORT = 1337,
-            REDIS_URL = None
-        )
+        settings = Settings(dict(
+            REDIS_HOST='baz',
+            REDIS_PORT=1337,
+            REDIS_URL=None
+        ))
 
         server = connection.from_settings(settings)
         connect_args = server.connection_pool.connection_kwargs
@@ -266,7 +267,7 @@ class ConnectionTest(TestCase):
 
     # We use default values for REDIS_HOST/REDIS_PORT.
     def test_redis_default(self):
-        settings = dict()
+        settings = Settings()
 
         server = connection.from_settings(settings)
         connect_args = server.connection_pool.connection_kwargs
