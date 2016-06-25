@@ -50,6 +50,10 @@ Enable the components in your `settings.py`:
   # Enables scheduling storing requests queue in redis.
   SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 
+  # Ensure all spiders share same duplicates filter through redis.
+  DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+
+
   # Don't cleanup redis queues, allows to pause/resume crawls.
   SCHEDULER_PERSIST = True
 
@@ -72,6 +76,13 @@ Enable the components in your `settings.py`:
       'scrapy_redis.pipelines.RedisPipeline': 300
   }
 
+  # The item pipeline serializes and stores the items in this redis key.
+  REDIS_ITEMS_KEY = '%(spider)s:items'
+
+  # The items serializer is by default ScrapyJSONEncoder. You can use any
+  # importable path to a callable object.
+  REDIS_ITEMS_SERIALIZER = 'json.dumps'
+
   # Specify the host and port to use when connecting to Redis (optional).
   REDIS_HOST = 'localhost'
   REDIS_PORT = 6379
@@ -79,6 +90,12 @@ Enable the components in your `settings.py`:
   # Specify the full Redis URL for connecting (optional).
   # If set, this takes precedence over the REDIS_HOST and REDIS_PORT settings.
   REDIS_URL = 'redis://user:pass@hostname:9001'
+
+  # Custom redis client parameters (i.e.: socket timeout, etc.)
+  REDIS_PARAMS  = {}
+
+  # If False, pops the start urls in the same order as pushed.
+  RANDOMIZE_START_URLS = False
 
 .. note::
 
@@ -113,7 +130,8 @@ across multiple spider instances, highly suitable for broad crawls.
 
 5. Start one or more post-processing workers::
 
-    $ python process_items.py
+    $ python process_items.py dmoz:items -v
+    ...
     Processing: Kilani Giftware (http://www.dmoz.org/Computers/Shopping/Gifts/)
     Processing: NinjaGizmos.com (http://www.dmoz.org/Computers/Shopping/Gifts/)
     ...
@@ -171,6 +189,16 @@ For implementation details see `Dockerfile` and `docker-compose.yml` and read of
 
 Changelog
 ---------
+
+0.6.1dev
+  * **Backwards incompatible change:** Require explicit ``DUPEFILTER_CLASS``
+    setting.
+  * Added ``SCHEDULER_FLUSH_ON_START`` setting.
+  * Added ``RANDOMIZE_START_URLS`` setting.
+  * Added ``REDIS_ITEMS_KEY`` setting.
+  * Added ``REDIS_ITEMS_SERIALIZER`` setting.
+  * Added ``REDIS_PARAMS`` setting.
+  * Added ``redis_batch_size`` spider attribute to read start urls in batches.
 
 0.6
   * Updated code to be compatible with Scrapy 1.0.
