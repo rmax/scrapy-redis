@@ -57,9 +57,11 @@ Use the following settings in your project:
   # Default requests serializer is pickle, but it can be changed to any module
   # with loads and dumps functions. Note that pickle is not compatible between
   # python versions.
-  # Caveat: the serializer must return strings keys and support bytes as values.
-  # Because of this reason the json or msgpack module will not work by default.
-  #SCHEDULER_SERIALIZER = "pickle"
+  # Caveat: In python 3.x, the serializer must return strings keys and support
+  # bytes as values. Because of this reason the json or msgpack module will not
+  # work by default. In python 2.x there is no such issue and you can use
+  # 'json' or 'msgpack' as serializers.
+  #SCHEDULER_SERIALIZER = "scrapy_redis.picklecompat"
 
 
   # Don't cleanup redis queues, allows to pause/resume crawls.

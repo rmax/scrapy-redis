@@ -2,10 +2,7 @@ import six
 
 from scrapy.utils.reqser import request_to_dict, request_from_dict
 
-try:
-    import cPickle as pickle  # PY2
-except ImportError:
-    import pickle
+from . import picklecompat
 
 
 class Base(object):
@@ -23,7 +20,7 @@ class Base(object):
         if serializer is None:
             # Backward compatibility.
             # TODO: deprecate pickle.
-            serializer = pickle
+            serializer = picklecompat
         if not hasattr(serializer, 'loads'):
             raise TypeError("serializer does not implement 'loads' function: %r"
                             % serializer)
