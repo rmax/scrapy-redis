@@ -5,6 +5,5 @@ redis:
 
 crawler:
   build: .
-  command: -s LOG_LEVEL=INFO -s CONCURRENT_REQUESTS=32 # for CMD overriding
   links:
     - redis:localhost

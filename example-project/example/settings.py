@@ -23,3 +23,7 @@ ITEM_PIPELINES = {
 }
 
 LOG_LEVEL = 'DEBUG'
+
+# Introduce an artifical delay to make use of parallelism. to speed up the
+# crawl.
+DOWNLOAD_DELAY = 1
