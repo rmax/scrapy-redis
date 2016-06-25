@@ -2,8 +2,8 @@
 History
 =======
 
-0.6.2dev (Y-m-d)
-----------------
+0.6.2 (2016-06-26)
+------------------
 * Support ``redis_cls`` parameter in ``REDIS_PARAMS`` setting.
 * Python 3.x compatibility fixed.
 * Added ``SCHEDULER_SERIALIZER`` setting.
