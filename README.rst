@@ -91,6 +91,8 @@ Use the following settings in your project:
 
   # Custom redis client parameters (i.e.: socket timeout, etc.)
   #REDIS_PARAMS  = {}
+  # Use custom redis client class.
+  #REDIS_PARAMS['redis_cls'] = 'myproject.RedisClient'
 
   # If True, it uses redis' ``spop`` operation. This could be useful if you
   # want to avoid duplicates in your start urls list. In this cases, urls must

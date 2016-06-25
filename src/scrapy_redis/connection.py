@@ -1,4 +1,9 @@
-from redis import StrictRedis
+import redis
+
+from scrapy.utils.misc import load_object
+
+
+DEFAULT_REDIS_CLS = redis.StrictRedis
 
 
 # Sane connection defaults.
@@ -16,10 +21,12 @@ SETTINGS_PARAMS_MAP = {
 }
 
 
-def from_settings(settings):
+def get_redis_from_settings(settings):
     """Returns a redis client instance from given Scrapy settings object.
 
-    This function uses ``get_client`` to instantiate the client.
+    This function uses ``get_client`` to instantiate the client and uses
+    ``DEFAULT_PARAMS`` global as defaults values for the parameters. You can
+    override them using the ``REDIS_PARAMS`` setting.
 
     Parameters
     ----------
@@ -43,20 +50,27 @@ def from_settings(settings):
         Additional client parameters.
 
     """
-    params = settings.getdict('REDIS_PARAMS').copy()
+    params = DEFAULT_PARAMS.copy()
+    params.update(settings.getdict('REDIS_PARAMS'))
     # XXX: Deprecate REDIS_* settings.
     for source, dest in SETTINGS_PARAMS_MAP.items():
         val = settings.get(source)
         if val:
             params[dest] = val
 
+    # Allow ``redis_cls`` to be a path to a class.
+    if isinstance(params.get('redis_cls'), basestring):
+        params['redis_cls'] = load_object(params['redis_cls'])
+
     return get_redis(**params)
+
+
+# Backwards compatible alias.
+from_settings = get_redis_from_settings
 
 
 def get_redis(**kwargs):
     """Returns a redis client instance.
-
-    This uses ``DEFAULT_PARAMS`` as defaults values for the parameters.
 
     Parameters
     ----------
@@ -73,11 +87,9 @@ def get_redis(**kwargs):
         Redis client instance.
 
     """
-    redis_cls = kwargs.pop('redis_cls', StrictRedis)
+    redis_cls = kwargs.pop('redis_cls', DEFAULT_REDIS_CLS)
     url = kwargs.pop('url', None)
-    params = DEFAULT_PARAMS.copy()
-    params.update(kwargs)
     if url:
-        return redis_cls.from_url(url, **params)
+        return redis_cls.from_url(url, **kwargs)
     else:
-        return redis_cls(**params)
+        return redis_cls(**kwargs)
