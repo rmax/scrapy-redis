@@ -29,7 +29,7 @@ class RedisMixin(object):
 
     def next_requests(self):
         """Returns a request to be scheduled or none."""
-        use_set = self.settings.getbool('RANDOMIZE_START_URLS')
+        use_set = self.settings.getbool('REDIS_START_URLS_AS_SET')
         fetch_one = self.server.spop if use_set else self.server.lpop
         # XXX: Do we need to use a timeout here?
         found = 0

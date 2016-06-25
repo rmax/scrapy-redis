@@ -43,7 +43,7 @@ From `github`::
 Usage
 -----
 
-Enable the components in your `settings.py`:
+Use the following settings in your project:
 
 .. code-block:: python
 
@@ -55,21 +55,18 @@ Enable the components in your `settings.py`:
 
 
   # Don't cleanup redis queues, allows to pause/resume crawls.
-  SCHEDULER_PERSIST = True
+  #SCHEDULER_PERSIST = True
 
   # Schedule requests using a priority queue. (default)
-  SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderPriorityQueue'
+  #SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderPriorityQueue'
 
   # Schedule requests using a queue (FIFO).
-  SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderQueue'
-
-  # Schedule requests using a stack (LIFO).
-  SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderStack'
+  #SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderQueue'
 
   # Max idle time to prevent the spider from being closed when distributed crawling.
   # This only works if queue class is SpiderQueue or SpiderStack,
   # and may also block the same time when your spider start at the first time (because the queue is empty).
-  SCHEDULER_IDLE_BEFORE_CLOSE = 10
+  #SCHEDULER_IDLE_BEFORE_CLOSE = 10
 
   # Store scraped item in redis for post-processing.
   ITEM_PIPELINES = {
@@ -77,25 +74,27 @@ Enable the components in your `settings.py`:
   }
 
   # The item pipeline serializes and stores the items in this redis key.
-  REDIS_ITEMS_KEY = '%(spider)s:items'
+  #REDIS_ITEMS_KEY = '%(spider)s:items'
 
   # The items serializer is by default ScrapyJSONEncoder. You can use any
   # importable path to a callable object.
-  REDIS_ITEMS_SERIALIZER = 'json.dumps'
+  #REDIS_ITEMS_SERIALIZER = 'json.dumps'
 
   # Specify the host and port to use when connecting to Redis (optional).
-  REDIS_HOST = 'localhost'
-  REDIS_PORT = 6379
+  #REDIS_HOST = 'localhost'
+  #REDIS_PORT = 6379
 
   # Specify the full Redis URL for connecting (optional).
   # If set, this takes precedence over the REDIS_HOST and REDIS_PORT settings.
-  REDIS_URL = 'redis://user:pass@hostname:9001'
+  #REDIS_URL = 'redis://user:pass@hostname:9001'
 
   # Custom redis client parameters (i.e.: socket timeout, etc.)
-  REDIS_PARAMS  = {}
+  #REDIS_PARAMS  = {}
 
-  # If False, pops the start urls in the same order as pushed.
-  RANDOMIZE_START_URLS = False
+  # If True, it uses redis' ``spop`` operation. This could be useful if you
+  # want to avoid duplicates in your start urls list. In this cases, urls must
+  # be added via ``sadd`` command or you will get a type error from redis.
+  #REDIS_START_URLS_AS_SET = False
 
 .. note::
 
@@ -170,23 +169,6 @@ Then:
     redis-cli lpush myspider:start_urls http://google.com
 
 
-Docker version of example-project
----------------------------------
-It's suppose to have installed:
-
-* docker (https://docs.docker.com/installation/)
-* docker-compose (https://docs.docker.com/compose/install/)
-
-For implementation details see `Dockerfile` and `docker-compose.yml` and read official docker documentation.
-
-1. To start sample `example-project` (`-d` for daemon)::
-
-    $ docker-compose up
-
-2. To scale `crawler` (4 instances for example)::
-
-    $ docker-compose scale crawler=4
-
 Changelog
 ---------
 
@@ -194,7 +176,7 @@ Changelog
   * **Backwards incompatible change:** Require explicit ``DUPEFILTER_CLASS``
     setting.
   * Added ``SCHEDULER_FLUSH_ON_START`` setting.
-  * Added ``RANDOMIZE_START_URLS`` setting.
+  * Added ``REDIS_START_URLS_AS_SET`` setting.
   * Added ``REDIS_ITEMS_KEY`` setting.
   * Added ``REDIS_ITEMS_SERIALIZER`` setting.
   * Added ``REDIS_PARAMS`` setting.
