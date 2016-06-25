@@ -19,6 +19,7 @@ def read_file(filename):
 requirements = [
     'Scrapy>=1.0',
     'redis>=2.10',
+    'six>=1.5.2',
 ]
 
 requirements_setup = [

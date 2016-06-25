@@ -18,8 +18,6 @@ env:
 
 matrix:
   allow_failures:
-    - env: SCRAPY_VER=11 PYTHON_VER=34
-    - env: SCRAPY_VER=11 PYTHON_VER=35
     - env: SCRAPY_VER=10 PYTHON_VER=py
     - env: SCRAPY_VER=11 PYTHON_VER=py
 

@@ -5,6 +5,7 @@ History
 0.6.2dev (Y-m-d)
 ----------------
 * Support ``redis_cls`` parameter in ``REDIS_PARAMS`` setting.
+* Python 3.x compatibility fixed.
 
 0.6.1 (2016-06-25)
 ------------------

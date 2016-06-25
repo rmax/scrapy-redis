@@ -1,4 +1,5 @@
 import redis
+import six
 
 from scrapy.utils.misc import load_object
 
@@ -59,7 +60,7 @@ def get_redis_from_settings(settings):
             params[dest] = val
 
     # Allow ``redis_cls`` to be a path to a class.
-    if isinstance(params.get('redis_cls'), basestring):
+    if isinstance(params.get('redis_cls'), six.string_types):
         params['redis_cls'] = load_object(params['redis_cls'])
 
     return get_redis(**params)
