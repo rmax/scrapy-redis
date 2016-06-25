@@ -1,3 +1,6 @@
+# Config file for automatic testing at travis-ci.org
+# This file will be regenerated if you run travis_pypi_setup.py
+
 language: python
 python: 3.5
 sudo: false
@@ -10,14 +13,45 @@ env:
   - SCRAPY_VER=11 PYTHON_VER=27
   - SCRAPY_VER=11 PYTHON_VER=34
   - SCRAPY_VER=11 PYTHON_VER=35
+  - SCRAPY_VER=10 PYTHON_VER=py
+  - SCRAPY_VER=11 PYTHON_VER=py
 
 matrix:
   allow_failures:
     - env: SCRAPY_VER=11 PYTHON_VER=34
     - env: SCRAPY_VER=11 PYTHON_VER=35
+    - env: SCRAPY_VER=10 PYTHON_VER=py
+    - env: SCRAPY_VER=11 PYTHON_VER=py
 
-install:
-  - pip install -U tox
+before_install:
+  - python --version
+  - uname -a
+  - lsb_release -a
 
+# command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+install: 
+  - pip install -U tox twine
+  - virtualenv --version
+  - easy_install --version
+  - pip --version
+  - tox --version
+
+# command to run tests, e.g. python setup.py test
 script:
   - tox -v -e py${PYTHON_VER}-scrapy${SCRAPY_VER}
+
+after_failure:
+  - more .tox/log/* | cat
+  - more .tox/*/log/* | cat
+
+before_cache:
+  - rm -fr $HOME/.cache/pip/log
+
+cache:
+  diretories:
+    - $HOME/.cache/pip
+
+notifications:
+  email:
+    on_sucess: never
+    on_failure: always

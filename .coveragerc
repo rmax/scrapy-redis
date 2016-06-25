@@ -1,0 +1,15 @@
+[paths]
+source =
+    src
+
+[run]
+branch = true
+source =
+    scrapy_redis
+    tests
+parallel = true
+
+[report]
+show_missing = true
+precision = 2
+omit = 

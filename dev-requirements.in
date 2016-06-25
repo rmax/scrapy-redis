@@ -1,0 +1,22 @@
+#
+# This file specifics development requirements. To update the requirements.txt
+# file run:
+#
+#    pip-compile dev-requirements.in -o dev-requirements.txt
+#
+# tests
+mock
+pytest
+coverage
+flake8
+tox
+
+# docs
+watchdog
+Sphinx
+
+# meta
+bumpversion
+check-manifest
+pip-tools
+wheel

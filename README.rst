@@ -1,29 +1,46 @@
-Redis-based components for Scrapy
-=================================
+============
+scrapy-redis
+============
 
-This project attempts to provide Redis-backed components for Scrapy.
+.. image:: https://img.shields.io/pypi/v/scrapy-redis.svg
+        :target: https://pypi.python.org/pypi/scrapy-redis
 
-Features:
+.. image:: https://img.shields.io/travis/rolando/scrapy-redis.svg
+        :target: https://travis-ci.org/rolando/scrapy-redis
+
+.. image:: https://readthedocs.org/projects/scrapy-redis/badge/?version=latest
+        :target: https://readthedocs.org/projects/scrapy-redis/?badge=latest
+        :alt: Documentation Status
+
+
+Redis-based components for Scrapy.
+
+* Free software: MIT license
+* Documentation: https://scrapy-redis.readthedocs.org.
+
+Features
+--------
 
 * Distributed crawling/scraping
+
     You can start multiple spider instances that share a single redis queue.
     Best suitable for broad multi-domain crawls.
+
 * Distributed post-processing
+
     Scraped items gets pushed into a redis queued meaning that you can start as
     many as needed post-processing processes sharing the items queue.
 
-Requirements:
+* Scrapy plug-and-play components
+  
+    Scheduler + Duplication Filter, Item Pipeline, Base Spiders.
 
-* Scrapy >= 1.0.0
-* redis-py >= 2.10.0
-* redis server >= 2.8.0
+Requirements
+------------
 
-Available Scrapy components:
-
-* Scheduler
-* Duplication Filter
-* Item Pipeline
-* Base Spider
+* Redis >= 2.8
+* ``Scrapy`` >= 1.0
+* ``redis-py`` >= 2.10
 
 
 Installation
@@ -177,48 +194,3 @@ Then:
     These spiders rely on the spider idle signal to fetch start urls, hence it
     may have a few seconds of delay between the time you push a new url and the
     spider starts crawling it.
-
-
-Changelog
----------
-
-0.6.1dev
-  * **Backwards incompatible change:** Require explicit ``DUPEFILTER_CLASS``
-    setting.
-  * Added ``SCHEDULER_FLUSH_ON_START`` setting.
-  * Added ``REDIS_START_URLS_AS_SET`` setting.
-  * Added ``REDIS_ITEMS_KEY`` setting.
-  * Added ``REDIS_ITEMS_SERIALIZER`` setting.
-  * Added ``REDIS_PARAMS`` setting.
-  * Added ``REDIS_START_URLS_BATCH_SIZE`` spider attribute to read start urls
-    in batches.
-  * Added ``RedisCrawlSpider``.
-
-0.6
-  * Updated code to be compatible with Scrapy 1.0.
-  * Added `-a domain=...` option for example spiders.
-
-0.5
-  * Added `REDIS_URL` setting to support Redis connection string.
-  * Added `SCHEDULER_IDLE_BEFORE_CLOSE` setting to prevent the spider closing too
-    quickly when the queue is empty. Default value is zero keeping the previous
-    behavior.
-  * Schedule preemptively requests on item scraped.
-  * This version is the latest release compatible with Scrapy 0.24.x.
-
-0.4
-  * Added `RedisSpider` and `RedisMixin` classes as building blocks for spiders
-    to be fed through a redis queue.
-  * Added redis queue stats.
-  * Let the encoder handle the item as it comes instead converting it to a dict.
-
-0.3
-  * Added support for different queue classes.
-  * Changed requests serialization from `marshal` to `cPickle`.
-
-0.2
-  * Improved backward compatibility.
-  * Added example project.
-
-0.1
-  * Initial version.
