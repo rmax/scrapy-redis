@@ -16,14 +16,12 @@ def read_file(filename):
         return fp.read()
 
 
-requirements = [
-    'Scrapy>=1.0',
-    'redis>=2.10',
-    'six>=1.5.2',
-]
+def read_requirements(filename):
+    return [
+        line.strip() for line in read_file(filename).splitlines()
+        if not line.startswith('#')
+    ]
 
-requirements_setup = [
-]
 
 setup(
     name='scrapy-redis',
@@ -35,8 +33,9 @@ setup(
     url='https://github.com/rolando/scrapy-redis',
     packages=list(find_packages('src')),
     package_dir={'': 'src'},
+    setup_requires=read_requirements('requirements-setup.txt'),
+    install_requires=read_requirements('requirements-install.txt'),
     include_package_data=True,
-    install_requires=requirements,
     license="MIT",
     keywords='scrapy-redis',
     classifiers=[
@@ -50,5 +49,4 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
     ],
-    setup_requires=requirements_setup,
 )

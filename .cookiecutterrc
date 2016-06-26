@@ -10,8 +10,11 @@ cookiecutter:
     project_slug: scrapy-redis
     pypi_username: rolando
     release_date: '2011-09-01'
+    use_codecov: y
     use_cython: n
+    use_landscape: y
     use_pypi_deployment_with_travis: n
     use_pytest: y
+    use_requiresio: y
     version: 0.6.2
     year: 2011-2016

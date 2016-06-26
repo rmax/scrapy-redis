@@ -80,7 +80,7 @@ build-inplace:
 	python setup.py build_ext --inplace
 
 develop: clean
-	python setup.py develop -v
+	pip install -e .
 
 test: develop
 	py.test
@@ -95,12 +95,6 @@ coverage: develop
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
-compile-reqs:
-	pip-compile -v dev-requirements.in -o dev-requirements.txt
-
-install-reqs:
-	pip install -r dev-requirements.txt
-
 docs:
 	rm -f docs/scrapy_redis.rst
 	rm -f docs/modules.rst
@@ -112,7 +106,7 @@ docs:
 servedocs: docs
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
-release: dist
+release: check dist
 	twine upload dist/*
 
 dist: clean
@@ -121,4 +115,18 @@ dist: clean
 	ls -l dist
 
 install: clean
-	python setup.py install
+	pip install .
+
+REQUIREMENTS_IN := $(wildcard requirements*.in)
+.PHONY: $(REQUIREMENTS_IN)
+
+requirements%.txt: requirements%.in
+	pip-compile -v $< -o $@
+
+REQUIREMENTS_TXT := $(REQUIREMENTS_IN:.in=.txt)
+compile-reqs: $(REQUIREMENTS_TXT)
+	@test -z "$$REQUIREMENTS_TXT" && echo "No 'requirements*.in' files. Nothing to do"
+
+install-reqs:
+	@test -z "$$REQUIREMENTS_TXT" && echo "No 'requirements*.txt' files. Nothing to do"
+	$(foreach req,$(REQUIREMENTS_TXT),pip install -r $(req);)

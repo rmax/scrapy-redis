@@ -36,7 +36,10 @@ install:
 
 # command to run tests, e.g. python setup.py test
 script:
-  - tox -v -e py${PYTHON_VER}-scrapy${SCRAPY_VER}
+  - tox -e py${PYTHON_VER}-scrapy${SCRAPY_VER}
+
+after_success:
+    - bash <(curl -s https://codecov.io/bash)
 
 after_failure:
   - more .tox/log/* | cat
