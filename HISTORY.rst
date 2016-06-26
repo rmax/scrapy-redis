@@ -2,6 +2,10 @@
 History
 =======
 
+0.6.3dev (Y-m-d)
+----------------
+* TODO
+
 0.6.2 (2016-06-26)
 ------------------
 * Support ``redis_cls`` parameter in ``REDIS_PARAMS`` setting.
