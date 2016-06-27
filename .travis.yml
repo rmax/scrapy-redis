@@ -39,7 +39,12 @@ script:
   - tox -e py${PYTHON_VER}-scrapy${SCRAPY_VER}
 
 after_success:
-    - bash <(curl -s https://codecov.io/bash)
+    - |
+      # Codecov requires a single .coverage and will run 'coverage xml' to
+      # generate the report.
+      pip install -U coverage
+      coverage combine
+      bash <(curl -s https://codecov.io/bash)
 
 after_failure:
   - more .tox/log/* | cat
