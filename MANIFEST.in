@@ -9,6 +9,7 @@ include *.rst
 include *.txt
 
 include LICENSE
+include VERSION
 include Makefile
 
 global-exclude __pycache__ *.py[cod]

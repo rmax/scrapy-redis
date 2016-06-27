@@ -8,7 +8,7 @@ Installation
 Stable release
 --------------
 
-To install scrapy-redis, run this command in your terminal:
+To install Scrapy-Redis, run this command in your terminal:
 
 .. code-block:: console
 
@@ -24,7 +24,7 @@ you through the process.
 From sources
 ------------
 
-The sources for scrapy-redis can be downloaded from the `Github repo`_.
+The sources for Scrapy-Redis can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 

@@ -2,9 +2,10 @@
 History
 =======
 
-0.6.3dev (Y-m-d)
-----------------
-* TODO
+.. comment:: bumpversion marker
+
+0.6.3-dev (unreleased)
+----------------------
 
 0.6.2 (2016-06-26)
 ------------------

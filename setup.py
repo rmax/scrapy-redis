@@ -13,7 +13,15 @@ def find_packages(path):
 
 def read_file(filename):
     with open(filename) as fp:
-        return fp.read()
+        return fp.read().strip()
+
+
+def read_rst(filename):
+    return "".join(
+        line for line in read_file(filename).splitlines()
+        # Ignore unsupported directives by pypi.
+        if not line.startswith('.. comment::')
+    )
 
 
 def read_requirements(filename):
@@ -25,9 +33,9 @@ def read_requirements(filename):
 
 setup(
     name='scrapy-redis',
-    version='0.6.3dev',
+    version=read_file('VERSION'),
     description="Redis-based components for Scrapy.",
-    long_description=read_file('README.rst') + '\n\n' + read_file('HISTORY.rst'),
+    long_description=read_rst('README.rst') + '\n\n' + read_rst('HISTORY.rst'),
     author="Rolando Espinoza",
     author_email='rolando at rmax.io',
     url='https://github.com/rolando/scrapy-redis',

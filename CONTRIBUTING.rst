@@ -38,8 +38,8 @@ is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-scrapy-redis could always use more documentation, whether as part of the
-official scrapy-redis docs, in docstrings, or even on the web in blog posts,
+Scrapy-Redis could always use more documentation, whether as part of the
+official Scrapy-Redis docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
