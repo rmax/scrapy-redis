@@ -1,34 +1,30 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import io
 from pkgutil import walk_packages
 from setuptools import setup
 
 
 def find_packages(path):
     # This method returns packages and subpackages as well.
-    for _, name, is_pkg in walk_packages([path]):
-        if is_pkg:
-            yield name
+    return [name for _, name, is_pkg in walk_packages([path]) if is_pkg]
 
 
 def read_file(filename):
-    with open(filename) as fp:
+    with io.open(filename) as fp:
         return fp.read().strip()
 
 
 def read_rst(filename):
-    return "".join(
-        line for line in read_file(filename).splitlines()
-        # Ignore unsupported directives by pypi.
-        if not line.startswith('.. comment::')
-    )
+    # Ignore unsupported directives by pypi.
+    content = read_file(filename)
+    return ''.join(line for line in io.StringIO(content)
+                   if not line.startswith('.. comment::'))
 
 
 def read_requirements(filename):
-    return [
-        line.strip() for line in read_file(filename).splitlines()
-        if not line.startswith('#')
-    ]
+    return [line.strip() for line in read_file(filename).splitlines()
+            if not line.startswith('#')]
 
 
 setup(

@@ -29,6 +29,7 @@ before_install:
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install: 
   - pip install -U tox twine
+  - pip install -U coverage
   - virtualenv --version
   - easy_install --version
   - pip --version
@@ -42,7 +43,6 @@ after_success:
     - |
       # Codecov requires a single .coverage and will run 'coverage xml' to
       # generate the report.
-      pip install -U coverage
       coverage combine
       bash <(curl -s https://codecov.io/bash)
 
