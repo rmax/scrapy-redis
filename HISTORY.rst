@@ -4,8 +4,8 @@ History
 
 .. comment:: bumpversion marker
 
-0.6.3-dev (unreleased)
-----------------------
+0.6.3 (2016-07-03)
+------------------
 * Added ``REDIS_START_URLS_KEY`` setting.
 * Fixed spider method ``from_crawler`` signature.
 
