@@ -5,11 +5,17 @@ from scrapy.spiders import Spider, CrawlSpider
 from . import connection
 
 
+# Default batch size matches default concurrent requests setting.
+DEFAULT_START_URLS_BATCH_SIZE = 16
+DEFAULT_START_URLS_KEY = '%(name)s:start_urls'
+
+
 class RedisMixin(object):
     """Mixin class to implement reading urls from a redis queue."""
-    redis_key = None  # If empty, uses default '<spider>:start_urls'.
-    # Fetch this amount of start urls when idle.
-    redis_batch_size = 100
+    # Per spider redis key, default to DEFAULT_KEY.
+    redis_key = None
+    # Fetch this amount of start urls when idle. Default to DEFAULT_BATCH_SIZE.
+    redis_batch_size = None
     # Redis client instance.
     server = None
 
@@ -26,20 +32,38 @@ class RedisMixin(object):
             return
 
         if crawler is None:
-            # We allow optional crawler argument to keep backwrads
+            # We allow optional crawler argument to keep backwards
             # compatibility.
             # XXX: Raise a deprecation warning.
-            assert self.crawler, "crawler not set"
-            crawler = self.crawler
+            crawler = getattr(self, 'crawler', None)
 
-        if not self.redis_key:
-            self.redis_key = '%s:start_urls' % self.name
-        self.log("Reading URLs from redis key '%s'" % self.redis_key)
+        if crawler is None:
+            raise ValueError("crawler is required")
 
-        self.redis_batch_size = self.settings.getint(
-            'REDIS_START_URLS_BATCH_SIZE',
-            self.redis_batch_size,
-        )
+        settings = crawler.settings
+
+        if self.redis_key is None:
+            self.redis_key = settings.get(
+                'REDIS_START_URLS_KEY', DEFAULT_START_URLS_KEY,
+            )
+
+        self.redis_key = self.redis_key % {'name': self.name}
+
+        if not self.redis_key.strip():
+            raise ValueError("redis_key must not be empty")
+
+        if self.redis_batch_size is None:
+            self.redis_batch_size = settings.getint(
+                'REDIS_START_URLS_BATCH_SIZE', DEFAULT_START_URLS_BATCH_SIZE,
+            )
+
+        try:
+            self.redis_batch_size = int(self.redis_batch_size)
+        except (TypeError, ValueError):
+            raise ValueError("redis_batch_size must be an integer")
+
+        self.logger.info("Reading start URLs from redis key '%(redis_key)s' "
+                         "(batch size: %(redis_batch_size)s)", self.__dict__)
 
         self.server = connection.from_settings(crawler.settings)
         # The idle signal is called when the spider has no requests left,

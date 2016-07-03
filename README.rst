@@ -119,7 +119,10 @@ Use the following settings in your project:
   #REDIS_START_URLS_AS_SET = False
 
   # How many start urls to fetch at once.
-  #REDIS_START_URLS_BATCH_SIZE = False
+  #REDIS_START_URLS_BATCH_SIZE = 16
+
+  # Default start urls key for RedisSpider and RedisCrawlSpider.
+  #REDIS_START_URLS_KEY = '%(name)s:start_urls'
 
 .. note::
 
