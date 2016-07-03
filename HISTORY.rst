@@ -6,6 +6,8 @@ History
 
 0.6.3-dev (unreleased)
 ----------------------
+* Added ``REDIS_START_URLS_KEY`` setting.
+* Fixed spider method ``from_crawler`` signature.
 
 0.6.2 (2016-06-26)
 ------------------
