@@ -114,8 +114,8 @@ class RedisSpider(RedisMixin, Spider):
     """Spider that reads urls from redis queue when idle."""
 
     @classmethod
-    def from_crawler(self, crawler):
-        obj = super(RedisSpider, self).from_crawler(crawler)
+    def from_crawler(self, crawler, *args, **kwargs):
+        obj = super(RedisSpider, self).from_crawler(crawler, *args, **kwargs)
         obj.setup_redis(crawler)
         return obj
 
@@ -124,7 +124,7 @@ class RedisCrawlSpider(RedisMixin, CrawlSpider):
     """Spider that reads urls from redis queue when idle."""
 
     @classmethod
-    def from_crawler(self, crawler):
-        obj = super(RedisCrawlSpider, self).from_crawler(crawler)
+    def from_crawler(self, crawler, *args, **kwargs):
+        obj = super(RedisCrawlSpider, self).from_crawler(crawler, *args, **kwargs)
         obj.setup_redis(crawler)
         return obj
