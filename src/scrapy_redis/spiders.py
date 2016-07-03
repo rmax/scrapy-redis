@@ -81,8 +81,12 @@ class RedisMixin(object):
             if not data:
                 # Queue empty.
                 break
-            yield self.make_request_from_data(data)
-            found += 1
+            req = self.make_request_from_data(data)
+            if req:
+                yield req
+                found += 1
+            else:
+                self.logger.debug("Request not made from data: %r", data)
 
         if found:
             self.logger.debug("Read %s requests from '%s'", found, self.redis_key)
