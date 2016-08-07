@@ -12,9 +12,9 @@ DEFAULT_START_URLS_KEY = '%(name)s:start_urls'
 
 class RedisMixin(object):
     """Mixin class to implement reading urls from a redis queue."""
-    # Per spider redis key, default to DEFAULT_KEY.
+    # Per spider redis key, default to DEFAULT_START_URLS_KEY.
     redis_key = None
-    # Fetch this amount of start urls when idle. Default to DEFAULT_BATCH_SIZE.
+    # Fetch this amount of start urls when idle. Default to DEFAULT_START_URLS_BATCH_SIZE.
     redis_batch_size = None
     # Redis client instance.
     server = None
