@@ -1,12 +1,10 @@
-from scrapy.spiders import CrawlSpider, Rule
+from scrapy.spiders import Rule
 from scrapy.linkextractors import LinkExtractor
 
-from scrapy_redis.spiders import RedisMixin
-
-from example.items import ExampleLoader
+from scrapy_redis.spiders import RedisCrawlSpider
 
 
-class MyCrawler(RedisMixin, CrawlSpider):
+class MyCrawler(RedisCrawlSpider):
     """Spider that reads urls from redis queue (myspider:start_urls)."""
     name = 'mycrawler_redis'
     redis_key = 'mycrawler:start_urls'
@@ -17,16 +15,13 @@ class MyCrawler(RedisMixin, CrawlSpider):
     )
 
     def __init__(self, *args, **kwargs):
+        # Dynamically define the allowed domains list.
         domain = kwargs.pop('domain', '')
-        self.alowed_domains = filter(None, domain.split(','))
+        self.allowed_domains = filter(None, domain.split(','))
         super(MyCrawler, self).__init__(*args, **kwargs)
 
-    def _set_crawler(self, crawler):
-        CrawlSpider._set_crawler(self, crawler)
-        RedisMixin.setup_redis(self)
-
     def parse_page(self, response):
-        el = ExampleLoader(response=response)
-        el.add_xpath('name', '//title[1]/text()')
-        el.add_value('url', response.url)
-        return el.load_item()
+        return {
+            'name': response.css('title::text').extract_first(),
+            'url': response.url,
+        }

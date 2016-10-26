@@ -1,1 +1,16 @@
-include README.rst
+graft docs
+graft src
+graft tests
+graft example-project
+
+include *.in
+include *.ini
+include *.rst
+include *.txt
+
+include LICENSE
+include VERSION
+include Makefile
+
+global-exclude __pycache__ *.py[cod]
+global-exclude *.so *.dylib

@@ -1,0 +1,3 @@
+# Readthedocs workaround.
+# This should be installed using pip from the root directory.
+-e .

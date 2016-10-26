@@ -1,0 +1,4 @@
+# This packages are required to install and run our package.
+Scrapy>=1.0
+redis>=2.10
+six>=1.5.2

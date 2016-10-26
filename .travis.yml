@@ -1,13 +1,63 @@
-sudo: false
+# Config file for automatic testing at travis-ci.org
+# This file will be regenerated if you run travis_pypi_setup.py
+
 language: python
-python: 2.7
+python: 3.5
+sudo: false
+
 services:
   - redis-server
+
 env:
-  - SCRAPY="scrapy==1.0.0"
-  - SCRAPY="scrapy>=1.0.0"
-install:
-  - pip install $SCRAPY
-  - pip install -r requirements.txt
-  - pip install -r requirements-test.txt
-script: py.test
+  - SCRAPY_VER=10 PYTHON_VER=27
+  - SCRAPY_VER=11 PYTHON_VER=27
+  - SCRAPY_VER=11 PYTHON_VER=34
+  - SCRAPY_VER=11 PYTHON_VER=35
+  - SCRAPY_VER=10 PYTHON_VER=py
+  - SCRAPY_VER=11 PYTHON_VER=py
+
+matrix:
+  allow_failures:
+    - env: SCRAPY_VER=10 PYTHON_VER=py
+    - env: SCRAPY_VER=11 PYTHON_VER=py
+
+before_install:
+  - python --version
+  - uname -a
+  - lsb_release -a
+
+# command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
+install: 
+  - pip install -U tox twine
+  - pip install -U coverage
+  - virtualenv --version
+  - easy_install --version
+  - pip --version
+  - tox --version
+
+# command to run tests, e.g. python setup.py test
+script:
+  - tox -e py${PYTHON_VER}-scrapy${SCRAPY_VER}
+
+after_success:
+    - |
+      # Codecov requires a single .coverage and will run 'coverage xml' to
+      # generate the report.
+      coverage combine
+      bash <(curl -s https://codecov.io/bash)
+
+after_failure:
+  - more .tox/log/* | cat
+  - more .tox/*/log/* | cat
+
+before_cache:
+  - rm -fr $HOME/.cache/pip/log
+
+cache:
+  diretories:
+    - $HOME/.cache/pip
+
+notifications:
+  email:
+    on_sucess: never
+    on_failure: always

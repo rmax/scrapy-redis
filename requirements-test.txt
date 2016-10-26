@@ -1,3 +1,0 @@
-mock
-pytest
-pytest-cov

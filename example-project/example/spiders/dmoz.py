@@ -1,27 +1,23 @@
 from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
 
-from example.items import ExampleLoader
-
 
 class DmozSpider(CrawlSpider):
+    """Follow categories and extract links."""
     name = 'dmoz'
     allowed_domains = ['dmoz.org']
     start_urls = ['http://www.dmoz.org/']
 
-    categories_lx = LinkExtractor(restrict_xpaths='//div[@id="catalogs"]')
-    directory_lx = LinkExtractor(restrict_xpaths='//ul[@class="directory dir-col"]')
-
-    rules = (
-        Rule(categories_lx),
-        Rule(directory_lx, callback='parse_directory', follow=True)
-    )
+    rules = [
+        Rule(LinkExtractor(
+            restrict_css=('.top-cat', '.sub-cat', '.cat-item')
+        ), callback='parse_directory', follow=True),
+    ]
 
     def parse_directory(self, response):
-        for li in response.css('ul.directory-url > li'):
-            el = ExampleLoader(selector=li)
-            el.add_css('name', 'a::text')
-            el.add_css('description', '::text')
-            el.add_css('link', 'a::attr(href)')
-            el.add_value('url', response.url)
-            yield el.load_item()
+        for div in response.css('.title-and-desc'):
+            yield {
+                'name': div.css('.site-title::text').extract_first(),
+                'description': div.css('.site-descr::text').extract_first().strip(),
+                'link': div.css('a::attr(href)').extract_first(),
+            }

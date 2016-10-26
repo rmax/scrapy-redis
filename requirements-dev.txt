@@ -1,0 +1,8 @@
+# This packages are requires only for development and release management.
+Sphinx
+bumpversion
+check-manifest
+pip-tools
+twine
+watchdog
+wheel

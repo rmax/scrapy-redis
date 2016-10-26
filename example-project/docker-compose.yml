@@ -1,0 +1,9 @@
+redis:
+  image: redis
+  ports:
+   - "6379:6379" # added port for external db provisioning
+
+crawler:
+  build: .
+  links:
+    - redis:localhost
