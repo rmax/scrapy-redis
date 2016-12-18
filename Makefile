@@ -117,9 +117,11 @@ servedocs: docs
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
 release:
-	# Release upload is done by travis.
-	bumpversion release --commit --tag
-	git push --follow-tags
+	@echo "To do a release, follow the steps:"
+	@echo "- bumpversion release"
+	@echo "- Review and commit"
+	@echo "- git tag -a \`cat VERSION\`"
+	@echo "- git push --follow-tags"
 
 dist-upload: clean check dist
 	twine upload dist/*
