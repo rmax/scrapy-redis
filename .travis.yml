@@ -75,7 +75,7 @@ before_cache:
   - rm -fr $HOME/.cache/pip/log
 
 cache:
-  diretories:
+  directories:
     - $HOME/.cache/pip
 
 notifications:
