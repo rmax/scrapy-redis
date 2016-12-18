@@ -38,7 +38,7 @@ install:
 
 # command to run tests, e.g. python setup.py test
 script:
-  - tox -e $TOXENV
+  - tox -e $TOXENV --workdir $HOME/.tox
 
 after_success:
   # Codecov requires a single .coverage and will run 'coverage xml' to
@@ -47,15 +47,18 @@ after_success:
   - bash <(curl -s https://codecov.io/bash)
 
 after_failure:
-  - more .tox/log/* | cat
-  - more .tox/*/log/* | cat
+  - more $HOME/.tox/log/* | cat
+  - more $HOME/.tox/*/log/* | cat
 
 before_cache:
   - rm -fr $HOME/.cache/pip/log
+  - rm -fr $HOME/.tox/log/*
+  - rm -fr $HOME/.tox/*/log/*
 
 cache:
   directories:
     - $HOME/.cache/pip
+    - $HOME/.tox/
 
 notifications:
   email:
