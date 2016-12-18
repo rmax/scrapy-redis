@@ -28,12 +28,16 @@ before_install:
 
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install: 
-  - pip install -U tox twine
-  - pip install -U coverage
-  - virtualenv --version
-  - easy_install --version
-  - pip --version
-  - tox --version
+  - |
+    set -x
+    pip install -U pip wheel
+    pip install -U tox twine coverage
+  - |
+    set -x
+    virtualenv --version
+    easy_install --version
+    pip --version
+    tox --version
 
 # command to run tests, e.g. python setup.py test
 script:
