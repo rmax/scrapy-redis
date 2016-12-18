@@ -6,6 +6,8 @@ History
 
 0.6.4-dev (2016-12-17)
 ------------------
+* Fixed data decoding in Python 3.x.
+* Added ``REDIS_ENCODING`` setting (default ``utf-8``).
 
 0.6.3 (2016-07-03)
 ------------------
