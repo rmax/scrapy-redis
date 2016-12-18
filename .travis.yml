@@ -18,6 +18,7 @@ env:
   - TOXENV=py35-scrapydev
 
 matrix:
+  fast_finish: true
   allow_failures:
     - env: TOXENV=py27-scrapydev
     - env: TOXENV=py34-scrapydev
