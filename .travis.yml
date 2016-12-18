@@ -74,5 +74,6 @@ deploy:
     secure: "Pgcj+Otx9o2MxOuXibvz9LUd5DqlW0jaKDScVOAcFT+//U0esjRqY08bRFQlrSTXokJa6X/dVZlb2mQE8L4vr7mLFspRGO4FByK34L089/ETwsLKI2rks2zVbmPSyweL3sz88EXLKmYs7WsKtCnET67qra6hreKbO67ALAh5WWk="
   on:
     tags: true
+    all_branches: true
     repo: rolando/scrapy-redis
     condition: "$TOXENV == py35-scrapy12"
