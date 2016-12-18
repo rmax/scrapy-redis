@@ -35,7 +35,8 @@ help:
 	@echo "compile-reqs - compile requirements"
 	@echo "install-reqs - install requirements"
 	@echo "docs - generate Sphinx HTML documentation, including API docs"
-	@echo "release - package and upload a release"
+	@echo "dist-upload - package and upload a release"
+	@echo "release - bump release and push changes"
 	@echo "dist - package"
 	@echo "develop - install package in develop mode"
 	@echo "install - install the package to the active Python's site-packages"
@@ -115,10 +116,12 @@ docs: docs-build
 servedocs: docs
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
-release: clean check dist
-	# Tagging release.
-	VERSION=`cat VERSION`; git tag -a v$$VERSION
+release:
+	# Release upload is done by travis.
+	bumpversion release --commit --tag
 	git push --follow-tags
+
+dist-upload: clean check dist
 	twine upload dist/*
 
 dist: clean
