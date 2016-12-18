@@ -8,6 +8,7 @@ History
 ------------------
 * Fixed data decoding in Python 3.x.
 * Added ``REDIS_ENCODING`` setting (default ``utf-8``).
+* Default to ``CONCURRENT_REQUESTS`` value for ``REDIS_START_URLS_BATCH_SIZE``.
 
 0.6.3 (2016-07-03)
 ------------------

@@ -7,9 +7,6 @@ from .utils import bytes_to_str
 
 
 # TODO: Move these defaults to its own module.
-# Default batch size matches default concurrent requests setting.
-# TODO: This must default to the actual CONCURRENT_REQUESTS value.
-DEFAULT_START_URLS_BATCH_SIZE = 16
 DEFAULT_START_URLS_KEY = '%(name)s:start_urls'
 # TODO: Pass this encoding to the redis client in the scheduler too.
 DEFAULT_REDIS_ENCODING = 'utf-8'
@@ -59,7 +56,8 @@ class RedisMixin(object):
 
         if self.redis_batch_size is None:
             self.redis_batch_size = settings.getint(
-                'REDIS_START_URLS_BATCH_SIZE', DEFAULT_START_URLS_BATCH_SIZE,
+                'REDIS_START_URLS_BATCH_SIZE',
+                settings.getint('CONCURRENT_REQUESTS'),
             )
 
         try:
@@ -85,6 +83,7 @@ class RedisMixin(object):
         fetch_one = self.server.spop if use_set else self.server.lpop
         # XXX: Do we need to use a timeout here?
         found = 0
+        # TODO: Use redis pipeline execution.
         while found < self.redis_batch_size:
             data = fetch_one(self.redis_key)
             if not data:
@@ -117,6 +116,7 @@ class RedisMixin(object):
 
     def schedule_next_requests(self):
         """Schedules a request if available"""
+        # TODO: While there is capacity, schedule a batch of redis requests.
         for req in self.next_requests():
             self.crawler.engine.crawl(req, spider=self)
 
@@ -134,7 +134,7 @@ class RedisSpider(RedisMixin, Spider):
     ----------
     redis_key : str (default: REDIS_START_URLS_KEY)
         Redis key where to fetch start URLs from..
-    redis_batch_size : int (default: REDIS_START_URLS_BATCH_SIZE)
+    redis_batch_size : int (default: CONCURRENT_REQUESTS)
         Number of messages to fetch from redis on each attempt.
     redis_encoding : str (default: REDIS_ENCODING)
         Encoding to use when decoding messages from redis queue.
@@ -143,7 +143,7 @@ class RedisSpider(RedisMixin, Spider):
     --------
     REDIS_START_URLS_KEY : str (default: "<spider.name>:start_urls")
         Default Redis key where to fetch start URLs from..
-    REDIS_START_URLS_BATCH_SIZE : int (default: 16)
+    REDIS_START_URLS_BATCH_SIZE : int (deprecated by CONCURRENT_REQUESTS)
         Default number of messages to fetch from redis on each attempt.
     REDIS_START_URLS_AS_SET : bool (default: False)
         Use SET operations to retrieve messages from the redis queue. If False,
@@ -167,7 +167,7 @@ class RedisCrawlSpider(RedisMixin, CrawlSpider):
     ----------
     redis_key : str (default: REDIS_START_URLS_KEY)
         Redis key where to fetch start URLs from..
-    redis_batch_size : int (default: REDIS_START_URLS_BATCH_SIZE)
+    redis_batch_size : int (default: CONCURRENT_REQUESTS)
         Number of messages to fetch from redis on each attempt.
     redis_encoding : str (default: REDIS_ENCODING)
         Encoding to use when decoding messages from redis queue.
@@ -176,12 +176,12 @@ class RedisCrawlSpider(RedisMixin, CrawlSpider):
     --------
     REDIS_START_URLS_KEY : str (default: "<spider.name>:start_urls")
         Default Redis key where to fetch start URLs from..
-    REDIS_START_URLS_BATCH_SIZE : int (default: 16)
+    REDIS_START_URLS_BATCH_SIZE : int (deprecated by CONCURRENT_REQUESTS)
         Default number of messages to fetch from redis on each attempt.
-    REDIS_ENCODING : str (default: "utf-8")
-        Default encoding to use when decoding messages from redis queue.
     REDIS_START_URLS_AS_SET : bool (default: True)
         Use SET operations to retrieve messages from the redis queue.
+    REDIS_ENCODING : str (default: "utf-8")
+        Default encoding to use when decoding messages from redis queue.
 
     """
 

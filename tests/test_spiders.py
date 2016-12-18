@@ -116,11 +116,10 @@ def test_consume_urls_from_redis(start_urls_as_set, spider_cls):
     crawler.settings.setdict({
         'REDIS_START_URLS_KEY': redis_key,
         'REDIS_START_URLS_AS_SET': start_urls_as_set,
-        'REDIS_START_URLS_BATCH_SIZE': batch_size,
+        'CONCURRENT_REQUESTS': batch_size,
     })
     spider = spider_cls.from_crawler(crawler)
     with flushall(spider.server):
-        batch_size = 5
         urls = [
             'http://example.com/%d' % i for i in range(batch_size * 2)
         ]
