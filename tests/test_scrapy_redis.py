@@ -10,7 +10,7 @@ from unittest import TestCase
 
 from scrapy_redis import connection
 from scrapy_redis.dupefilter import RFPDupeFilter
-from scrapy_redis.queue import SpiderQueue, SpiderPriorityQueue, SpiderStack
+from scrapy_redis.queue import FifoQueue, LifoQueue, PriorityQueue
 from scrapy_redis.scheduler import Scheduler
 
 
@@ -88,9 +88,9 @@ class QueueTestMixin(RedisTestMixin):
         self.assertEqual(len(self.q), 0)
 
 
-class SpiderQueueTest(QueueTestMixin, TestCase):
+class FifoQueueTest(QueueTestMixin, TestCase):
 
-    queue_cls = SpiderQueue
+    queue_cls = FifoQueue
 
     def test_queue(self):
         req1 = Request('http://example.com/page1')
@@ -106,9 +106,9 @@ class SpiderQueueTest(QueueTestMixin, TestCase):
         self.assertEqual(out2.url, req2.url)
 
 
-class SpiderPriorityQueueTest(QueueTestMixin, TestCase):
+class PriorityQueueTest(QueueTestMixin, TestCase):
 
-    queue_cls = SpiderPriorityQueue
+    queue_cls = PriorityQueue
 
     def test_queue(self):
         req1 = Request('http://example.com/page1', priority=100)
@@ -128,9 +128,9 @@ class SpiderPriorityQueueTest(QueueTestMixin, TestCase):
         self.assertEqual(out3.url, req2.url)
 
 
-class SpiderStackTest(QueueTestMixin, TestCase):
+class LifoQueueTest(QueueTestMixin, TestCase):
 
-    queue_cls = SpiderStack
+    queue_cls = LifoQueue
 
     def test_queue(self):
         req1 = Request('http://example.com/page1')

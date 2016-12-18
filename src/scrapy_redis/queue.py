@@ -4,15 +4,21 @@ from . import picklecompat
 
 
 class Base(object):
-    """Per-spider queue/stack base class"""
+    """Per-spider base queue class"""
 
     def __init__(self, server, spider, key, serializer=None):
         """Initialize per-spider redis queue.
 
-        Parameters:
-            server -- redis connection
-            spider -- spider instance
-            key -- key for this queue (e.g. "%(spider)s:queue")
+        Parameters
+        ----------
+        server : StrictRedis
+            Redis client instance.
+        spider : Spider
+            Scrapy spider instance.
+        key: str
+            Redis key where to put and get messages.
+        serializer : object
+            Serializer object with ``loads`` and ``dumps`` methods.
 
         """
         if serializer is None:
@@ -58,7 +64,7 @@ class Base(object):
         self.server.delete(self.key)
 
 
-class SpiderQueue(Base):
+class FifoQueue(Base):
     """Per-spider FIFO queue"""
 
     def __len__(self):
@@ -81,7 +87,7 @@ class SpiderQueue(Base):
             return self._decode_request(data)
 
 
-class SpiderPriorityQueue(Base):
+class PriorityQueue(Base):
     """Per-spider priority queue abstraction using redis' sorted set"""
 
     def __len__(self):
@@ -111,8 +117,8 @@ class SpiderPriorityQueue(Base):
             return self._decode_request(results[0])
 
 
-class SpiderStack(Base):
-    """Per-spider stack"""
+class LifoQueue(Base):
+    """Per-spider LIFO queue."""
 
     def __len__(self):
         """Return the length of the stack"""
@@ -135,4 +141,7 @@ class SpiderStack(Base):
             return self._decode_request(data)
 
 
-__all__ = ['SpiderQueue', 'SpiderPriorityQueue', 'SpiderStack']
+# TODO: Deprecate the use of these names.
+SpiderQueue = FifoQueue
+SpiderStack = LifoQueue
+SpiderPriorityQueue = PriorityQueue

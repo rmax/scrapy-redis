@@ -8,12 +8,14 @@ from scrapy_redis.queue import Base
 
 class TestBaseQueue(object):
 
+    queue_cls = Base
+
     def setup(self):
         self.server = mock.Mock()
         self.spider = Spider(name='foo')
         self.spider.parse_method = lambda x: x
         self.key = 'key'
-        self.q = Base(self.server, self.spider, self.key)
+        self.q = self.queue_cls(self.server, self.spider, self.key)
 
     def test_encode_decode_requests(self, q=None):
         if q is None:
@@ -30,7 +32,7 @@ class TestBaseQueue(object):
         serializer = mock.Mock()
         serializer.dumps = mock.Mock(side_effect=lambda x: x)
         serializer.loads = mock.Mock(side_effect=lambda x: x)
-        q  = Base(self.server, self.spider, self.key, serializer=serializer)
+        q = Base(self.server, self.spider, self.key, serializer=serializer)
         self.test_encode_decode_requests(q)
         assert serializer.dumps.call_count == 1
         assert serializer.loads.call_count == 1
