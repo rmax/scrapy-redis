@@ -69,3 +69,14 @@ notifications:
   email:
     on_sucess: never
     on_failure: always
+
+deploy:
+  provider: pypi
+  distributions: "sdist bdist_wheel"
+  user: darkrho
+  password:
+    secure: "Pgcj+Otx9o2MxOuXibvz9LUd5DqlW0jaKDScVOAcFT+//U0esjRqY08bRFQlrSTXokJa6X/dVZlb2mQE8L4vr7mLFspRGO4FByK34L089/ETwsLKI2rks2zVbmPSyweL3sz88EXLKmYs7WsKtCnET67qra6hreKbO67ALAh5WWk="
+  on:
+    tags: true
+    repo: rolando/scrapy-redis
+    condition: "$TOXENV == py35-scrapy12"
