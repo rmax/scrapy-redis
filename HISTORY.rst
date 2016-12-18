@@ -4,6 +4,9 @@ History
 
 .. comment:: bumpversion marker
 
+0.7.0-dev (unreleased)
+------------------
+
 0.6.4 (2016-12-18)
 ------------------
 * Fixed data decoding in Python 3.x.
