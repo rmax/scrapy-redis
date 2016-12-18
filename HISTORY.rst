@@ -4,6 +4,9 @@ History
 
 .. comment:: bumpversion marker
 
+0.6.4-dev (2016-12-17)
+------------------
+
 0.6.3 (2016-07-03)
 ------------------
 * Added ``REDIS_START_URLS_KEY`` setting.
