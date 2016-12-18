@@ -6,37 +6,24 @@ services:
   - redis-server
 
 env:
-  - SCRAPY_VER=10 PYTHON_VER=27
-  - SCRAPY_VER=10 PYTHON_VER=py
-  - SCRAPY_VER=11 PYTHON_VER=27
-  - SCRAPY_VER=11 PYTHON_VER=34
-  - SCRAPY_VER=11 PYTHON_VER=35
-  - SCRAPY_VER=11 PYTHON_VER=py
-  - SCRAPY_VER=11 PYTHON_VER=py3
-  - SCRAPY_VER=12 PYTHON_VER=27
-  - SCRAPY_VER=12 PYTHON_VER=34
-  - SCRAPY_VER=12 PYTHON_VER=35
-  - SCRAPY_VER=12 PYTHON_VER=py
-  - SCRAPY_VER=12 PYTHON_VER=py3
-  - SCRAPY_VER=dev PYTHON_VER=27
-  - SCRAPY_VER=dev PYTHON_VER=34
-  - SCRAPY_VER=dev PYTHON_VER=35
-  - SCRAPY_VER=dev PYTHON_VER=py
-  - SCRAPY_VER=dev PYTHON_VER=py3
+  - TOXENV=py27-scrapy10
+  - TOXENV=py27-scrapy11
+  - TOXENV=py27-scrapy12
+  - TOXENV=py27-scrapydev
+  - TOXENV=py34-scrapy10
+  - TOXENV=py34-scrapy11
+  - TOXENV=py34-scrapy12
+  - TOXENV=py34-scrapydev
+  - TOXENV=py35-scrapy10
+  - TOXENV=py35-scrapy11
+  - TOXENV=py35-scrapy12
+  - TOXENV=py35-scrapydev
 
 matrix:
   allow_failures:
-    - env: SCRAPY_VER=10 PYTHON_VER=py
-    - env: SCRAPY_VER=11 PYTHON_VER=py
-    - env: SCRAPY_VER=12 PYTHON_VER=py
-    - env: SCRAPY_VER=10 PYTHON_VER=py3
-    - env: SCRAPY_VER=11 PYTHON_VER=py3
-    - env: SCRAPY_VER=12 PYTHON_VER=py3
-    - env: SCRAPY_VER=dev PYTHON_VER=27
-    - env: SCRAPY_VER=dev PYTHON_VER=34
-    - env: SCRAPY_VER=dev PYTHON_VER=35
-    - env: SCRAPY_VER=dev PYTHON_VER=py
-    - env: SCRAPY_VER=dev PYTHON_VER=py3
+    - env: TOXENV=py27-scrapydev
+    - env: TOXENV=py34-scrapydev
+    - env: TOXENV=py35-scrapydev
 
 before_install:
   - python --version
@@ -58,7 +45,7 @@ install:
 
 # command to run tests, e.g. python setup.py test
 script:
-  - tox -e py${PYTHON_VER}-scrapy${SCRAPY_VER}
+  - tox -e $TOXENV
 
 after_success:
     - |
