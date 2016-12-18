@@ -3,20 +3,41 @@ import six
 
 from scrapy.utils.misc import load_object
 
-from . import connection
+from . import connection, defaults
 
 
 # TODO: add SCRAPY_JOB support.
 class Scheduler(object):
-    """Redis-based scheduler"""
+    """Redis-based scheduler
+
+    Settings
+    --------
+    SCHEDULER_PERSIST : bool (default: False)
+        Whether to persist or clear redis queue.
+    SCHEDULER_FLUSH_ON_START : bool (default: False)
+        Whether to flush redis queue on start.
+    SCHEDULER_IDLE_BEFORE_CLOSE : int (default: 0)
+        How many seconds to wait before closing if no message is received.
+    SCHEDULER_QUEUE_KEY : str
+        Scheduler redis key.
+    SCHEDULER_QUEUE_CLASS : str
+        Scheduler queue class.
+    SCHEDULER_DUPEFILTER_KEY : str
+        Scheduler dupefilter redis key.
+    SCHEDULER_DUPEFILTER_CLASS : str
+        Scheduler dupefilter class.
+    SCHEDULER_SERIALIZER : str
+        Scheduler serializer.
+
+    """
 
     def __init__(self, server,
                  persist=False,
                  flush_on_start=False,
-                 queue_key='%(spider)s:requests',
-                 queue_cls='scrapy_redis.queue.SpiderPriorityQueue',
-                 dupefilter_key='%(spider)s:dupefilter',
-                 dupefilter_cls='scrapy_redis.dupefilter.RFPDupeFilter',
+                 queue_key=defaults.SCHEDULER_QUEUE_KEY,
+                 queue_cls=defaults.SCHEDULER_QUEUE_CLASS,
+                 dupefilter_key=defaults.SCHEDULER_DUPEFILTER_KEY,
+                 dupefilter_cls=defaults.SCHEDULER_DUPEFILTER_CLASS,
                  idle_before_close=0,
                  serializer=None):
         """Initialize scheduler.

@@ -4,10 +4,9 @@ import time
 from scrapy.dupefilters import BaseDupeFilter
 from scrapy.utils.request import request_fingerprint
 
+from . import defaults
 from .connection import get_redis_from_settings
 
-
-DEFAULT_DUPEFILTER_KEY = "dupefilter:%(timestamp)s"
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +63,7 @@ class RFPDupeFilter(BaseDupeFilter):
         # class as standalone dupefilter with scrapy's default scheduler
         # if scrapy passes spider on open() method this wouldn't be needed
         # TODO: Use SCRAPY_JOB env as default and fallback to timestamp.
-        key = DEFAULT_DUPEFILTER_KEY % {'timestamp': int(time.time())}
+        key = defaults.DUPEFILTER_KEY % {'timestamp': int(time.time())}
         debug = settings.getbool('DUPEFILTER_DEBUG')
         return cls(server, key=key, debug=debug)
 
