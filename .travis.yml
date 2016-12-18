@@ -6,23 +6,12 @@ services:
   - redis-server
 
 env:
-  - TOXENV=py27-scrapy10
-  - TOXENV=py27-scrapy11
-  - TOXENV=py27-scrapy12
-  - TOXENV=py27-scrapydev
-  - TOXENV=py34-scrapy11
-  - TOXENV=py34-scrapy12
-  - TOXENV=py34-scrapydev
-  - TOXENV=py35-scrapy11
-  - TOXENV=py35-scrapy12
-  - TOXENV=py35-scrapydev
+  - TOXENV=py27-scrapyrel
+  - TOXENV=py34-scrapyrel
+  - TOXENV=py35-scrapyrel
 
 matrix:
   fast_finish: true
-  allow_failures:
-    - env: TOXENV=py27-scrapydev
-    - env: TOXENV=py34-scrapydev
-    - env: TOXENV=py35-scrapydev
 
 before_install:
   - python --version
@@ -76,4 +65,4 @@ deploy:
     tags: true
     all_branches: true
     repo: rolando/scrapy-redis
-    condition: "$TOXENV == py35-scrapy12"
+    condition: "$TOXENV == py35-scrapyrel"
