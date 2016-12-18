@@ -13,3 +13,5 @@ TODO
   cases (i.e.: producer/consumer).
 * Add pyrebloom dupefilter.
 * Warn and pass unserializable requests.
+* Drop official support for Scrapy 1.0. It is enough to support current and previous
+  scrapy  version.
