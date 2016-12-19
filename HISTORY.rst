@@ -4,6 +4,11 @@ History
 
 .. comment:: bumpversion marker
 
+0.6.5 (2016-12-19)
+------------------
+* Fixed typo in default settings.
+
+
 0.6.4 (2016-12-18)
 ------------------
 * Fixed data decoding in Python 3.x.
