@@ -120,9 +120,10 @@ Use the following settings in your project:
   # Use custom redis client class.
   #REDIS_PARAMS['redis_cls'] = 'myproject.RedisClient'
 
-  # If True, it uses redis' ``spop`` operation. This could be useful if you
-  # want to avoid duplicates in your start urls list. In this cases, urls must
-  # be added via ``sadd`` command or you will get a type error from redis.
+  # If True, it uses redis' ``SPOP`` operation. You have to use the ``SADD``
+  # command to add URLs to the redis queue. This could be useful if you
+  # want to avoid duplicates in your start urls list and the order of
+  # processing does not matter.
   #REDIS_START_URLS_AS_SET = False
 
   # Default start urls key for RedisSpider and RedisCrawlSpider.
