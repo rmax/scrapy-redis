@@ -4,6 +4,10 @@ History
 
 .. comment:: bumpversion marker
 
+0.6.6 (2016-12-20)
+------------------
+* Fixes wrong message on dupefilter duplicates.
+
 0.6.5 (2016-12-19)
 ------------------
 * Fixed typo in default settings.
