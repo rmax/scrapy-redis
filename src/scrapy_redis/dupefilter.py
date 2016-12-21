@@ -144,6 +144,5 @@ class RFPDupeFilter(BaseDupeFilter):
             msg = ("Filtered duplicate request %(request)s"
                    " - no more duplicates will be shown"
                    " (see DUPEFILTER_DEBUG to show all duplicates)")
-            msg = "Filtered duplicate request: %(request)s"
             self.logger.debug(msg, {'request': request}, extra={'spider': spider})
             self.logdupes = False
