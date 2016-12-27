@@ -64,7 +64,7 @@ class RedisMixin(object):
             self.redis_encoding = settings.get('REDIS_ENCODING', defaults.REDIS_ENCODING)
 
         self.logger.info("Reading start URLs from redis key '%(redis_key)s' "
-                         "(batch size: %(redis_batch_size)s, encoding: %(redis_encoding)",
+                         "(batch size: %(redis_batch_size)s, encoding: %(redis_encoding)s",
                          self.__dict__)
 
         self.server = connection.from_settings(crawler.settings)
