@@ -4,6 +4,10 @@ History
 
 .. comment:: bumpversion marker
 
+0.6.7 (2016-12-27)
+------------------
+* Fixes bad formatting in logging message.
+
 0.6.6 (2016-12-20)
 ------------------
 * Fixes wrong message on dupefilter duplicates.
