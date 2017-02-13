@@ -49,6 +49,8 @@ Features
 * Scrapy plug-and-play components
   
     Scheduler + Duplication Filter, Item Pipeline, Base Spiders.
+    
+.. note:: This features cover the basic case of distributing the workload across multiple workers. If you need more features like URL expiration, advanced URL prioritization, etc., we suggest you to take a look at the `Frontera`_ project.
 
 Requirements
 ------------
@@ -134,7 +136,7 @@ Use the following settings in your project:
 
 .. note::
 
-  Version 0.3 changed the requests serialization from `marshal` to `cPickle`,
+  Version 0.3 changed the requests serialization from ``marshal`` to ``cPickle``,
   therefore persisted requests using version 0.2 will not able to work on 0.3.
 
 
@@ -210,3 +212,5 @@ Then:
     These spiders rely on the spider idle signal to fetch start urls, hence it
     may have a few seconds of delay between the time you push a new url and the
     spider starts crawling it.
+
+.. _Frontera: https://github.com/scrapinghub/frontera
