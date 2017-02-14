@@ -4,6 +4,10 @@ History
 
 .. comment:: bumpversion marker
 
+0.6.8 (2017-02-14)
+------------------
+* Fixed automated release due to not matching registered email.
+
 0.6.7 (2016-12-27)
 ------------------
 * Fixes bad formatting in logging message.
