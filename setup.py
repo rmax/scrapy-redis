@@ -33,7 +33,7 @@ setup(
     description="Redis-based components for Scrapy.",
     long_description=read_rst('README.rst') + '\n\n' + read_rst('HISTORY.rst'),
     author="Rolando Espinoza",
-    author_email='rolando at rmax.io',
+    author_email='rolando@rmax.io',
     url='https://github.com/rolando/scrapy-redis',
     packages=list(find_packages('src')),
     package_dir={'': 'src'},

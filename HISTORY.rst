@@ -6,6 +6,23 @@ History
 
 0.7.0-dev (unreleased)
 ------------------
+* Unreleased.
+
+0.6.8 (2017-02-14)
+------------------
+* Fixed automated release due to not matching registered email.
+
+0.6.7 (2016-12-27)
+------------------
+* Fixes bad formatting in logging message.
+
+0.6.6 (2016-12-20)
+------------------
+* Fixes wrong message on dupefilter duplicates.
+
+0.6.5 (2016-12-19)
+------------------
+* Fixed typo in default settings.
 
 0.6.4 (2016-12-18)
 ------------------
