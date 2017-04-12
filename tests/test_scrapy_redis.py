@@ -193,7 +193,7 @@ class SchedulerTest(RedisTestMixin, TestCase):
 
     def test_scheduler_persistent(self):
         # TODO: Improve this test to avoid the need to check for log messages.
-        self.spider.log = mock.Mock(spec=self.spider.log)
+        self.spider.log = mock.Mock(spec=self.spider.logger)
 
         self.scheduler.persist = True
         self.scheduler.open(self.spider)

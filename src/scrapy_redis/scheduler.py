@@ -148,7 +148,7 @@ class Scheduler(object):
             self.flush()
         # notice if there are requests already in the queue to resume the crawl
         if len(self.queue):
-            spider.log("Resuming crawl (%d requests scheduled)" % len(self.queue))
+            spider.logger.info("Resuming crawl (%d requests scheduled)" % len(self.queue))
 
     def close(self, reason):
         if not self.persist:
