@@ -1,4 +1,5 @@
 import redis
+import rediscluster
 
 
 # For standalone use.
@@ -7,6 +8,7 @@ DUPEFILTER_KEY = 'dupefilter:%(timestamp)s'
 PIPELINE_KEY = '%(spider)s:items'
 
 REDIS_CLS = redis.StrictRedis
+REDISCLUSTER_CLS = rediscluster.StrictRedisCluster
 REDIS_ENCODING = 'utf-8'
 # Sane connection defaults.
 REDIS_PARAMS = {
