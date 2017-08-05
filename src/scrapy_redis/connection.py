@@ -11,6 +11,7 @@ SETTINGS_PARAMS_MAP = {
     'REDIS_HOST': 'host',
     'REDIS_PORT': 'port',
     'REDIS_ENCODING': 'encoding',
+    'REDIS_CLUSTER': 'cluster',
 }
 
 
@@ -41,6 +42,8 @@ def get_redis_from_settings(settings):
         Server port.
     REDIS_ENCODING : str, optional
         Data encoding.
+    REDIS_CLUSTER : bool, optional
+        True for using reids-cluster, False for not.
     REDIS_PARAMS : dict, optional
         Additional client parameters.
 
@@ -82,7 +85,11 @@ def get_redis(**kwargs):
         Redis client instance.
 
     """
-    redis_cls = kwargs.pop('redis_cls', defaults.REDIS_CLS)
+    cluster = kwargs.pop('cluster', False)
+    if cluster:
+        redis_cls = kwargs.pop('redis_cls', defaults.REDISCLUSTER_CLS)
+    else:
+        redis_cls = kwargs.pop('redis_cls', defaults.REDIS_CLS)
     url = kwargs.pop('url', None)
     if url:
         return redis_cls.from_url(url, **kwargs)
