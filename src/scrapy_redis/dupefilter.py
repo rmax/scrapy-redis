@@ -114,6 +114,15 @@ class RFPDupeFilter(BaseDupeFilter):
         """
         return request_fingerprint(request)
 
+    @classmethod
+    def from_spider(cls, spider):
+        settings = spider.settings
+        server = get_redis_from_settings(settings)
+        dupefilter_key = settings.get("SCHEDULER_DUPEFILTER_KEY", defaults.SCHEDULER_DUPEFILTER_KEY)
+        key = dupefilter_key % {'spider': spider.name}
+        debug = settings.getbool('DUPEFILTER_DEBUG')
+        return cls(server, key=key, debug=debug)
+
     def close(self, reason=''):
         """Delete data on close. Called by Scrapy's scheduler.
 
