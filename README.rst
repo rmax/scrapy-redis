@@ -213,4 +213,17 @@ Then:
     may have a few seconds of delay between the time you push a new url and the
     spider starts crawling it.
 
+
+Contributions
+-------------
+
+Donate BTC: ``13haqimDV7HbGWtz7uC6wP1zvsRWRAhPmF``
+
+Donate BCC: ``CSogMjdfPZnKf1p5ocu3gLR54Pa8M42zZM``
+
+Donate ETH: ``0x681d9c8a2a3ff0b612ab76564e7dca3f2ccc1c0d``
+
+Donate LTC: ``LaPHpNS1Lns3rhZSvvkauWGDfCmDLKT8vP``
+
+
 .. _Frontera: https://github.com/scrapinghub/frontera
