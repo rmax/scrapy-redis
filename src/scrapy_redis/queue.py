@@ -96,7 +96,7 @@ class PriorityQueue(Base):
 
     def push(self, request):
         """Push a request"""
-        data = self._encode_request(request)
+        data = str(self._encode_request(request))
         score = -request.priority
         # We don't use zadd method as the order of arguments change depending on
         # whether the class is Redis or StrictRedis, and the option of using
@@ -114,7 +114,7 @@ class PriorityQueue(Base):
         pipe.zrange(self.key, 0, 0).zremrangebyrank(self.key, 0, 0)
         results, count = pipe.execute()
         if results:
-            return self._decode_request(results[0])
+            return self._decode_request(eval(results[0]))
 
 
 class LifoQueue(Base):
