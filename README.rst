@@ -12,20 +12,6 @@ Scrapy-Redis
 .. image:: https://img.shields.io/pypi/pyversions/scrapy-redis.svg
         :target: https://pypi.python.org/pypi/scrapy-redis
 
-.. image:: https://img.shields.io/travis/rolando/scrapy-redis.svg
-        :target: https://travis-ci.org/rolando/scrapy-redis
-
-.. image:: https://codecov.io/github/rolando/scrapy-redis/coverage.svg?branch=master
-    :alt: Coverage Status
-    :target: https://codecov.io/github/rolando/scrapy-redis
-
-.. image:: https://landscape.io/github/rolando/scrapy-redis/master/landscape.svg?style=flat
-    :target: https://landscape.io/github/rolando/scrapy-redis/master
-    :alt: Code Quality Status
-
-.. image:: https://requires.io/github/rolando/scrapy-redis/requirements.svg?branch=master
-    :alt: Requirements Status
-    :target: https://requires.io/github/rolando/scrapy-redis/requirements/?branch=master
 
 Redis-based components for Scrapy.
 
@@ -47,9 +33,21 @@ Features
     many as needed post-processing processes sharing the items queue.
 
 * Scrapy plug-and-play components
-  
+
     Scheduler + Duplication Filter, Item Pipeline, Base Spiders.
+
+* In this forked version: added `json` supported data in Redis
     
+    data contains `url`, `meta` and other optional parameters. `meta` is a nested json which contains sub-data.
+    this function extract this data and send another FormRequest with `url`, `meta` and addition `formdata`.
+
+    For example:
+    .. code-block:: json::
+        {"url": "https://exaple.com", "meta": {'job-id':'123xsd', 'start-date':'dd/mm/yy'}, "url_cookie_key":"fertxsas" }
+
+    this data can be accessed in `scrapy spider` through request.
+    like: `request.url`, `request.metadata`, `request.url_cookie_key`
+
 .. note:: This features cover the basic case of distributing the workload across multiple workers. If you need more features like URL expiration, advanced URL prioritization, etc., we suggest you to take a look at the `Frontera`_ project.
 
 Requirements
@@ -59,6 +57,20 @@ Requirements
 * Redis >= 2.8
 * ``Scrapy`` >= 1.1
 * ``redis-py`` >= 2.10
+
+Installation
+------------
+
+From `github`::
+
+  $ git clone https://github.com/darkrho/scrapy-redis.git
+  $ cd scrapy-redis
+  $ python setup.py install
+
+.. note:: For using this json supported data feature, please make sure you have not installed the scrapy-redis through pip. If you already did it, you first uninstall that one.
+    .. code::
+        pip uninstall scrapy-redis
+
 
 Usage
 -----
@@ -146,7 +158,7 @@ Running the example project
 This example illustrates how to share a spider's requests queue
 across multiple spider instances, highly suitable for broad crawls.
 
-1. Setup scrapy_redis package in your PYTHONPATH
+1. Check scrapy_redis package in your PYTHONPATH
 
 2. Run the crawler for first time then stop it::
 
@@ -202,28 +214,15 @@ Then:
 
     scrapy runspider myspider.py
 
-2. push urls to redis::
+2. push json data to redis::
 
-    redis-cli lpush myspider:start_urls http://google.com
+    redis-cli lpush myspider '{"url": "https://exaple.com", "meta": {"job-id":"123xsd", "start-date":"dd/mm/yy"}, "url_cookie_key":"fertxsas" }'
 
 
 .. note::
 
-    These spiders rely on the spider idle signal to fetch start urls, hence it
-    may have a few seconds of delay between the time you push a new url and the
-    spider starts crawling it.
+    * These spiders rely on the spider idle signal to fetch start urls, hence it
+      may have a few seconds of delay between the time you push a new url and the
+      spider starts crawling it.
 
-
-Contributions
--------------
-
-Donate BTC: ``13haqimDV7HbGWtz7uC6wP1zvsRWRAhPmF``
-
-Donate BCC: ``CSogMjdfPZnKf1p5ocu3gLR54Pa8M42zZM``
-
-Donate ETH: ``0x681d9c8a2a3ff0b612ab76564e7dca3f2ccc1c0d``
-
-Donate LTC: ``LaPHpNS1Lns3rhZSvvkauWGDfCmDLKT8vP``
-
-
-.. _Frontera: https://github.com/scrapinghub/frontera
+    * Also please pay attention to json formatting.
