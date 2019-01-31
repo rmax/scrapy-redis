@@ -37,7 +37,7 @@ Features
     Scheduler + Duplication Filter, Item Pipeline, Base Spiders.
 
 * In this forked version: added `json` supported data in Redis
-    
+
     data contains `url`, `meta` and other optional parameters. `meta` is a nested json which contains sub-data.
     this function extract this data and send another FormRequest with `url`, `meta` and addition `formdata`.
 
@@ -45,8 +45,8 @@ Features
     .. code-block:: json::
         {"url": "https://exaple.com", "meta": {'job-id':'123xsd', 'start-date':'dd/mm/yy'}, "url_cookie_key":"fertxsas" }
 
-    this data can be accessed in `scrapy spider` through request.
-    like: `request.url`, `request.metadata`, `request.url_cookie_key`
+    this data can be accessed in `scrapy spider` through response.
+    like: `response.url`, `response.meta`, `response.url_cookie_key`
 
 .. note:: This features cover the basic case of distributing the workload across multiple workers. If you need more features like URL expiration, advanced URL prioritization, etc., we suggest you to take a look at the `Frontera`_ project.
 
