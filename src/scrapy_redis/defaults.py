@@ -1,6 +1,5 @@
 import redis
 
-
 # For standalone use.
 DUPEFILTER_KEY = 'dupefilter:%(timestamp)s'
 
@@ -23,3 +22,5 @@ SCHEDULER_DUPEFILTER_CLASS = 'scrapy_redis.dupefilter.RFPDupeFilter'
 
 START_URLS_KEY = '%(name)s:start_urls'
 START_URLS_AS_SET = False
+START_URLS_AS_ZSET = False
+ZSET_DEFAULT_PRIORITY = 0

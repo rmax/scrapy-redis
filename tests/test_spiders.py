@@ -6,6 +6,7 @@ from scrapy import signals
 from scrapy.exceptions import DontCloseSpider
 from scrapy.settings import Settings
 
+from scrapy_redis.defaults import ZSET_DEFAULT_PRIORITY
 from scrapy_redis.spiders import (
     RedisCrawlSpider,
     RedisSpider,
@@ -107,14 +108,16 @@ class MockRequest(mock.Mock):
     MySpider,
     MyCrawlSpider,
 ])
+@pytest.mark.parametrize('start_urls_as_zset', [False, True])
 @pytest.mark.parametrize('start_urls_as_set', [False, True])
 @mock.patch('scrapy.spiders.Request', MockRequest)
-def test_consume_urls_from_redis(start_urls_as_set, spider_cls):
+def test_consume_urls_from_redis(start_urls_as_zset, start_urls_as_set, spider_cls):
     batch_size = 5
     redis_key = 'start:urls'
     crawler = get_crawler()
     crawler.settings.setdict({
         'REDIS_START_URLS_KEY': redis_key,
+        'REDIS_START_URLS_AS_ZSET': start_urls_as_zset,
         'REDIS_START_URLS_AS_SET': start_urls_as_set,
         'CONCURRENT_REQUESTS': batch_size,
     })
@@ -124,14 +127,21 @@ def test_consume_urls_from_redis(start_urls_as_set, spider_cls):
             'http://example.com/%d' % i for i in range(batch_size * 2)
         ]
         reqs = []
-        server_put = spider.server.sadd if start_urls_as_set else spider.server.rpush
+
+        if start_urls_as_zset:
+            server_put = lambda key, value: spider.server.zadd(key, {value: ZSET_DEFAULT_PRIORITY})
+        elif start_urls_as_set:
+            server_put = spider.server.sadd
+        else:
+            server_put = spider.server.rpush
+
         for url in urls:
             server_put(redis_key, url)
             reqs.append(MockRequest(url))
 
         # First call is to start requests.
         start_requests = list(spider.start_requests())
-        if start_urls_as_set:
+        if start_urls_as_zset or start_urls_as_set:
             assert len(start_requests) == batch_size
             assert set(start_requests).issubset(reqs)
         else:
@@ -146,7 +156,7 @@ def test_consume_urls_from_redis(start_urls_as_set, spider_cls):
 
         # Last batch was passed to crawl.
         assert crawler.engine.crawl.call_count == batch_size
-        if start_urls_as_set:
+        if start_urls_as_zset or start_urls_as_set:
             crawler.engine.crawl.assert_has_calls([
                 mock.call(req, spider=spider) for req in reqs if req not in start_requests
             ], any_order=True)

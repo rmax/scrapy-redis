@@ -15,6 +15,23 @@ class RedisMixin(object):
     # Redis client placeholder.
     server = None
 
+    # zset start urls use
+    lua_script = """
+        local function tablelength(T)
+            local count = 0
+            for _ in pairs(T) do count = count + 1 end
+            return count
+        end
+        
+        local data = redis.call("zrange", KEYS[1], -1, -1)
+        if (tablelength(data) ~= 0) then 
+            redis.call("zrem", KEYS[1], data[1])
+            return data
+        else
+            return data
+        end
+    """
+
     def start_requests(self):
         """Returns a batch of start requests from redis."""
         return self.next_requests()
@@ -72,10 +89,24 @@ class RedisMixin(object):
         # that's when we will schedule new requests from redis queue
         crawler.signals.connect(self.spider_idle, signal=signals.spider_idle)
 
+    def set_start_urls(self, key):
+        return self.server.spop(key)
+
+    def queue_start_urls(self, key):
+        return self.server.lpop(key)
+
+    def zset_start_urls(self, key):
+        data = self.server.eval(self.lua_script, 1, key)
+        return data[0] if data else None
+
     def next_requests(self):
         """Returns a request to be scheduled or none."""
-        use_set = self.settings.getbool('REDIS_START_URLS_AS_SET', defaults.START_URLS_AS_SET)
-        fetch_one = self.server.spop if use_set else self.server.lpop
+        if self.settings.getbool('REDIS_START_URLS_AS_ZSET', defaults.START_URLS_AS_ZSET):
+            fetch_one = self.zset_start_urls
+        elif self.settings.getbool('REDIS_START_URLS_AS_SET', defaults.START_URLS_AS_SET):
+            fetch_one = self.set_start_urls
+        else:
+            fetch_one = self.queue_start_urls
         # XXX: Do we need to use a timeout here?
         found = 0
         # TODO: Use redis pipeline execution.
