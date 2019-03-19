@@ -128,6 +128,11 @@ Use the following settings in your project:
   # processing does not matter.
   #REDIS_START_URLS_AS_SET = False
 
+  # If True, it uses redis ``zrange`` and ``zrem`` operation. You have to use the ``zadd``
+  # command to add URLS and Scores to redis queue. This could be useful if you
+  # want to use priority and avoid duplicates in your start urls list.
+  #REDIS_START_URLS_AS_ZSET = False
+
   # Default start urls key for RedisSpider and RedisCrawlSpider.
   #REDIS_START_URLS_KEY = '%(name)s:start_urls'
 
