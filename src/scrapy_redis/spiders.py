@@ -142,7 +142,7 @@ class RedisMixin(object):
         """Schedules a request if available, otherwise waits."""
         # XXX: Handle a sentinel to close the spider.
         self.schedule_next_requests()
-        raise DontCloseSpider
+        # raise DontCloseSpider
 
 
 class RedisSpider(RedisMixin, Spider):
