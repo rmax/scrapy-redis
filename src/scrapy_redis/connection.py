@@ -1,3 +1,5 @@
+import sys
+
 import six
 
 from scrapy.utils.misc import load_object
@@ -12,6 +14,9 @@ SETTINGS_PARAMS_MAP = {
     'REDIS_PORT': 'port',
     'REDIS_ENCODING': 'encoding',
 }
+
+if sys.version_info > (3,):
+    SETTINGS_PARAMS_MAP['REDIS_DECODE_RESPONSES'] = 'decode_responses'
 
 
 def get_redis_from_settings(settings):
@@ -43,6 +48,11 @@ def get_redis_from_settings(settings):
         Data encoding.
     REDIS_PARAMS : dict, optional
         Additional client parameters.
+
+    Python 3 Only
+    ----------------
+    REDIS_DECODE_RESPONSES : bool, optional
+        Sets the `decode_responses` kwarg in Redis cls ctor
 
     """
     params = defaults.REDIS_PARAMS.copy()
