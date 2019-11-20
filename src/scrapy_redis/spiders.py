@@ -68,6 +68,7 @@ class RedisMixin(object):
                          self.__dict__)
 
         self.server = connection.from_settings(crawler.settings)
+        self.pipe = self.server.pipeline()
         # The idle signal is called when the spider has no requests left,
         # that's when we will schedule new requests from redis queue
         crawler.signals.connect(self.spider_idle, signal=signals.spider_idle)
@@ -75,14 +76,16 @@ class RedisMixin(object):
     def next_requests(self):
         """Returns a request to be scheduled or none."""
         use_set = self.settings.getbool('REDIS_START_URLS_AS_SET', defaults.START_URLS_AS_SET)
-        fetch_one = self.server.spop if use_set else self.server.lpop
+        fetch_one = self.pipe.spop if use_set else self.pipe.lpop
         # XXX: Do we need to use a timeout here?
+
+        for _ in range(self.redis_batch_size):
+            fetch_one(self.redis_key)
+
+        datas = self.pipe.execute()
         found = 0
-        # TODO: Use redis pipeline execution.
-        while found < self.redis_batch_size:
-            data = fetch_one(self.redis_key)
+        for data in datas:
             if not data:
-                # Queue empty.
                 break
             req = self.make_request_from_data(data)
             if req:
@@ -90,7 +93,6 @@ class RedisMixin(object):
                 found += 1
             else:
                 self.logger.debug("Request not made from data: %r", data)
-
         if found:
             self.logger.debug("Read %s requests from '%s'", found, self.redis_key)
 
