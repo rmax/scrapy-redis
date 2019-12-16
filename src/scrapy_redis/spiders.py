@@ -26,7 +26,6 @@ class RedisMixin(object):
         """
         if self.server is not None:
             return
-        self.pipe = self.server.pipeline()
 
         if crawler is None:
             # We allow optional crawler argument to keep backwards
@@ -69,6 +68,7 @@ class RedisMixin(object):
                          self.__dict__)
 
         self.server = connection.from_settings(crawler.settings)
+        self.pipe = self.server.pipeline()
         # The idle signal is called when the spider has no requests left,
         # that's when we will schedule new requests from redis queue
         crawler.signals.connect(self.spider_idle, signal=signals.spider_idle)
