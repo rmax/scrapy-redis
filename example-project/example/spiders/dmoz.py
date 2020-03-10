@@ -5,8 +5,8 @@ from scrapy.spiders import CrawlSpider, Rule
 class DmozSpider(CrawlSpider):
     """Follow categories and extract links."""
     name = 'dmoz'
-    allowed_domains = ['dmoz.org']
-    start_urls = ['http://www.dmoz.org/']
+    allowed_domains = ['dmoz-odp.org']
+    start_urls = ['http://www.dmoz-odp.org/']
 
     rules = [
         Rule(LinkExtractor(
