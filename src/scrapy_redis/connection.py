@@ -10,6 +10,7 @@ SETTINGS_PARAMS_MAP = {
     'REDIS_URL': 'url',
     'REDIS_HOST': 'host',
     'REDIS_PORT': 'port',
+    'REDIS_DB': 'db',
     'REDIS_ENCODING': 'encoding',
 }
 
