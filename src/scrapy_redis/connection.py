@@ -40,6 +40,8 @@ def get_redis_from_settings(settings):
         Server host.
     REDIS_PORT : str, optional
         Server port.
+    REDIS_DB : int, optional
+        Server database
     REDIS_ENCODING : str, optional
         Data encoding.
     REDIS_PARAMS : dict, optional
