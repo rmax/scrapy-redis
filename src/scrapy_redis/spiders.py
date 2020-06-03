@@ -72,18 +72,22 @@ class RedisMixin(object):
         # that's when we will schedule new requests from redis queue
         crawler.signals.connect(self.spider_idle, signal=signals.spider_idle)
 
+    def lpop_multi(self, redis_key, batch_size):
+        with self.server.pipeline() as pipe:
+            pipe.lrange(redis_key, 0, batch_size - 1)
+            pipe.ltrim(redis_key, batch_size, -1)
+            datas, _ = pipe.execute()
+        return datas
+
     def next_requests(self):
         """Returns a request to be scheduled or none."""
         use_set = self.settings.getbool('REDIS_START_URLS_AS_SET', defaults.START_URLS_AS_SET)
-        fetch_one = self.server.spop if use_set else self.server.lpop
+        fetch_data = self.server.spop if use_set else self.lpop_multi
         # XXX: Do we need to use a timeout here?
         found = 0
-        # TODO: Use redis pipeline execution.
-        while found < self.redis_batch_size:
-            data = fetch_one(self.redis_key)
-            if not data:
-                # Queue empty.
-                break
+
+        datas = fetch_data(self.redis_key, self.redis_batch_size)
+        for data in datas:
             req = self.make_request_from_data(data)
             if req:
                 yield req
