@@ -47,9 +47,9 @@ Features
     many as needed post-processing processes sharing the items queue.
 
 * Scrapy plug-and-play components
-  
+
     Scheduler + Duplication Filter, Item Pipeline, Base Spiders.
-    
+
 .. note:: This features cover the basic case of distributing the workload across multiple workers. If you need more features like URL expiration, advanced URL prioritization, etc., we suggest you to take a look at the `Frontera`_ project.
 
 Requirements
@@ -127,6 +127,11 @@ Use the following settings in your project:
   # want to avoid duplicates in your start urls list and the order of
   # processing does not matter.
   #REDIS_START_URLS_AS_SET = False
+
+  # If True, it uses redis ``zrevrange`` and ``zremrangebyrank`` operation. You have to use the ``zadd``
+  # command to add URLS and Scores to redis queue. This could be useful if you
+  # want to use priority and avoid duplicates in your start urls list.
+  #REDIS_START_URLS_AS_ZSET = False
 
   # Default start urls key for RedisSpider and RedisCrawlSpider.
   #REDIS_START_URLS_KEY = '%(name)s:start_urls'

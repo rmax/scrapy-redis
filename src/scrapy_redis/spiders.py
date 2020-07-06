@@ -68,25 +68,37 @@ class RedisMixin(object):
                          self.__dict__)
 
         self.server = connection.from_settings(crawler.settings)
+
+        if self.settings.getbool('REDIS_START_URLS_AS_SET', defaults.START_URLS_AS_SET):
+            self.fetch_data = self.server.spop
+        elif self.settings.getbool('REDIS_START_URLS_AS_ZSET', defaults.START_URLS_AS_ZSET):
+            self.fetch_data = self.pop_priority_queue
+        else:
+            self.fetch_data = self.pop_list_queue
+
         # The idle signal is called when the spider has no requests left,
         # that's when we will schedule new requests from redis queue
         crawler.signals.connect(self.spider_idle, signal=signals.spider_idle)
 
-    def lpop_multi(self, redis_key, batch_size):
+    def pop_list_queue(self, redis_key, batch_size):
         with self.server.pipeline() as pipe:
             pipe.lrange(redis_key, 0, batch_size - 1)
             pipe.ltrim(redis_key, batch_size, -1)
             datas, _ = pipe.execute()
         return datas
 
+    def pop_priority_queue(self, redis_key, batch_size):
+        with self.server.pipeline() as pipe:
+            pipe.zrevrange(redis_key, 0, batch_size - 1)
+            pipe.zremrangebyrank(redis_key, -batch_size, -1)
+            datas, _ = pipe.execute()
+        return datas
+
     def next_requests(self):
         """Returns a request to be scheduled or none."""
-        use_set = self.settings.getbool('REDIS_START_URLS_AS_SET', defaults.START_URLS_AS_SET)
-        fetch_data = self.server.spop if use_set else self.lpop_multi
         # XXX: Do we need to use a timeout here?
         found = 0
-
-        datas = fetch_data(self.redis_key, self.redis_batch_size)
+        datas = self.fetch_data(self.redis_key, self.redis_batch_size)
         for data in datas:
             req = self.make_request_from_data(data)
             if req:
