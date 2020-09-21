@@ -1,6 +1,8 @@
 from scrapy import signals
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import Spider, CrawlSpider
+from collections import Iterable
+
 
 from . import connection, defaults
 from .utils import bytes_to_str
@@ -88,9 +90,15 @@ class RedisMixin(object):
 
         datas = fetch_data(self.redis_key, self.redis_batch_size)
         for data in datas:
-            req = self.make_request_from_data(data)
-            if req:
-                yield req
+            reqs = self.make_request_from_data(data)
+            if isinstance(reqs, Iterable):
+                for req in reqs:
+                    yield req
+                    # XXX: should be here?
+                    found += 1
+                    self.logger.info(f'start req url:{req.url}')
+            elif reqs:
+                yield reqs
                 found += 1
             else:
                 self.logger.debug("Request not made from data: %r", data)
