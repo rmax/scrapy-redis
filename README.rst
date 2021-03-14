@@ -74,7 +74,7 @@ Use the following settings in your project:
   DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 
   # Enables stats shared based on Redis
-  STATS_CLASS = "gerapy_redis.stats.RedisStatsCollector"
+  STATS_CLASS = "scrapy_redis.stats.RedisStatsCollector"
 
   # Default requests serializer is pickle, but it can be changed to any module
   # with loads and dumps functions. Note that pickle is not compatible between
