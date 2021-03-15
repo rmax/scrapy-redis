@@ -1,6 +1,7 @@
 from scrapy.statscollectors import StatsCollector
 from .connection import from_settings as redis_from_settings
 from .defaults import STATS_KEY, SCHEDULER_PERSIST
+from datetime import datetime
 
 
 class RedisStatsCollector(StatsCollector):
@@ -42,6 +43,8 @@ class RedisStatsCollector(StatsCollector):
 
     def set_value(self, key, value, spider=None):
         """Set the value according to hash key of stats"""
+        if isinstance(value, datetime):
+            value = value.timestamp()
         self.server.hset(self._get_key(spider), key, value)
 
     def set_stats(self, stats, spider=None):

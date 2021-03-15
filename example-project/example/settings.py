@@ -9,7 +9,7 @@ SPIDER_MODULES = ['example.spiders']
 NEWSPIDER_MODULE = 'example.spiders'
 
 USER_AGENT = 'scrapy-redis (+https://github.com/rolando/scrapy-redis)'
-
+STATS_CLASS = "scrapy_redis.stats.RedisStatsCollector"
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 SCHEDULER_PERSIST = True
