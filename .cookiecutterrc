@@ -15,5 +15,5 @@ cookiecutter:
     use_pypi_deployment_with_travis: n
     use_pytest: y
     use_requiresio: y
-    version: 0.7.0-dev
-    year: 2011-2016
+    version: 0.7.1-a1
+    year: 2011-2021
