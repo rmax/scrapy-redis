@@ -5,11 +5,11 @@ History
 .. comment:: bumpversion marker
 
 0.7.1-b1 (2021-03-22)
-------------------
+---------------------
 * Add support for stats extensions.
 
 0.7.0-dev (unreleased)
-------------------
+----------------------
 * Unreleased.
 
 0.6.8 (2017-02-14)
