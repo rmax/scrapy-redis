@@ -60,3 +60,6 @@ target/
 
 # rope-vim
 .ropeproject
+
+# Extra
+.DS_Store
