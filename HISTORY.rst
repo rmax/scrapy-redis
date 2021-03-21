@@ -4,6 +4,9 @@ History
 
 .. comment:: bumpversion marker
 
+0.7.1-b1 (2021-03-22)
+------------------
+
 0.7.0-dev (unreleased)
 ------------------
 * Unreleased.
