@@ -4,9 +4,14 @@ History
 
 .. comment:: bumpversion marker
 
+0.7.1 (2021-03-27)
+------------------
+* Fixes datetime parse error for redis-py 3.x.
+* Add support for stats extensions.
+
 0.7.1-rc1 (2021-03-27)
 ----------------------
-* Fixes datetime parse error for redis-py 3.x
+* Fixes datetime parse error for redis-py 3.x.
 
 0.7.1-b1 (2021-03-22)
 ---------------------
