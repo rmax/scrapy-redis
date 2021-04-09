@@ -70,7 +70,7 @@ class RedisStatsCollector(StatsCollector):
         self.set_value(key, min(self.get_value(key, value), value))
 
     def clear_stats(self, spider=None):
-        """Clarn all the hash stats"""
+        """Clear all the hash stats"""
         self.server.delete(self._get_key(spider))
 
     def open_spider(self, spider):
