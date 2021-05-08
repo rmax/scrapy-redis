@@ -2,7 +2,7 @@ from scrapy import signals
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import Spider, CrawlSpider
 from collections import Iterable
-
+import time
 
 from . import connection, defaults
 from .utils import bytes_to_str
@@ -16,6 +16,9 @@ class RedisMixin(object):
 
     # Redis client placeholder.
     server = None
+
+    # Idle start time
+    spider_idle_start_time = int(time.time())
 
     def start_requests(self):
         """Returns a batch of start requests from redis."""
@@ -73,10 +76,13 @@ class RedisMixin(object):
 
         if self.settings.getbool('REDIS_START_URLS_AS_SET', defaults.START_URLS_AS_SET):
             self.fetch_data = self.server.spop
+            self.count_size = self.server.scard
         elif self.settings.getbool('REDIS_START_URLS_AS_ZSET', defaults.START_URLS_AS_ZSET):
             self.fetch_data = self.pop_priority_queue
+            self.count_size = self.server.zcard
         else:
             self.fetch_data = self.pop_list_queue
+            self.count_size = self.server.llen
 
         # The idle signal is called when the spider has no requests left,
         # that's when we will schedule new requests from redis queue
@@ -140,9 +146,20 @@ class RedisMixin(object):
             self.crawler.engine.crawl(req, spider=self)
 
     def spider_idle(self):
-        """Schedules a request if available, otherwise waits."""
-        # XXX: Handle a sentinel to close the spider.
+        """
+        Schedules a request if available, otherwise waits.
+        or close spider when waiting seconds > MAX_IDLE_TIME_BEFORE_CLOSE.
+        MAX_IDLE_TIME_BEFORE_CLOSE will not affect SCHEDULER_IDLE_BEFORE_CLOSE.
+        """
+        if self.server is not None and self.count_size(self.redis_key) > 0:
+            self.spider_idle_start_time = int(time.time())
+
         self.schedule_next_requests()
+
+        max_idle_time = self.settings.getint("MAX_IDLE_TIME_BEFORE_CLOSE")
+        idle_time = int(time.time()) - self.spider_idle_start_time
+        if max_idle_time != 0 and idle_time >= max_idle_time:
+            return
         raise DontCloseSpider
 
 

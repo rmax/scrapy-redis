@@ -100,6 +100,12 @@ Use the following settings in your project:
   # and may also block the same time when your spider start at the first time (because the queue is empty).
   #SCHEDULER_IDLE_BEFORE_CLOSE = 10
 
+  # Maximum idle time before close spider.
+  # When the number of idle seconds is greater than MAX_IDLE_TIME_BEFORE_CLOSE, the crawler will close.
+  # If 0, the crawler will DontClose forever to wait for the next request.
+  # If negative number, the crawler will immediately close when the queue is empty, just like Scrapy.
+  #MAX_IDLE_TIME_BEFORE_CLOSE = 0
+
   # Store scraped item in redis for post-processing.
   ITEM_PIPELINES = {
       'scrapy_redis.pipelines.RedisPipeline': 300
