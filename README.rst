@@ -58,7 +58,7 @@ Requirements
 * Python 2.7, 3.4 or 3.5
 * Redis >= 2.8
 * ``Scrapy`` >= 1.1
-* ``redis-py`` >= 2.10
+* ``redis-py`` >= 3.0
 
 Usage
 -----
