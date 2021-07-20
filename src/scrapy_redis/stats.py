@@ -21,7 +21,7 @@ class RedisStatsCollector(StatsCollector):
     def _get_key(self, spider=None):
         """Return the hash name of stats"""
         if spider:
-            self.stats_key % {'spider': spider.name}
+            return self.stats_key % {'spider': spider.name}
         if self.spider:
             return self.stats_key % {'spider': self.spider.name}
         return self.stats_key % {'spider': self.spider_name or 'scrapy'}
