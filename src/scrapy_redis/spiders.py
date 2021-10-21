@@ -1,8 +1,9 @@
-from scrapy import signals, Request
-from scrapy.exceptions import DontCloseSpider
-from scrapy.spiders import Spider, CrawlSpider
-from collections.abc import Iterable
 import time
+from collections.abc import Iterable
+
+from scrapy import Request, signals
+from scrapy.exceptions import DontCloseSpider
+from scrapy.spiders import CrawlSpider, Spider
 
 from scrapy_redis import connection, defaults
 

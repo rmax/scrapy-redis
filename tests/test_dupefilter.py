@@ -1,5 +1,4 @@
 import mock
-
 from scrapy.http import Request
 from scrapy.settings import Settings
 

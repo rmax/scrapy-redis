@@ -13,7 +13,6 @@ import time
 
 from scrapy_redis import get_redis
 
-
 logger = logging.getLogger('process_items')
 
 

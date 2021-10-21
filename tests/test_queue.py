@@ -1,5 +1,4 @@
 import mock
-
 from scrapy import Spider
 from scrapy.http import Request
 

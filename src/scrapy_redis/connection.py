@@ -4,7 +4,6 @@ from scrapy.utils.misc import load_object
 
 from scrapy_redis import defaults
 
-
 # Shortcut maps 'setting name' -> 'parmater name'.
 SETTINGS_PARAMS_MAP = {
     'REDIS_URL': 'url',

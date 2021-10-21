@@ -7,7 +7,6 @@ from scrapy.utils.request import request_fingerprint
 from scrapy_redis import defaults
 from scrapy_redis.connection import get_redis_from_settings
 
-
 logger = logging.getLogger(__name__)
 
 

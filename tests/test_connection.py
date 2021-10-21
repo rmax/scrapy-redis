@@ -1,13 +1,9 @@
 import mock
-
 from scrapy.settings import Settings
 
 from scrapy_redis import defaults
-from scrapy_redis.connection import (
-    from_settings,
-    get_redis,
-    get_redis_from_settings,
-)
+from scrapy_redis.connection import (from_settings, get_redis,
+                                     get_redis_from_settings)
 
 
 class TestGetRedis(object):

@@ -1,4 +1,4 @@
-from scrapy.utils.reqser import request_to_dict, request_from_dict
+from scrapy.utils.reqser import request_from_dict, request_to_dict
 
 from scrapy_redis import picklecompat
 

@@ -1,15 +1,12 @@
 import contextlib
+
 import mock
 import pytest
-
 from scrapy import signals
 from scrapy.exceptions import DontCloseSpider
 from scrapy.settings import Settings
 
-from scrapy_redis.spiders import (
-    RedisCrawlSpider,
-    RedisSpider,
-)
+from scrapy_redis.spiders import RedisCrawlSpider, RedisSpider
 
 
 @contextlib.contextmanager

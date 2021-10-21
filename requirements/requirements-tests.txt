@@ -5,3 +5,4 @@ mock
 pytest
 tox
 tox-py
+isort

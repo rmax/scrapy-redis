@@ -1,7 +1,9 @@
-from scrapy.statscollectors import StatsCollector
-from .connection import from_settings as redis_from_settings
-from .defaults import STATS_KEY, SCHEDULER_PERSIST
 from datetime import datetime
+
+from scrapy.statscollectors import StatsCollector
+
+from .connection import from_settings as redis_from_settings
+from .defaults import SCHEDULER_PERSIST, STATS_KEY
 
 
 class RedisStatsCollector(StatsCollector):

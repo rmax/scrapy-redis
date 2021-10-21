@@ -1,6 +1,5 @@
 import redis
 
-
 # For standalone use.
 DUPEFILTER_KEY = 'dupefilter:%(timestamp)s'
 

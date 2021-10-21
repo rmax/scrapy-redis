@@ -1,18 +1,16 @@
 import os
+from unittest import TestCase
 
 import mock
 import redis
-
 from scrapy import Request, Spider
 from scrapy.settings import Settings
 from scrapy.utils.test import get_crawler
-from unittest import TestCase
 
 from scrapy_redis import connection
 from scrapy_redis.dupefilter import RFPDupeFilter
 from scrapy_redis.queue import FifoQueue, LifoQueue, PriorityQueue
 from scrapy_redis.scheduler import Scheduler
-
 
 # allow test settings from environment
 REDIS_HOST = os.environ.get('REDIST_HOST', 'localhost')
