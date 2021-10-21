@@ -1,11 +1,10 @@
-from scrapy import signals
+from scrapy import signals, Request
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import Spider, CrawlSpider
-from collections import Iterable
+from collections.abc import Iterable
 import time
 
-from . import connection, defaults
-from .utils import bytes_to_str
+from scrapy_redis import connection, defaults
 
 
 class RedisMixin(object):
@@ -136,8 +135,8 @@ class RedisMixin(object):
             Message from redis.
 
         """
-        url = bytes_to_str(data, self.redis_encoding)
-        return self.make_requests_from_url(url)
+        url = data.decode(encoding=self.redis_encoding)
+        return Request(url, dont_filter=True)
 
     def schedule_next_requests(self):
         """Schedules a request if available"""
@@ -190,8 +189,8 @@ class RedisSpider(RedisMixin, Spider):
     """
 
     @classmethod
-    def from_crawler(self, crawler, *args, **kwargs):
-        obj = super(RedisSpider, self).from_crawler(crawler, *args, **kwargs)
+    def from_crawler(cls, crawler, *args, **kwargs):
+        obj = super(RedisSpider, cls).from_crawler(crawler, *args, **kwargs)
         obj.setup_redis(crawler)
         return obj
 
@@ -222,7 +221,7 @@ class RedisCrawlSpider(RedisMixin, CrawlSpider):
     """
 
     @classmethod
-    def from_crawler(self, crawler, *args, **kwargs):
-        obj = super(RedisCrawlSpider, self).from_crawler(crawler, *args, **kwargs)
+    def from_crawler(cls, crawler, *args, **kwargs):
+        obj = super(RedisCrawlSpider, cls).from_crawler(crawler, *args, **kwargs)
         obj.setup_redis(crawler)
         return obj

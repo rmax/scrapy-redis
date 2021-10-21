@@ -1,6 +1,6 @@
 from scrapy.utils.reqser import request_to_dict, request_from_dict
 
-from . import picklecompat
+from scrapy_redis import picklecompat
 
 
 class Base(object):

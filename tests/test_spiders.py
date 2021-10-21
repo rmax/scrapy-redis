@@ -109,7 +109,7 @@ class MockRequest(mock.Mock):
 ])
 @pytest.mark.parametrize('start_urls_as_zset', [False, True])
 @pytest.mark.parametrize('start_urls_as_set', [False, True])
-@mock.patch('scrapy.spiders.Request', MockRequest)
+@mock.patch('scrapy_redis.spiders.Request', MockRequest)
 def test_consume_urls_from_redis(start_urls_as_zset, start_urls_as_set, spider_cls):
     batch_size = 5
     redis_key = 'start:urls'
@@ -123,13 +123,14 @@ def test_consume_urls_from_redis(start_urls_as_zset, start_urls_as_set, spider_c
     spider = spider_cls.from_crawler(crawler)
     with flushall(spider.server):
         urls = [
-            'http://example.com/%d' % i for i in range(batch_size * 2)
+            'https://example.com/%d' % i for i in range(batch_size * 2)
         ]
         reqs = []
         if start_urls_as_set:
             server_put = spider.server.sadd
         elif start_urls_as_zset:
-            server_put = lambda key, value: spider.server.zadd(key, {value: 0})
+            def server_put(key, value):
+                spider.server.zadd(key, {value: 0})
         else:
             server_put = spider.server.rpush
         for url in urls:

@@ -63,3 +63,5 @@ target/
 
 # Extra
 .DS_Store
+
+.idea

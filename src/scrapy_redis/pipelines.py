@@ -2,7 +2,7 @@ from scrapy.utils.misc import load_object
 from scrapy.utils.serialize import ScrapyJSONEncoder
 from twisted.internet.threads import deferToThread
 
-from . import connection, defaults
+from scrapy_redis import connection, defaults
 
 
 default_serialize = ScrapyJSONEncoder().encode

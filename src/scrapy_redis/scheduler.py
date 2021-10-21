@@ -1,9 +1,8 @@
 import importlib
-import six
 
 from scrapy.utils.misc import load_object
 
-from . import connection, defaults
+from scrapy_redis import connection, defaults
 
 
 # TODO: add SCRAPY_JOB support.
@@ -104,7 +103,7 @@ class Scheduler(object):
                 kwargs[name] = val
 
         # Support serializer as a path to a module.
-        if isinstance(kwargs.get('serializer'), six.string_types):
+        if isinstance(kwargs.get('serializer'), str):
             kwargs['serializer'] = importlib.import_module(kwargs['serializer'])
 
         server = connection.from_settings(settings)
