@@ -1,11 +1,20 @@
 name: main
 
+
+
 on:
   - push
   - pull_request
 
 jobs:
   test:
+    services:
+      redis:
+        image: redis
+        # Map TCP port 6379 on Docker host to a random free port on the Redis container
+        ports:
+          - 6379:6379
+
     runs-on: ${{ matrix.os  }}
 
     strategy:
@@ -30,7 +39,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install tox tox-py
 
-      - name: Run tox with ${{ matrix.python-version }}
+      - name: Run tox with Python ${{ matrix.python }}
         run: |
           tox --py current
 
