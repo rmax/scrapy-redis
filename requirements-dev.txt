@@ -6,3 +6,4 @@ pip-tools
 twine
 watchdog
 wheel
+build

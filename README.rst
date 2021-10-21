@@ -31,7 +31,7 @@ Redis-based components for Scrapy.
 
 * Free software: MIT license
 * Documentation: https://scrapy-redis.readthedocs.org.
-* Python versions: 2.7, 3.4+
+* Python versions: 3.7+
 
 Features
 --------
@@ -55,9 +55,9 @@ Features
 Requirements
 ------------
 
-* Python 2.7, 3.4 or 3.5
+* Python 3.7+
 * Redis >= 2.8
-* ``Scrapy`` >= 1.1
+* ``Scrapy`` >= 2.0
 * ``redis-py`` >= 3.0
 
 Usage

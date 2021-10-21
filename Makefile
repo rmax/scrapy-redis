@@ -45,7 +45,7 @@ check: check-setup check-manifest check-history lint
 
 check-setup:
 	@echo "Checking package metadata (name, description, etc)"
-	python setup.py check --strict --metadata --restructuredtext
+	python setup.py check --strict --metadata
 
 check-manifest:
 	@echo "Checking MANIFEST.in"
@@ -85,19 +85,19 @@ lint:
 	flake8 src tests
 
 build-inplace:
-	python setup.py build_ext --inplace
+	python -m build
 
 develop: clean
 	pip install -e .
 
 test: develop
-	py.test
+	pytest
 
 test-all:
 	tox -v
 
 coverage: develop
-	coverage run -m py.test
+	coverage run -m pytest
 	coverage combine
 	coverage report
 	coverage html
@@ -127,8 +127,8 @@ dist-upload: clean check dist
 	twine upload dist/*
 
 dist: clean
-	python setup.py sdist
-	python setup.py bdist_wheel
+	python -m build -s
+	python -m build -w
 	ls -l dist
 
 install: clean
