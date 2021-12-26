@@ -4,6 +4,9 @@ History
 
 .. comment:: bumpversion marker
 
+0.7.2-a1 (2021-12-27)
+------------------
+
 0.7.1 (2021-03-27)
 ------------------
 * Fixes datetime parse error for redis-py 3.x.
