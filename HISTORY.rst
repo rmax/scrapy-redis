@@ -4,6 +4,9 @@ History
 
 .. comment:: bumpversion marker
 
+0.7.2 (2021-12-27)
+------------------
+
 0.7.2-rc1 (2021-12-27)
 ----------------------
 * Fix RedisStatsCollector._get_key()
