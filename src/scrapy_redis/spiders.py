@@ -1,4 +1,5 @@
-from scrapy import signals
+import json
+from scrapy import signals, FormRequest
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import Spider, CrawlSpider
 from collections import Iterable
@@ -130,8 +131,17 @@ class RedisMixin(object):
     def make_request_from_data(self, data):
         """Returns a Request instance from data coming from Redis.
 
-        By default, ``data`` is an encoded URL. You can override this method to
-        provide your own message decoding.
+        Overriding this function to support the 'json' requested ``data`` that contains
+        `url` ,`meta` and other optional parameters. `meta` is a nested json which contains sub-data.
+
+        Along with:
+        After accessing the data, sending the FormRequest with `url`, `meta` and addition `formdata`
+
+        For example:
+        {"url": "https://exaple.com", "meta": {'job-id':'123xsd', 'start-date':'dd/mm/yy'}, "url_cookie_key":"fertxsas" }
+
+        this data can be accessed from 'scrapy.spider' through response.
+        'response.url', 'response.meta', 'response.url_cookie_key'
 
         Parameters
         ----------
@@ -139,8 +149,21 @@ class RedisMixin(object):
             Message from redis.
 
         """
-        url = bytes_to_str(data, self.redis_encoding)
-        return self.make_requests_from_url(url)
+        # url = bytes_to_str(data, self.redis_encoding)
+        formatted_data = bytes_to_str(data, self.redis_encoding)
+
+        # change to json array
+        parameter = json.loads(formatted_data)
+        url = parameter['url']
+        del parameter['url']
+        metadata = {}
+        try:
+            metadata = parameter['meta']
+            del parameter['meta']
+        except:
+            pass
+
+        return FormRequest(url, dont_filter=True, formdata=parameter, meta=metadata)
 
     def schedule_next_requests(self):
         """Schedules a request if available"""
