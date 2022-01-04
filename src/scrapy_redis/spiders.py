@@ -190,8 +190,8 @@ class RedisSpider(RedisMixin, Spider):
     """
 
     @classmethod
-    def from_crawler(self, crawler, *args, **kwargs):
-        obj = super(RedisSpider, self).from_crawler(crawler, *args, **kwargs)
+    def from_crawler(cls, crawler, *args, **kwargs):
+        obj = super(RedisSpider, cls).from_crawler(crawler, *args, **kwargs)
         obj.setup_redis(crawler)
         return obj
 
@@ -222,7 +222,7 @@ class RedisCrawlSpider(RedisMixin, CrawlSpider):
     """
 
     @classmethod
-    def from_crawler(self, crawler, *args, **kwargs):
-        obj = super(RedisCrawlSpider, self).from_crawler(crawler, *args, **kwargs)
+    def from_crawler(cls, crawler, *args, **kwargs):
+        obj = super(RedisCrawlSpider, cls).from_crawler(crawler, *args, **kwargs)
         obj.setup_redis(crawler)
         return obj
