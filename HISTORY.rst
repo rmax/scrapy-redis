@@ -4,8 +4,27 @@ History
 
 .. comment:: bumpversion marker
 
-0.7.0-dev (unreleased)
+0.7.2 (2021-12-27)
 ------------------
+* Fix RedisStatsCollector._get_key()
+* Fix redis-py dependency version
+* Added maximum idle waiting time MAX_IDLE_TIME_BEFORE_CLOSE
+
+0.7.1 (2021-03-27)
+------------------
+* Fixes datetime parse error for redis-py 3.x.
+* Add support for stats extensions.
+
+0.7.1-rc1 (2021-03-27)
+----------------------
+* Fixes datetime parse error for redis-py 3.x.
+
+0.7.1-b1 (2021-03-22)
+---------------------
+* Add support for stats extensions.
+
+0.7.0-dev (unreleased)
+----------------------
 * Unreleased.
 
 0.6.8 (2017-02-14)

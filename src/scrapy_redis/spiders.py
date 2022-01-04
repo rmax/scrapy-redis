@@ -2,6 +2,8 @@ import json
 from scrapy import signals, FormRequest
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import Spider, CrawlSpider
+from collections import Iterable
+import time
 
 from . import connection, defaults
 from .utils import bytes_to_str
@@ -15,6 +17,10 @@ class RedisMixin(object):
 
     # Redis client placeholder.
     server = None
+
+    # Idle start time
+    spider_idle_start_time = int(time.time())
+    max_idle_time = None
 
     def start_requests(self):
         """Returns a batch of start requests from redis."""
@@ -65,29 +71,56 @@ class RedisMixin(object):
             self.redis_encoding = settings.get('REDIS_ENCODING', defaults.REDIS_ENCODING)
 
         self.logger.info("Reading start URLs from redis key '%(redis_key)s' "
-                         "(batch size: %(redis_batch_size)s, encoding: %(redis_encoding)s",
+                         "(batch size: %(redis_batch_size)s, encoding: %(redis_encoding)s)",
                          self.__dict__)
 
         self.server = connection.from_settings(crawler.settings)
+
+        if self.settings.getbool('REDIS_START_URLS_AS_SET', defaults.START_URLS_AS_SET):
+            self.fetch_data = self.server.spop
+            self.count_size = self.server.scard
+        elif self.settings.getbool('REDIS_START_URLS_AS_ZSET', defaults.START_URLS_AS_ZSET):
+            self.fetch_data = self.pop_priority_queue
+            self.count_size = self.server.zcard
+        else:
+            self.fetch_data = self.pop_list_queue
+            self.count_size = self.server.llen
+
+        self.max_idle_time = self.settings.getint("MAX_IDLE_TIME_BEFORE_CLOSE")
+
         # The idle signal is called when the spider has no requests left,
         # that's when we will schedule new requests from redis queue
         crawler.signals.connect(self.spider_idle, signal=signals.spider_idle)
 
+    def pop_list_queue(self, redis_key, batch_size):
+        with self.server.pipeline() as pipe:
+            pipe.lrange(redis_key, 0, batch_size - 1)
+            pipe.ltrim(redis_key, batch_size, -1)
+            datas, _ = pipe.execute()
+        return datas
+
+    def pop_priority_queue(self, redis_key, batch_size):
+        with self.server.pipeline() as pipe:
+            pipe.zrevrange(redis_key, 0, batch_size - 1)
+            pipe.zremrangebyrank(redis_key, -batch_size, -1)
+            datas, _ = pipe.execute()
+        return datas
+
     def next_requests(self):
         """Returns a request to be scheduled or none."""
-        use_set = self.settings.getbool('REDIS_START_URLS_AS_SET', defaults.START_URLS_AS_SET)
-        fetch_one = self.server.spop if use_set else self.server.lpop
         # XXX: Do we need to use a timeout here?
         found = 0
-        # TODO: Use redis pipeline execution.
-        while found < self.redis_batch_size:
-            data = fetch_one(self.redis_key)
-            if not data:
-                # Queue empty.
-                break
-            req = self.make_request_from_data(data)
-            if req:
-                yield req
+        datas = self.fetch_data(self.redis_key, self.redis_batch_size)
+        for data in datas:
+            reqs = self.make_request_from_data(data)
+            if isinstance(reqs, Iterable):
+                for req in reqs:
+                    yield req
+                    # XXX: should be here?
+                    found += 1
+                    self.logger.info(f'start req url:{req.url}')
+            elif reqs:
+                yield reqs
                 found += 1
             else:
                 self.logger.debug("Request not made from data: %r", data)
@@ -139,10 +172,20 @@ class RedisMixin(object):
             self.crawler.engine.crawl(req, spider=self)
 
     def spider_idle(self):
-        """Schedules a request if available, otherwise waits."""
-        # XXX: Handle a sentinel to close the spider.
+        """
+        Schedules a request if available, otherwise waits.
+        or close spider when waiting seconds > MAX_IDLE_TIME_BEFORE_CLOSE.
+        MAX_IDLE_TIME_BEFORE_CLOSE will not affect SCHEDULER_IDLE_BEFORE_CLOSE.
+        """
+        if self.server is not None and self.count_size(self.redis_key) > 0:
+            self.spider_idle_start_time = int(time.time())
+
         self.schedule_next_requests()
-        # raise DontCloseSpider
+
+        idle_time = int(time.time()) - self.spider_idle_start_time
+        if self.max_idle_time != 0 and idle_time >= self.max_idle_time:
+            return
+        raise DontCloseSpider
 
 
 class RedisSpider(RedisMixin, Spider):

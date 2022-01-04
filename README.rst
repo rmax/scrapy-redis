@@ -12,7 +12,21 @@ Scrapy-Redis
 .. image:: https://img.shields.io/pypi/pyversions/scrapy-redis.svg
         :target: https://pypi.python.org/pypi/scrapy-redis
 
+.. image:: https://img.shields.io/travis/rolando/scrapy-redis.svg
+        :target: https://travis-ci.org/rolando/scrapy-redis
 
+.. image:: https://codecov.io/github/rolando/scrapy-redis/coverage.svg?branch=master
+    :alt: Coverage Status
+    :target: https://codecov.io/github/rolando/scrapy-redis
+
+.. image:: https://landscape.io/github/rolando/scrapy-redis/master/landscape.svg?style=flat
+    :target: https://landscape.io/github/rolando/scrapy-redis/master
+    :alt: Code Quality Status
+
+.. image:: https://requires.io/github/rolando/scrapy-redis/requirements.svg?branch=master
+    :alt: Requirements Status
+    :target: https://requires.io/github/rolando/scrapy-redis/requirements/?branch=master
+    
 Redis-based components for Scrapy.
 
 * Free software: MIT license
@@ -47,7 +61,7 @@ Features
 
     this data can be accessed in `scrapy spider` through response.
     like: `response.url`, `response.meta`, `response.url_cookie_key`
-
+    
 .. note:: This features cover the basic case of distributing the workload across multiple workers. If you need more features like URL expiration, advanced URL prioritization, etc., we suggest you to take a look at the `Frontera`_ project.
 
 Requirements
@@ -56,7 +70,7 @@ Requirements
 * Python 2.7, 3.4 or 3.5
 * Redis >= 2.8
 * ``Scrapy`` >= 1.1
-* ``redis-py`` >= 2.10
+* ``redis-py`` >= 3.0
 
 Installation
 ------------
@@ -85,6 +99,9 @@ Use the following settings in your project:
   # Ensure all spiders share same duplicates filter through redis.
   DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 
+  # Enables stats shared based on Redis
+  STATS_CLASS = "scrapy_redis.stats.RedisStatsCollector"
+
   # Default requests serializer is pickle, but it can be changed to any module
   # with loads and dumps functions. Note that pickle is not compatible between
   # python versions.
@@ -108,6 +125,12 @@ Use the following settings in your project:
   # This only works if queue class is SpiderQueue or SpiderStack,
   # and may also block the same time when your spider start at the first time (because the queue is empty).
   #SCHEDULER_IDLE_BEFORE_CLOSE = 10
+
+  # Maximum idle time before close spider.
+  # When the number of idle seconds is greater than MAX_IDLE_TIME_BEFORE_CLOSE, the crawler will close.
+  # If 0, the crawler will DontClose forever to wait for the next request.
+  # If negative number, the crawler will immediately close when the queue is empty, just like Scrapy.
+  #MAX_IDLE_TIME_BEFORE_CLOSE = 0
 
   # Store scraped item in redis for post-processing.
   ITEM_PIPELINES = {
@@ -139,6 +162,11 @@ Use the following settings in your project:
   # want to avoid duplicates in your start urls list and the order of
   # processing does not matter.
   #REDIS_START_URLS_AS_SET = False
+
+  # If True, it uses redis ``zrevrange`` and ``zremrangebyrank`` operation. You have to use the ``zadd``
+  # command to add URLS and Scores to redis queue. This could be useful if you
+  # want to use priority and avoid duplicates in your start urls list.
+  #REDIS_START_URLS_AS_ZSET = False
 
   # Default start urls key for RedisSpider and RedisCrawlSpider.
   #REDIS_START_URLS_KEY = '%(name)s:start_urls'
@@ -222,7 +250,20 @@ Then:
 .. note::
 
     * These spiders rely on the spider idle signal to fetch start urls, hence it
-      may have a few seconds of delay between the time you push a new url and the
-      spider starts crawling it.
+    may have a few seconds of delay between the time you push a new url and the
+    spider starts crawling it.
 
     * Also please pay attention to json formatting.
+    
+Contributions
+-------------
+
+Donate BTC: ``13haqimDV7HbGWtz7uC6wP1zvsRWRAhPmF``
+
+Donate BCC: ``CSogMjdfPZnKf1p5ocu3gLR54Pa8M42zZM``
+
+Donate ETH: ``0x681d9c8a2a3ff0b612ab76564e7dca3f2ccc1c0d``
+
+Donate LTC: ``LaPHpNS1Lns3rhZSvvkauWGDfCmDLKT8vP``
+
+.. _Frontera: https://github.com/scrapinghub/frontera
