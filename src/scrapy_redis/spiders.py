@@ -19,6 +19,7 @@ class RedisMixin(object):
 
     # Idle start time
     spider_idle_start_time = int(time.time())
+    max_idle_time = None
 
     def start_requests(self):
         """Returns a batch of start requests from redis."""
@@ -83,6 +84,8 @@ class RedisMixin(object):
         else:
             self.fetch_data = self.pop_list_queue
             self.count_size = self.server.llen
+
+        self.max_idle_time = self.settings.getint("MAX_IDLE_TIME_BEFORE_CLOSE")
 
         # The idle signal is called when the spider has no requests left,
         # that's when we will schedule new requests from redis queue
@@ -156,9 +159,8 @@ class RedisMixin(object):
 
         self.schedule_next_requests()
 
-        max_idle_time = self.settings.getint("MAX_IDLE_TIME_BEFORE_CLOSE")
         idle_time = int(time.time()) - self.spider_idle_start_time
-        if max_idle_time != 0 and idle_time >= max_idle_time:
+        if self.max_idle_time != 0 and idle_time >= self.max_idle_time:
             return
         raise DontCloseSpider
 
