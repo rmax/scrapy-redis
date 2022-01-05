@@ -13,9 +13,9 @@ USER_AGENT = 'scrapy-redis (+https://github.com/rolando/scrapy-redis)'
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
 SCHEDULER_PERSIST = True
-#SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderPriorityQueue"
-#SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderQueue"
-#SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderStack"
+# SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderPriorityQueue"
+# SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderQueue"
+# SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderStack"
 
 ITEM_PIPELINES = {
     'example.pipelines.ExamplePipeline': 300,
