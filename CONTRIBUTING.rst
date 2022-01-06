@@ -79,7 +79,7 @@ Ready to contribute? Here's how to set up `scrapy-redis` for local development.
 5. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
 
     $ flake8 scrapy_redis tests
-    $ python setup.py test or pytest
+    $ pytest --ignore=setup.py
     $ tox
 
    To get flake8 and tox, just pip install them into your virtualenv.
@@ -110,4 +110,4 @@ Tips
 
 To run a subset of tests::
 
-    $ pytest tests.test_scrapy_redis
+    $ pytest tests/test_scrapy_redis
