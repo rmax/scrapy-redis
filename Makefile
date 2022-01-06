@@ -91,13 +91,13 @@ develop: clean
 	pip install -e .
 
 test: develop
-	py.test
+	pytest --ignore=setup.py
 
 test-all:
 	tox -v
 
 coverage: develop
-	coverage run -m py.test
+	coverage run -m pytest --ignore=setup.py
 	coverage combine
 	coverage report
 	coverage html
