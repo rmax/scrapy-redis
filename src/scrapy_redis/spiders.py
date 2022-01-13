@@ -1,8 +1,8 @@
 import json
+from collections.abc import Iterable
 from scrapy import signals, FormRequest
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import Spider, CrawlSpider
-import collections.abc as abc
 import time
 
 from . import connection, defaults
@@ -113,7 +113,7 @@ class RedisMixin(object):
         datas = self.fetch_data(self.redis_key, self.redis_batch_size)
         for data in datas:
             reqs = self.make_request_from_data(data)
-            if isinstance(reqs, abc.Iterable):
+            if isinstance(reqs, Iterable):
                 for req in reqs:
                     yield req
                     # XXX: should be here?
