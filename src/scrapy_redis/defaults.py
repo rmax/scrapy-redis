@@ -26,3 +26,4 @@ SCHEDULER_PERSIST = False
 START_URLS_KEY = '%(name)s:start_urls'
 START_URLS_AS_SET = False
 START_URLS_AS_ZSET = False
+MAX_IDLE_TIME = 0
