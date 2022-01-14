@@ -56,6 +56,13 @@ class TestRedisMixin_setup_redis(object):
             self.myspider.setup_redis()
         assert "redis_batch_size" in str(excinfo.value)
 
+    def test_invalid_idle_time(self):
+        self.myspider.max_idle_time = 'x'
+        self.myspider.crawler = get_crawler()
+        with pytest.raises(ValueError) as excinfo:
+            self.myspider.setup_redis()
+        assert "max_idle_time" in str(excinfo.value)
+
     @mock.patch('scrapy_redis.spiders.connection')
     def test_via_from_crawler(self, connection):
         server = connection.from_settings.return_value = mock.Mock()
@@ -82,12 +89,13 @@ def test_from_crawler_with_spider_arguments(spider_cls):
         crawler, 'foo',
         redis_key='key:%(name)s',
         redis_batch_size='2000',
+        max_idle_time='100',
     )
     assert spider.name == 'foo'
     assert spider.redis_key == 'key:foo'
     assert spider.redis_batch_size == 2000
-
-
+    assert spider.max_idle_time == 100
+    
 class MockRequest(mock.Mock):
     def __init__(self, url, **kwargs):
         super(MockRequest, self).__init__()
