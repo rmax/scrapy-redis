@@ -86,7 +86,16 @@ class RedisMixin(object):
             self.fetch_data = self.pop_list_queue
             self.count_size = self.server.llen
 
-        self.max_idle_time = settings.getint("MAX_IDLE_TIME_BEFORE_CLOSE")
+        if self.max_idle_time is None:
+            self.max_idle_time = settings.getint(
+                "MAX_IDLE_TIME_BEFORE_CLOSE",
+                defaults.MAX_IDLE_TIME
+            )
+
+        try:
+            self.max_idle_time = int(self.max_idle_time)
+        except (TypeError, ValueError):
+            raise ValueError("max_idle_time must be an integer")
 
         # The idle signal is called when the spider has no requests left,
         # that's when we will schedule new requests from redis queue
