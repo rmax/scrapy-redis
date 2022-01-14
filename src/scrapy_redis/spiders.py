@@ -76,17 +76,17 @@ class RedisMixin(object):
 
         self.server = connection.from_settings(crawler.settings)
 
-        if self.settings.getbool('REDIS_START_URLS_AS_SET', defaults.START_URLS_AS_SET):
+        if settings.getbool('REDIS_START_URLS_AS_SET', defaults.START_URLS_AS_SET):
             self.fetch_data = self.server.spop
             self.count_size = self.server.scard
-        elif self.settings.getbool('REDIS_START_URLS_AS_ZSET', defaults.START_URLS_AS_ZSET):
+        elif settings.getbool('REDIS_START_URLS_AS_ZSET', defaults.START_URLS_AS_ZSET):
             self.fetch_data = self.pop_priority_queue
             self.count_size = self.server.zcard
         else:
             self.fetch_data = self.pop_list_queue
             self.count_size = self.server.llen
 
-        self.max_idle_time = self.settings.getint("MAX_IDLE_TIME_BEFORE_CLOSE")
+        self.max_idle_time = settings.getint("MAX_IDLE_TIME_BEFORE_CLOSE")
 
         # The idle signal is called when the spider has no requests left,
         # that's when we will schedule new requests from redis queue
