@@ -150,7 +150,7 @@ class RedisMixin(object):
         {"url": "https://exaple.com", "meta": {'job-id':'123xsd', 'start-date':'dd/mm/yy'}, "url_cookie_key":"fertxsas" }
 
         this data can be accessed from 'scrapy.spider' through response.
-        'response.url', 'response.meta', 'response.url_cookie_key'
+        'response.url', 'response.meta', 'response.request.cookies'
 
         Parameters
         ----------
