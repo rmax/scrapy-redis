@@ -147,7 +147,14 @@ class RedisMixin(object):
         After accessing the data, sending the FormRequest with `url`, `meta` and addition `formdata`
 
         For example:
-        {"url": "https://exaple.com", "meta": {'job-id':'123xsd', 'start-date':'dd/mm/yy'}, "url_cookie_key":"fertxsas" }
+        {
+            "url": "https://exaple.com",
+            "meta": {
+                'job-id':'123xsd',
+                'start-date':'dd/mm/yy'
+            },
+            "url_cookie_key":"fertxsas"
+        }
 
         this data can be accessed from 'scrapy.spider' through response.
         'response.url', 'response.meta', 'response.url_cookie_key'
@@ -169,7 +176,7 @@ class RedisMixin(object):
         try:
             metadata = parameter['meta']
             del parameter['meta']
-        except:
+        except Exception:
             pass
 
         return FormRequest(url, dont_filter=True, formdata=parameter, meta=metadata)
