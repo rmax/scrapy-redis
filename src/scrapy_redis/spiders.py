@@ -157,7 +157,7 @@ class RedisMixin(object):
         }
 
         this data can be accessed from 'scrapy.spider' through response.
-        'response.url', 'response.meta', 'response.url_cookie_key'
+        'request.url', 'request.meta', 'request.cookies'
 
         Parameters
         ----------
