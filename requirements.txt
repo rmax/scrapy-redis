@@ -1,6 +1,6 @@
-Scrapy>=1.0
-redis>=3.0
-six>=1.5.2
+Scrapy>=2.0
+redis>=4.0
+six>=1.10
 coverage
 flake8
 mock
