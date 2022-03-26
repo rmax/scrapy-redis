@@ -77,9 +77,9 @@ Installation
 
 From `github`::
 
-  git clone https://github.com/darkrho/scrapy-redis.git
-  cd scrapy-redis
-  python setup.py install
+    git clone https://github.com/darkrho/scrapy-redis.git
+    cd scrapy-redis
+    python setup.py install
 
 .. note:: For using this json supported data feature, please make sure you have not installed the scrapy-redis through pip. If you already did it, you first uninstall that one.
     .. code::
@@ -190,28 +190,28 @@ across multiple spider instances, highly suitable for broad crawls.
 
 2. Run the crawler for first time then stop it::
 
-    cd example-project
-    scrapy crawl dmoz
-    ... [dmoz] ...
-    ^C
+       cd example-project
+       scrapy crawl dmoz
+       ... [dmoz] ...
+       ^C
 
 3. Run the crawler again to resume stopped crawling::
 
-    scrapy crawl dmoz
-    ... [dmoz] DEBUG: Resuming crawl (9019 requests scheduled)
+       scrapy crawl dmoz
+       ... [dmoz] DEBUG: Resuming crawl (9019 requests scheduled)
 
 4. Start one or more additional scrapy crawlers::
 
-    scrapy crawl dmoz
-    ... [dmoz] DEBUG: Resuming crawl (8712 requests scheduled)
+       scrapy crawl dmoz
+       ... [dmoz] DEBUG: Resuming crawl (8712 requests scheduled)
 
 5. Start one or more post-processing workers::
 
-    python process_items.py dmoz:items -v
-    ...
-    Processing: Kilani Giftware (http://www.dmoz.org/Computers/Shopping/Gifts/)
-    Processing: NinjaGizmos.com (http://www.dmoz.org/Computers/Shopping/Gifts/)
-    ...
+       python process_items.py dmoz:items -v
+       ...
+       Processing: Kilani Giftware (http://www.dmoz.org/Computers/Shopping/Gifts/)
+       Processing: NinjaGizmos.com (http://www.dmoz.org/Computers/Shopping/Gifts/)
+       ...
 
 
 Feeding a Spider from Redis
@@ -240,11 +240,11 @@ Then:
 
 1. run the spider::
 
-    scrapy runspider myspider.py
+       scrapy runspider myspider.py
 
 2. push json data to redis::
 
-    redis-cli lpush myspider '{"url": "https://exaple.com", "meta": {"job-id":"123xsd", "start-date":"dd/mm/yy"}, "url_cookie_key":"fertxsas" }'
+       redis-cli lpush myspider '{"url": "https://exaple.com", "meta": {"job-id":"123xsd", "start-date":"dd/mm/yy"}, "url_cookie_key":"fertxsas" }'
 
 
 .. note::
