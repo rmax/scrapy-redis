@@ -254,16 +254,11 @@ Then:
     spider starts crawling it.
 
     * Also please pay attention to json formatting.
-    
-Contributions
--------------
 
-Donate BTC: ``13haqimDV7HbGWtz7uC6wP1zvsRWRAhPmF``
+Alternative Choice
+---------------------------
 
-Donate BCC: ``CSogMjdfPZnKf1p5ocu3gLR54Pa8M42zZM``
-
-Donate ETH: ``0x681d9c8a2a3ff0b612ab76564e7dca3f2ccc1c0d``
-
-Donate LTC: ``LaPHpNS1Lns3rhZSvvkauWGDfCmDLKT8vP``
+Frontera_  is a web crawling framework consisting of `crawl frontier`_, and distribution/scaling primitives, allowing to build a large scale online web crawler.
 
 .. _Frontera: https://github.com/scrapinghub/frontera
+.. _crawl frontier: http://nlp.stanford.edu/IR-book/html/htmledition/the-url-frontier-1.html
