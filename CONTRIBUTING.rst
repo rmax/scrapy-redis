@@ -79,18 +79,28 @@ Ready to contribute? Here's how to set up `scrapy-redis` for local development.
 5. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
 
        flake8 scrapy_redis tests
-       pytest --ignore=setup.py
+       pip install .
+       python -m pytest --ignore=setup.py
        tox
 
    To get flake8 and tox, just pip install them into your virtualenv.
 
-6. Commit your changes and push your branch to GitHub::
+6. Note that if the error of `No module named scrapy_redis` shows, please install `scrapy-redis` of your branch by::
+   
+       pip install .
+
+7. Or change the import lines::
+
+       from scrapy_redis import xxx # from this
+       from src.scrapy_redis import xxx # to this
+
+8. Commit your changes and push your branch to GitHub::
 
        git add .
        git commit -m "Your detailed description of your changes."
        git push origin name-of-your-bugfix-or-feature
 
-7. Submit a pull request through the GitHub website.
+9. Submit a pull request through the GitHub website.
 
 Pull Request Guidelines
 -----------------------

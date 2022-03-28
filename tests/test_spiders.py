@@ -148,7 +148,7 @@ def test_consume_urls_from_redis(start_urls_as_zset, start_urls_as_set, spider_c
         start_requests = list(spider.start_requests())
         if start_urls_as_zset or start_urls_as_set:
             assert len(start_requests) == batch_size
-            assert set(start_requests).issubset(reqs)
+            assert set(map(lambda x: x.url, start_requests)).issubset(map(lambda x: x.url, reqs))
         else:
             assert start_requests == reqs[:batch_size]
 
