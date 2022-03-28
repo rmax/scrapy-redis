@@ -3,6 +3,7 @@ from collections.abc import Iterable
 from scrapy import signals, FormRequest
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import Spider, CrawlSpider
+from scrapy_redis import TextColor
 import time
 
 from . import connection, defaults
@@ -169,7 +170,14 @@ class RedisMixin(object):
         formatted_data = bytes_to_str(data, self.redis_encoding)
 
         # change to json array
-        parameter = json.loads(formatted_data)
+        parameter = {}
+        if type(formatted_data) == dict:
+            parameter = json.loads(formatted_data)
+        else:
+            print(TextColor.WARNING + "WARNING: String request is deprecated, please use JSON data format. \
+                Detail information, please check https://github.com/rmax/scrapy-redis#features" + TextColor.ENDC)
+            return FormRequest(formatted_data, dont_filter=True)
+
         url = parameter['url']
         del parameter['url']
         metadata = {}
