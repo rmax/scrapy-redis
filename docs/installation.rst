@@ -12,7 +12,7 @@ To install Scrapy-Redis, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install scrapy-redis
+    pip install scrapy-redis
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -30,19 +30,19 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/rolando/scrapy-redis
+    git clone git://github.com/rolando/scrapy-redis
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/rolando/scrapy-redis/tarball/master
+    curl  -OL https://github.com/rolando/scrapy-redis/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
 .. code-block:: console
 
-    $ pip install -e .
+    pip install -e .
 
 
 .. _Github repo: https://github.com/rolando/scrapy-redis
