@@ -66,9 +66,11 @@ Ready to contribute? Here's how to set up `scrapy-redis` for local development.
 
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
 
-       mkvirtualenv scrapy-redis
+       pip install virtualenv==20.0.23
+       virtualenv --python=/usr/bin/python3 ~/scrapy_redis
+       source ~/scrapy_redis/bin/activate
        cd scrapy-redis/
-       python setup.py develop
+       pip install .
 
 4. Create a branch for local development::
 
@@ -78,14 +80,13 @@ Ready to contribute? Here's how to set up `scrapy-redis` for local development.
 
 5. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
 
-       flake8 scrapy_redis tests
-       pip install .
+       flake8 src/ tests/
        python -m pytest --ignore=setup.py
        tox
 
    To get flake8 and tox, just pip install them into your virtualenv.
 
-6. Note that if the error of `No module named scrapy_redis` shows, please install `scrapy-redis` of your branch by::
+6. Note that if the error of `No module named scrapy_redis` shows, please check the install `scrapy-redis` of your branch by::
    
        pip install .
 
