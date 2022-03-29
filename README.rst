@@ -19,9 +19,9 @@ Scrapy-Redis
     :alt: Coverage Status
     :target: https://codecov.io/github/rolando/scrapy-redis
 
-.. image:: https://requires.io/github/rolando/scrapy-redis/requirements.svg?branch=master
-    :alt: Requirements Status
-    :target: https://requires.io/github/rolando/scrapy-redis/requirements/?branch=master
+.. image:: https://requires.io/github/LuckyPigeon/scrapy-redis/requirements.svg?branch=master
+     :target: https://requires.io/github/LuckyPigeon/scrapy-redis/requirements/?branch=master
+     :alt: Requirements Status
     
 Redis-based components for Scrapy.
 
