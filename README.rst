@@ -19,10 +19,6 @@ Scrapy-Redis
     :alt: Coverage Status
     :target: https://codecov.io/github/rolando/scrapy-redis
 
-.. image:: https://landscape.io/github/rolando/scrapy-redis/master/landscape.svg?style=flat
-    :target: https://landscape.io/github/rolando/scrapy-redis/master
-    :alt: Code Quality Status
-
 .. image:: https://requires.io/github/rolando/scrapy-redis/requirements.svg?branch=master
     :alt: Requirements Status
     :target: https://requires.io/github/rolando/scrapy-redis/requirements/?branch=master
