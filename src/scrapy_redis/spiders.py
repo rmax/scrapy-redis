@@ -184,8 +184,8 @@ class RedisMixin(object):
         try:
             metadata = parameter['meta']
             del parameter['meta']
-        except Exception:
-            pass
+        except KeyError as e:
+            print('Failed to delete metadata: ', e)
 
         return FormRequest(url, dont_filter=True, formdata=parameter, meta=metadata)
 
