@@ -95,7 +95,8 @@ def test_from_crawler_with_spider_arguments(spider_cls):
     assert spider.redis_key == 'key:foo'
     assert spider.redis_batch_size == 2000
     assert spider.max_idle_time == 100
-    
+
+
 class MockRequest(mock.Mock):
     def __init__(self, url, **kwargs):
         super(MockRequest, self).__init__()
