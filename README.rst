@@ -12,10 +12,10 @@ Scrapy-Redis
 .. image:: https://img.shields.io/pypi/pyversions/scrapy-redis.svg
         :target: https://pypi.python.org/pypi/scrapy-redis
 
-.. image:: https://img.shields.io/travis/rolando/scrapy-redis.svg
+.. image:: https://img.shields.io/travis/rmax/scrapy-redis.svg
         :target: https://travis-ci.org/rolando/scrapy-redis
 
-.. image:: https://codecov.io/github/rolando/scrapy-redis/coverage.svg?branch=master
+.. image:: https://codecov.io/github/rmax/scrapy-redis/coverage.svg?branch=master
     :alt: Coverage Status
     :target: https://codecov.io/github/rolando/scrapy-redis
 
