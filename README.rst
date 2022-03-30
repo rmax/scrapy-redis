@@ -26,8 +26,8 @@ Scrapy-Redis
 Redis-based components for Scrapy.
 
 * Free software: MIT license
-* Documentation: https://scrapy-redis.readthedocs.org.
-* Python versions: 2.7, 3.4+
+* Documentation: https://github.com/rmax/scrapy-redis/wiki.
+* Python versions: 3.7+
 
 Features
 --------
@@ -53,6 +53,7 @@ Features
 
     For example:
     .. code-block:: json::
+
         {"url": "https://exaple.com", "meta": {'job-id':'123xsd', 'start-date':'dd/mm/yy'}, "url_cookie_key":"fertxsas" }
 
     this data can be accessed in `scrapy spider` through response.
@@ -63,10 +64,10 @@ Features
 Requirements
 ------------
 
-* Python 2.7, 3.4 or 3.5
-* Redis >= 2.8
-* ``Scrapy`` >= 1.1
-* ``redis-py`` >= 3.0
+* Python 3.7+
+* Redis >= 5.0
+* ``Scrapy`` >=  2.0
+* ``redis-py`` >= 4.0
 
 Installation
 ------------
