@@ -52,7 +52,7 @@ Features
     this function extract this data and send another FormRequest with `url`, `meta` and addition `formdata`.
 
     For example:
-    .. code-block:: json::
+    .. code-block:: json
 
         {"url": "https://exaple.com", "meta": {'job-id':'123xsd', 'start-date':'dd/mm/yy'}, "url_cookie_key":"fertxsas" }
 
@@ -79,7 +79,9 @@ From `github`::
     python setup.py install
 
 .. note:: For using this json supported data feature, please make sure you have not installed the scrapy-redis through pip. If you already did it, you first uninstall that one.
-    .. code::
+  
+.. code-block:: python
+
         pip uninstall scrapy-redis
 
 
