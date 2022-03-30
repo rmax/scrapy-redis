@@ -46,10 +46,10 @@ Features
 
     Scheduler + Duplication Filter, Item Pipeline, Base Spiders.
 
-* In this forked version: added `json` supported data in Redis
+* In this forked version: added ``json`` supported data in Redis
 
-    data contains `url`, `meta` and other optional parameters. `meta` is a nested json which contains sub-data.
-    this function extract this data and send another FormRequest with `url`, `meta` and addition `formdata`.
+    data contains ``url``, ```meta``` and other optional parameters. ``meta`` is a nested json which contains sub-data.
+    this function extract this data and send another FormRequest with ``url``, ``meta`` and addition ``formdata``.
 
     For example:
 
@@ -60,7 +60,7 @@ Features
     this data can be accessed in `scrapy spider` through response.
     like: `request.url`, `request.meta`, `request.cookies`
     
-.. note:: This features cover the basic case of distributing the workload across multiple workers. If you need more features like URL expiration, advanced URL prioritization, etc., we suggest you to take a look at the `Frontera`_ project.
+.. note:: This features cover the basic case of distributing the workload across multiple workers. If you need more features like URL expiration, advanced URL prioritization, etc., we suggest you to take a look at the Frontera_ project.
 
 Requirements
 ------------
@@ -73,7 +73,9 @@ Requirements
 Installation
 ------------
 
-From `github` ::
+From GitHub
+
+.. code-block:: bash
 
     git clone https://github.com/darkrho/scrapy-redis.git
     cd scrapy-redis
@@ -83,7 +85,7 @@ From `github` ::
   
 .. code-block:: python
 
-        pip uninstall scrapy-redis
+    pip uninstall scrapy-redis
 
 
 Usage
@@ -186,43 +188,51 @@ Running the example project
 This example illustrates how to share a spider's requests queue
 across multiple spider instances, highly suitable for broad crawls.
 
-1. Check scrapy_redis package in your PYTHONPATH
+1. Check scrapy_redis package in your ``PYTHONPATH``
 
-2. Run the crawler for first time then stop it::
+2. Run the crawler for first time then stop it
 
-       cd example-project
-       scrapy crawl dmoz
-       ... [dmoz] ...
-       ^C
+.. code-block:: python
 
-3. Run the crawler again to resume stopped crawling::
+    cd example-project
+    scrapy crawl dmoz
+    ... [dmoz] ...
+    ^C
 
-       scrapy crawl dmoz
-       ... [dmoz] DEBUG: Resuming crawl (9019 requests scheduled)
+3. Run the crawler again to resume stopped crawling
 
-4. Start one or more additional scrapy crawlers::
+.. code-block:: python
 
-       scrapy crawl dmoz
-       ... [dmoz] DEBUG: Resuming crawl (8712 requests scheduled)
+    scrapy crawl dmoz
+    ... [dmoz] DEBUG: Resuming crawl (9019 requests scheduled)
 
-5. Start one or more post-processing workers::
+4. Start one or more additional scrapy crawlers
 
-       python process_items.py dmoz:items -v
-       ...
-       Processing: Kilani Giftware (http://www.dmoz.org/Computers/Shopping/Gifts/)
-       Processing: NinjaGizmos.com (http://www.dmoz.org/Computers/Shopping/Gifts/)
-       ...
+.. code-block:: python
+
+    scrapy crawl dmoz
+    ... [dmoz] DEBUG: Resuming crawl (8712 requests scheduled)
+
+5. Start one or more post-processing workers
+
+.. code-block:: python
+
+    python process_items.py dmoz:items -v
+    ...
+    Processing: Kilani Giftware (http://www.dmoz.org/Computers/Shopping/Gifts/)
+    Processing: NinjaGizmos.com (http://www.dmoz.org/Computers/Shopping/Gifts/)
+    ...
 
 
 Feeding a Spider from Redis
 ---------------------------
 
-The class `scrapy_redis.spiders.RedisSpider` enables a spider to read the
+The class ``scrapy_redis.spiders.RedisSpider`` enables a spider to read the
 urls from redis. The urls in the redis queue will be processed one
 after another, if the first request yields more requests, the spider
 will process those requests before fetching another url from redis.
 
-For example, create a file `myspider.py` with the code below:
+For example, create a file ``myspider.py``` with the code below:
 
 .. code-block:: python
 
@@ -238,13 +248,17 @@ For example, create a file `myspider.py` with the code below:
 
 Then:
 
-1. run the spider::
+1. run the spider
 
-       scrapy runspider myspider.py
+.. code-block:: python
 
-2. push json data to redis::
+    scrapy runspider myspider.py
 
-       redis-cli lpush myspider '{"url": "https://exaple.com", "meta": {"job-id":"123xsd", "start-date":"dd/mm/yy"}, "url_cookie_key":"fertxsas" }'
+2. push json data to redis
+
+.. code-block:: python
+
+    redis-cli lpush myspider '{"url": "https://exaple.com", "meta": {"job-id":"123xsd", "start-date":"dd/mm/yy"}, "url_cookie_key":"fertxsas" }'
 
 
 .. note::
