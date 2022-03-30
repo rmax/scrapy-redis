@@ -55,7 +55,7 @@ Features
 
     .. code-block:: json
 
-        { "url": "https://exaple.com", "meta": {'job-id':'123xsd', 'start-date':'dd/mm/yy'}, "url_cookie_key":"fertxsas" }
+        { "url": "https://exaple.com", "meta": {"job-id":"123xsd", "start-date":"dd/mm/yy"}, "url_cookie_key":"fertxsas" }
 
     this data can be accessed in `scrapy spider` through response.
     like: `request.url`, `request.meta`, `request.cookies`
@@ -73,7 +73,7 @@ Requirements
 Installation
 ------------
 
-From `github`::
+From `github` ::
 
     git clone https://github.com/darkrho/scrapy-redis.git
     cd scrapy-redis
