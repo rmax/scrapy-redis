@@ -3,7 +3,7 @@ from collections.abc import Iterable
 from scrapy import signals, FormRequest
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import Spider, CrawlSpider
-from scrapy_redis import TextColor
+from scrapy_redis.utils import TextColor
 import time
 
 from . import connection, defaults
