@@ -26,6 +26,9 @@ Scrapy-Redis
 .. image:: https://requires.io/github/rolando/scrapy-redis/requirements.svg?branch=master
     :alt: Requirements Status
     :target: https://requires.io/github/rolando/scrapy-redis/requirements/?branch=master
+.. image:: https://img.shields.io/badge/security-bandit-yellow.svg
+    :target: https://github.com/rmax/scrapy-redis
+    :alt: Security Status
     
 Redis-based components for Scrapy.
 
