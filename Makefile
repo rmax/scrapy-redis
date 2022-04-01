@@ -11,7 +11,7 @@ ENDC = "\033[0m"
 try:
 	from urllib.request import pathname2url
 except:
-	print(FAIL + "Python2 is deprecated, please upgrade your python >= 3.6" + ENDC)
+	print(FAIL + "Python2 is deprecated, please upgrade your python >= 3.7" + ENDC)
 
 webbrowser.open("file://" + pathname2url(os.path.abspath(sys.argv[1])))
 endef
