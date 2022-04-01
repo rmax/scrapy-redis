@@ -2,7 +2,8 @@ from scrapy_redis import picklecompat
 
 
 def test_picklecompat():
-    obj = {'_encoding': 'utf-8',
+    obj = {
+        '_encoding': 'utf-8',
         'body': '',
         'callback': '_response_downloaded',
         'cookies': {},
