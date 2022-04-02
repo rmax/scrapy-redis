@@ -166,28 +166,24 @@ class RedisMixin(object):
             Message from redis.
 
         """
-        # url = bytes_to_str(data, self.redis_encoding)
         formatted_data = bytes_to_str(data, self.redis_encoding)
 
-        # change to json array
-        parameter = {}
         if is_dict(formatted_data):
             parameter = json.loads(formatted_data)
         else:
-            print(TextColor.WARNING + "WARNING: String request is deprecated, please use JSON data format. \
+            self.logger.warning(TextColor.WARNING + "WARNING: String request is deprecated, please use JSON data format. \
                 Detail information, please check https://github.com/rmax/scrapy-redis#features" + TextColor.ENDC)
             return FormRequest(formatted_data, dont_filter=True)
 
-        url = parameter['url']
-        del parameter['url']
-        metadata = {}
-        try:
-            metadata = parameter['meta']
-            del parameter['meta']
-        except KeyError as e:
-            print('Failed to delete metadata: ', e)
+        if parameter.get('url', None) is None:
+            self.logger.warning(TextColor.WARNING + "The data from Redis has no url key in pushData" + TextColor.ENDC)
+            return []
 
-        return FormRequest(url, dont_filter=True, formdata=parameter, meta=metadata)
+        url = parameter.pop("url")
+        method = parameter.pop("method") if "method" in parameter else "GET"
+        metadata = parameter.pop("meta") if "meta" in parameter else {}
+
+        return FormRequest(url, dont_filter=True, method=method, formdata=parameter, meta=metadata)
 
     def schedule_next_requests(self):
         """Schedules a request if available"""
