@@ -3,11 +3,11 @@ from collections.abc import Iterable
 from scrapy import signals, FormRequest
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import Spider, CrawlSpider
-from scrapy_redis import TextColor
+from scrapy_redis.utils import TextColor
 import time
 
 from . import connection, defaults
-from .utils import bytes_to_str
+from .utils import bytes_to_str, is_dict
 
 
 class RedisMixin(object):
@@ -171,7 +171,7 @@ class RedisMixin(object):
 
         # change to json array
         parameter = {}
-        if type(formatted_data) == dict:
+        if is_dict(formatted_data):
             parameter = json.loads(formatted_data)
         else:
             print(TextColor.WARNING + "WARNING: String request is deprecated, please use JSON data format. \
@@ -184,8 +184,8 @@ class RedisMixin(object):
         try:
             metadata = parameter['meta']
             del parameter['meta']
-        except Exception:
-            pass
+        except KeyError as e:
+            print('Failed to delete metadata: ', e)
 
         return FormRequest(url, dont_filter=True, formdata=parameter, meta=metadata)
 

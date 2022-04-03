@@ -13,15 +13,19 @@ Scrapy-Redis
         :target: https://pypi.python.org/pypi/scrapy-redis
 
 .. image:: https://img.shields.io/travis/rmax/scrapy-redis.svg
-        :target: https://travis-ci.org/rolando/scrapy-redis
+        :target: https://travis-ci.org/rmax/scrapy-redis
 
 .. image:: https://codecov.io/github/rmax/scrapy-redis/coverage.svg?branch=master
-    :alt: Coverage Status
-    :target: https://codecov.io/github/rolando/scrapy-redis
+      :alt: Coverage Status
+      :target: https://codecov.io/github/rmax/scrapy-redis
 
 .. image:: https://requires.io/github/LuckyPigeon/scrapy-redis/requirements.svg?branch=master
-     :target: https://requires.io/github/LuckyPigeon/scrapy-redis/requirements/?branch=master
-     :alt: Requirements Status
+      :alt: Requirements Status
+      :target: https://requires.io/github/LuckyPigeon/scrapy-redis/requirements/?branch=master
+
+.. image:: https://img.shields.io/badge/security-bandit-green.svg
+      :alt: Security Status
+      :target: https://github.com/rmax/scrapy-redis
     
 Redis-based components for Scrapy.
 
