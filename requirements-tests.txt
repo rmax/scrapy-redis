@@ -1,0 +1,6 @@
+# This packages are required to run all the tests.
+flake8
+mock
+pytest
+pytest-cov
+tox
