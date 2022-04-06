@@ -32,7 +32,7 @@ Redis-based components for Scrapy.
 * Usage: https://github.com/rmax/scrapy-redis/wiki/Usage
 * Documentation: https://github.com/rmax/scrapy-redis/wiki.
 * Release: https://github.com/rmax/scrapy-redis/wiki/History
-* Contributing: https://github.com/rmax/scrapy-redis/blob/master/CONTRIBUTING.rst
+* Contribution: https://github.com/rmax/scrapy-redis/wiki/Getting-Started
 * LICENSE: MIT license
 
 Features
