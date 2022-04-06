@@ -95,29 +95,29 @@ Setup environment
 Setup testing environment
 ~~~~~~~~~~~~~~~
 
-6. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
+1. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
 
        pip install -r requirements-tests.txt
        flake8 src/ tests/
        python -m pytest --ignore=setup.py
        tox
 
-7. Note that if the error of `No module named scrapy_redis` shows, please check the install `scrapy-redis` of your branch by::
+2. Note that if the error of `No module named scrapy_redis` shows, please check the install `scrapy-redis` of your branch by::
    
        pip install .
 
-8. Or change the import lines::
+3. Or change the import lines::
 
        from scrapy_redis import xxx # from this
        from src.scrapy_redis import xxx # to this
 
-9. Commit your changes and push your branch to GitHub::
+4. Commit your changes and push your branch to GitHub::
 
        git add .
        git commit -m "Your detailed description of your changes."
        git push origin name-of-your-bugfix-or-feature
 
-10. Submit a pull request through the GitHub website.
+5. Submit a pull request through the GitHub website.
 
 Pull Request Guidelines
 -----------------------
