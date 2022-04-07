@@ -139,14 +139,13 @@ class RedisMixin(object):
             self.logger.debug("Read %s requests from '%s'", found, self.redis_key)
 
     def make_request_from_data(self, data):
-        """Returns a Request instance from data coming from Redis.
+        """Returns a Request instance from data coming from Redis or [].
 
         Overriding this function to support the 'json' requested ``data`` that contains
         `url` ,`meta` and other optional parameters. `meta` is a nested json which contains sub-data.
 
         Along with:
-        After accessing the data, sending the FormRequest with `url`, `meta` and addition `formdata`
-
+        After accessing the data, sending the FormRequest with `url`, `meta` and addition `formdata` `method`
         For example:
         {
             "url": "https://exaple.com",
@@ -154,11 +153,15 @@ class RedisMixin(object):
                 'job-id':'123xsd',
                 'start-date':'dd/mm/yy'
             },
-            "url_cookie_key":"fertxsas"
+            "url_cookie_key":"fertxsas",
+            "method":"POST"
         }
 
         this data can be accessed from 'scrapy.spider' through response.
         'request.url', 'request.meta', 'request.cookies'
+        If this data is not contain `url` will return [],so you should verify the `url` in the data.
+        if `method` not in data ,request object will set method to 'GET',not required.
+        if `meta` not in data, the request object will set `meta` to {},not required.
 
         Parameters
         ----------
@@ -176,11 +179,11 @@ class RedisMixin(object):
             return FormRequest(formatted_data, dont_filter=True)
 
         if parameter.get('url', None) is None:
-            self.logger.warning(TextColor.WARNING + "The data from Redis has no url key in pushData" + TextColor.ENDC)
+            self.logger.warning(TextColor.WARNING + "The data from Redis has no url key in push data" + TextColor.ENDC)
             return []
 
         url = parameter.pop("url")
-        method = parameter.pop("method") if "method" in parameter else "GET"
+        method = parameter.pop("method").upper() if "method" in parameter else "GET"
         metadata = parameter.pop("meta") if "meta" in parameter else {}
 
         return FormRequest(url, dont_filter=True, method=method, formdata=parameter, meta=metadata)
