@@ -141,11 +141,11 @@ class RedisMixin(object):
     def make_request_from_data(self, data):
         """Returns a Request instance from data coming from Redis or [].
 
-        Overriding this function to support the 'json' requested ``data`` that contains
+        Overriding this function to support the `json` requested `data` that contains
         `url` ,`meta` and other optional parameters. `meta` is a nested json which contains sub-data.
 
         Along with:
-        After accessing the data, sending the FormRequest with `url`, `meta` and addition `formdata` `method`
+        After accessing the data, sending the FormRequest with `url`, `meta` and addition `formdata`, `method`
         For example:
         {
             "url": "https://exaple.com",
@@ -157,11 +157,12 @@ class RedisMixin(object):
             "method":"POST"
         }
 
-        this data can be accessed from 'scrapy.spider' through response.
-        'request.url', 'request.meta', 'request.cookies'
-        If this data is not contain `url` will return [],so you should verify the `url` in the data.
-        if `method` not in data ,request object will set method to 'GET',not required.
-        if `meta` not in data, the request object will set `meta` to {},not required.
+        If `url` is empty, return []. So you should verify the `url` in the data.
+        If `method` is empty, the request object will set method to 'GET', optional.
+        If `meta` is empty, the request object will set `meta` to {}, optional.
+
+        This json supported data can be accessed from 'scrapy.spider' through response.
+        'request.url', 'request.meta', 'request.cookies', 'request.method'
 
         Parameters
         ----------
