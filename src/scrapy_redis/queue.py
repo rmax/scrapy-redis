@@ -1,4 +1,7 @@
-from scrapy.utils.request import request_from_dict
+try:
+    from scrapy.utils.request import request_from_dict
+except:
+    from scrapy.utils.reqser import request_to_dict, request_from_dict
 
 from . import picklecompat
 
@@ -39,7 +42,10 @@ class Base(object):
 
     def _encode_request(self, request):
         """Encode a request object"""
-        obj = request.to_dict(spider=self.spider)
+        try:
+            obj = request.to_dict(spider=self.spider)
+        except:
+            obj = request_to_dict(request, self.spider)
         return self.serializer.dumps(obj)
 
     def _decode_request(self, encoded_request):
