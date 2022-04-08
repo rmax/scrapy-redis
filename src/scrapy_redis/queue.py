@@ -1,6 +1,6 @@
 try:
     from scrapy.utils.request import request_from_dict
-except:
+except ImportError:
     from scrapy.utils.reqser import request_to_dict, request_from_dict
 
 from . import picklecompat
@@ -44,7 +44,7 @@ class Base(object):
         """Encode a request object"""
         try:
             obj = request.to_dict(spider=self.spider)
-        except:
+        except AttributeError:
             obj = request_to_dict(request, self.spider)
         return self.serializer.dumps(obj)
 
