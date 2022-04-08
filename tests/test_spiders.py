@@ -109,7 +109,7 @@ class MockRequest(mock.Mock):
         return hash(self.url)
 
     def __repr__(self):
-        return '<%s(%s)>' % (self.__class__.__name__, self.url)
+        return f'<{self.__class__.__name__}({self.url})>'
 
 
 @pytest.mark.parametrize('spider_cls', [
@@ -132,7 +132,7 @@ def test_consume_urls_from_redis(start_urls_as_zset, start_urls_as_set, spider_c
     spider = spider_cls.from_crawler(crawler)
     with flushall(spider.server):
         urls = [
-            'http://example.com/%d' % i for i in range(batch_size * 2)
+            f'http://example.com/{i}' for i in range(batch_size * 2)
         ]
         reqs = []
         if start_urls_as_set:
