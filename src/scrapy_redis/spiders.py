@@ -139,7 +139,8 @@ class RedisMixin(object):
             self.logger.debug("Read %s requests from '%s'", found, self.redis_key)
 
     def make_request_from_data(self, data):
-        """Returns a Request instance from data coming from Redis or [].
+        """
+        Returns a `Request` instance for data coming from Redis.
 
         Overriding this function to support the `json` requested `data` that contains
         `url` ,`meta` and other optional parameters. `meta` is a nested json which contains sub-data.
