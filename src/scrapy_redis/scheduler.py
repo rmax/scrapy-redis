@@ -131,8 +131,7 @@ class Scheduler(object):
                 serializer=self.serializer,
             )
         except TypeError as e:
-            raise ValueError("Failed to instantiate queue class '%s': %s",
-                             self.queue_cls, e)
+            raise ValueError(f"Failed to instantiate queue class '{self.queue_cls}': {e}")
 
         self.df = load_object(self.dupefilter_cls).from_spider(spider)
 
@@ -140,7 +139,7 @@ class Scheduler(object):
             self.flush()
         # notice if there are requests already in the queue to resume the crawl
         if len(self.queue):
-            spider.log("Resuming crawl (%d requests scheduled)" % len(self.queue))
+            spider.log(f"Resuming crawl ({len(self.queue)} requests scheduled)")
 
     def close(self, reason):
         if not self.persist:

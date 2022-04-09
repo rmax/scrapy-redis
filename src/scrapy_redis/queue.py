@@ -29,11 +29,9 @@ class Base(object):
             # TODO: deprecate pickle.
             serializer = picklecompat
         if not hasattr(serializer, 'loads'):
-            raise TypeError("serializer does not implement 'loads' function: %r"
-                            % serializer)
+            raise TypeError(f"serializer does not implement 'loads' function: {serializer}")
         if not hasattr(serializer, 'dumps'):
-            raise TypeError("serializer '%s' does not implement 'dumps' function: %r"
-                            % serializer)
+            raise TypeError(f"serializer does not implement 'dumps' function: {serializer}")
 
         self.server = server
         self.spider = spider
