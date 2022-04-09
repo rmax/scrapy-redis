@@ -63,7 +63,7 @@ class QueueTestMixin(RedisTestMixin):
 
     def setUp(self):
         self.spider = get_spider(name='myspider')
-        self.key = 'scrapy_redis:tests:%s:queue' % self.spider.name
+        self.key = f'scrapy_redis:tests:{self.spider.name}:queue'
         self.q = self.queue_cls(self.server, Spider('myspider'), self.key)
 
     def tearDown(self):
@@ -80,7 +80,7 @@ class QueueTestMixin(RedisTestMixin):
             # duplication filter whenever the serielized requests are the same.
             # This might be unwanted on repetitive requests to the same page
             # even with dont_filter=True flag.
-            req = Request('http://example.com/?page=%s' % i)
+            req = Request(f'http://example.com/?page={i}')
             self.q.push(req)
         self.assertEqual(len(self.q), 10)
 

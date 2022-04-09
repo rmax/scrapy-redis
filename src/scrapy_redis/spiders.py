@@ -133,10 +133,10 @@ class RedisMixin(object):
                 yield reqs
                 found += 1
             else:
-                self.logger.debug("Request not made from data: %r", data)
+                self.logger.debug(f"Request not made from data: {data}")
 
         if found:
-            self.logger.debug("Read %s requests from '%s'", found, self.redis_key)
+            self.logger.debug(f"Read {found} requests from '{self.redis_key}'")
 
     def make_request_from_data(self, data):
         """
@@ -176,12 +176,12 @@ class RedisMixin(object):
         if is_dict(formatted_data):
             parameter = json.loads(formatted_data)
         else:
-            self.logger.warning(TextColor.WARNING + "WARNING: String request is deprecated, please use JSON data format. \
-                Detail information, please check https://github.com/rmax/scrapy-redis#features" + TextColor.ENDC)
+            self.logger.warning(f"{TextColor.WARNING}WARNING: String request is deprecated, please use JSON data format. \
+                Detail information, please check https://github.com/rmax/scrapy-redis#features{TextColor.ENDC}")
             return FormRequest(formatted_data, dont_filter=True)
 
         if parameter.get('url', None) is None:
-            self.logger.warning(TextColor.WARNING + "The data from Redis has no url key in push data" + TextColor.ENDC)
+            self.logger.warning(f"{TextColor.WARNING}The data from Redis has no url key in push data{TextColor.ENDC}")
             return []
 
         url = parameter.pop("url")
