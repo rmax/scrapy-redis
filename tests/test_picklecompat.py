@@ -10,9 +10,9 @@ def test_picklecompat():
         'dont_filter': False,
         'errback': None,
         'headers': {'Referer': ['http://www.dmoz.org/']},
-        'meta': {'depth': 1, 'link_text': u'Fran\xe7ais', 'rule': 0},
+        'meta': {'depth': 1, 'link_text': 'Fran\xe7ais', 'rule': 0},
         'method': 'GET',
         'priority': 0,
-        'url': u'http://www.dmoz.org/World/Fran%C3%A7ais/',
+        'url': 'http://www.dmoz.org/World/Fran%C3%A7ais/',
     }
     assert obj == picklecompat.loads(picklecompat.dumps(obj))

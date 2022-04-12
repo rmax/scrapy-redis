@@ -133,20 +133,20 @@ class RedisMixin(object):
                 yield reqs
                 found += 1
             else:
-                self.logger.debug("Request not made from data: %r", data)
+                self.logger.debug(f"Request not made from data: {data}")
 
         if found:
-            self.logger.debug("Read %s requests from '%s'", found, self.redis_key)
+            self.logger.debug(f"Read {found} requests from '{self.redis_key}'")
 
     def make_request_from_data(self, data):
-        """Returns a Request instance from data coming from Redis.
+        """
+        Returns a `Request` instance for data coming from Redis.
 
-        Overriding this function to support the 'json' requested ``data`` that contains
+        Overriding this function to support the `json` requested `data` that contains
         `url` ,`meta` and other optional parameters. `meta` is a nested json which contains sub-data.
 
         Along with:
-        After accessing the data, sending the FormRequest with `url`, `meta` and addition `formdata`
-
+        After accessing the data, sending the FormRequest with `url`, `meta` and addition `formdata`, `method`
         For example:
         {
             "url": "https://exaple.com",
@@ -154,11 +154,16 @@ class RedisMixin(object):
                 'job-id':'123xsd',
                 'start-date':'dd/mm/yy'
             },
-            "url_cookie_key":"fertxsas"
+            "url_cookie_key":"fertxsas",
+            "method":"POST"
         }
 
-        this data can be accessed from 'scrapy.spider' through response.
-        'request.url', 'request.meta', 'request.cookies'
+        If `url` is empty, return []. So you should verify the `url` in the data.
+        If `method` is empty, the request object will set method to 'GET', optional.
+        If `meta` is empty, the request object will set `meta` to {}, optional.
+
+        This json supported data can be accessed from 'scrapy.spider' through response.
+        'request.url', 'request.meta', 'request.cookies', 'request.method'
 
         Parameters
         ----------
@@ -166,28 +171,24 @@ class RedisMixin(object):
             Message from redis.
 
         """
-        # url = bytes_to_str(data, self.redis_encoding)
         formatted_data = bytes_to_str(data, self.redis_encoding)
 
-        # change to json array
-        parameter = {}
         if is_dict(formatted_data):
             parameter = json.loads(formatted_data)
         else:
-            print(TextColor.WARNING + "WARNING: String request is deprecated, please use JSON data format. \
-                Detail information, please check https://github.com/rmax/scrapy-redis#features" + TextColor.ENDC)
+            self.logger.warning(f"{TextColor.WARNING}WARNING: String request is deprecated, please use JSON data format. \
+                Detail information, please check https://github.com/rmax/scrapy-redis#features{TextColor.ENDC}")
             return FormRequest(formatted_data, dont_filter=True)
 
-        url = parameter['url']
-        del parameter['url']
-        metadata = {}
-        try:
-            metadata = parameter['meta']
-            del parameter['meta']
-        except KeyError as e:
-            print('Failed to delete metadata: ', e)
+        if parameter.get('url', None) is None:
+            self.logger.warning(f"{TextColor.WARNING}The data from Redis has no url key in push data{TextColor.ENDC}")
+            return []
 
-        return FormRequest(url, dont_filter=True, formdata=parameter, meta=metadata)
+        url = parameter.pop("url")
+        method = parameter.pop("method").upper() if "method" in parameter else "GET"
+        metadata = parameter.pop("meta") if "meta" in parameter else {}
+
+        return FormRequest(url, dont_filter=True, method=method, formdata=parameter, meta=metadata)
 
     def schedule_next_requests(self):
         """Schedules a request if available"""
