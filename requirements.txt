@@ -1,0 +1,9 @@
+scrapy>=2.0
+redis>=4.0
+six>=1.15
+coverage
+flake8
+mock
+pytest
+tox
+pytest-cov
