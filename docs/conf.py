@@ -51,8 +51,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Scrapy-Redis'
-copyright = u'2011-2016, Rolando Espinoza'
+project = 'Scrapy-Redis'
+copyright = '2011-2016, Rolando Espinoza'
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -205,8 +205,8 @@ latex_elements = {
 # [howto/manual]).
 latex_documents = [
     ('index', 'scrapy_redis.tex',
-     u'Scrapy-Redis Documentation',
-     u'Rolando Espinoza', 'manual'),
+     'Scrapy-Redis Documentation',
+     'Rolando Espinoza', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at
@@ -236,8 +236,8 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'scrapy_redis',
-     u'Scrapy-Redis Documentation',
-     [u'Rolando Espinoza'], 1)
+     'Scrapy-Redis Documentation',
+     ['Rolando Espinoza'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -251,8 +251,8 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     ('index', 'scrapy_redis',
-     u'Scrapy-Redis Documentation',
-     u'Rolando Espinoza',
+     'Scrapy-Redis Documentation',
+     'Rolando Espinoza',
      'scrapy-redis',
      'One line description of project.',
      'Miscellaneous'),
