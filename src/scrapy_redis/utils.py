@@ -24,8 +24,21 @@ def bytes_to_str(s, encoding='utf-8'):
 
 
 def is_dict(string_content):
+    """Try load string_content as json, if failed, return False, else return True."""
     try:
         json.loads(string_content)
     except JSONDecodeError:
         return False
     return True
+
+
+def convert_bytes_to_str(data, encoding='utf-8'):
+    """Convert a dict's keys & values from `bytes` to `str`
+        or convert bytes to str"""
+    if isinstance(data, bytes):
+        return data.decode(encoding)
+    if isinstance(data, dict):
+        return dict(map(convert_bytes_to_str, data.items()))
+    elif isinstance(data, tuple):
+        return map(convert_bytes_to_str, data)
+    return data
