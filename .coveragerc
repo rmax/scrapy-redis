@@ -3,6 +3,7 @@ source =
     src
 
 [run]
+omit = setup.py
 branch = true
 source =
     scrapy_redis
