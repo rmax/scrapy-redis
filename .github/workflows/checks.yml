@@ -1,5 +1,5 @@
 # This is a basic workflow to help you get started with Actions
-name: CI
+name: Checks
 on:
   pull_request:
     branches: [master]
@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, macos-10.15, windows-latest]
+        os: [ubuntu-18.04]
         python-version: ["3.10"]
         env: [security, flake8, pylint]
 
