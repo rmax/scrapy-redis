@@ -1,5 +1,5 @@
 # This is GitHub Action for Continuous Intergration (CI)
-name: ${{ matrix.name }}
+name: CI
 on:
   pull_request:
     branches: [master]
