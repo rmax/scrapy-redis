@@ -1,5 +1,5 @@
 # This is GitHub Action for MacOS Continuous Intergration (CI)
-name: Build Ubuntu
+name: Build MacOS
 on:
   pull_request:
     branches: [master]
