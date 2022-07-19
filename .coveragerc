@@ -13,7 +13,6 @@ parallel = true
 [report]
 show_missing = true
 precision = 2
-omit = 
 exclude_lines =
     pragma: no cover
     def __repr__
