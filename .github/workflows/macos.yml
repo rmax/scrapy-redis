@@ -6,7 +6,7 @@ on:
 
 jobs:
   CI:
-    runs-on: macos-10.15
+    runs-on: macos-latest
     strategy:
       fail-fast: false
       matrix:
