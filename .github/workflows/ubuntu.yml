@@ -1,4 +1,4 @@
-# This is GitHub Action for Continuous Intergration (CI)
+# This is GitHub Action for Ubuntu Continuous Intergration (CI)
 name: Build Ubuntu
 on:
   pull_request:
