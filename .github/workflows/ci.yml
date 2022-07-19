@@ -1,18 +1,18 @@
-# This is GitHub Action for linting and security check
-name: Checks
+# This is GitHub Action for Continuous Intergration (CI)
+name: CI
 on:
   pull_request:
     branches: [master]
 
 jobs:
-  checks:
+  CI:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04]
+        os: [ubuntu-18.04, macos-10.15, windows-latest]
         python-version: ["3.10"]
-        env: [security, flake8, pylint]
+        env: [base]
 
     steps:
     - uses: actions/checkout@v2
@@ -22,7 +22,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Run check
+    - name: Continuous Integration (CI)
       env: 
         TOXENV: ${{ matrix.env }}
       run: |
