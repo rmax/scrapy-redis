@@ -1,6 +1,8 @@
 # This is a basic workflow to help you get started with Actions
 name: Checks
-on: [push, pull_request]
+on:
+  pull_request:
+    branches: [master]
 
 jobs:
   checks:
@@ -18,9 +20,6 @@ jobs:
         - python-version: "3.10"
           env:
             TOXENV: pylint
-        - python-version: "3.10"
-          env:
-            TOXENV: py310-scrapy26-redis42
 
     steps:
     - uses: actions/checkout@v2
