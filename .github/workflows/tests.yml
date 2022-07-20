@@ -1,4 +1,4 @@
-# This is GitHub Action for Ubuntu Continuous Intergration (CI)
+# This is GitHub Action for tests
 name: CI
 on:
   pull_request:
