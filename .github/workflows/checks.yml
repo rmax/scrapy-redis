@@ -1,16 +1,15 @@
 # This is GitHub Action for linting and security check
-name: Checks
+name: CI
 on:
   pull_request:
     branches: [master]
 
 jobs:
   checks:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04]
         python-version: ["3.10"]
         env: [security, flake8, pylint]
 
