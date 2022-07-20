@@ -1,10 +1,5 @@
-<<<<<<< HEAD:.github/workflows/ubuntu.yml
 # This is GitHub Action for Ubuntu Continuous Intergration (CI)
-name: Build Ubuntu
-=======
-# This is GitHub Action for Continuous Intergration (CI)
 name: CI
->>>>>>> rename action:.github/workflows/tests.yml
 on:
   pull_request:
     branches: [master]
