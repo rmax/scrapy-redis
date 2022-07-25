@@ -4,6 +4,15 @@ History
 
 .. comment:: bumpversion marker
 
+0.7.3 (2022-07-21)
+------------------
+* Move docs to GitHub Wiki
+* Update tox and support dynamic tests
+* Update support for json data
+* Refactor max idle time
+* Add support for python3.7~python3.10
+* Deprecate python2.x support
+
 0.7.2 (2021-12-27)
 ------------------
 * Fix RedisStatsCollector._get_key()
