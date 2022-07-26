@@ -1,7 +1,6 @@
 TODO
 ====
 
-* Test on different redis versions.
 * Add SCRAPY_JOB global support (jobs sharing same SCRAPY_JOB share same queues).
 * Use a spider middleware instead of spider mixin. This will avoid the spider
   idle signal hack.
@@ -13,5 +12,3 @@ TODO
   cases (i.e.: producer/consumer).
 * Add pyrebloom dupefilter.
 * Warn and pass unserializable requests.
-* Drop official support for Scrapy 1.0. It is enough to support current and previous
-  scrapy  version.
