@@ -58,9 +58,9 @@ class RedisMixin(object):
 
         if self.redis_batch_size is None:
             # TODO: Deprecate this setting (REDIS_START_URLS_BATCH_SIZE).
-            self.redis_batch_size = settings.getint(
+            self.redis_batch_size = settings.get(
                 'REDIS_START_URLS_BATCH_SIZE',
-                settings.getint('CONCURRENT_REQUESTS'),
+                settings.get('CONCURRENT_REQUESTS'),
             )
 
         try:
@@ -88,7 +88,7 @@ class RedisMixin(object):
             self.count_size = self.server.llen
 
         if self.max_idle_time is None:
-            self.max_idle_time = settings.getint(
+            self.max_idle_time = settings.get(
                 "MAX_IDLE_TIME_BEFORE_CLOSE",
                 defaults.MAX_IDLE_TIME
             )
