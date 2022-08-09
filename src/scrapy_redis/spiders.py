@@ -84,7 +84,7 @@ class RedisMixin(object):
             self.count_size = self.server.llen
 
         if self.max_idle_time is None:
-            self.max_idle_time = settings.getint(
+            self.max_idle_time = settings.get(
                 "MAX_IDLE_TIME_BEFORE_CLOSE",
                 defaults.MAX_IDLE_TIME
             )
