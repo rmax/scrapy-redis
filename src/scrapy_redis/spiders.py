@@ -57,11 +57,7 @@ class RedisMixin(object):
             raise ValueError("redis_key must not be empty")
 
         if self.redis_batch_size is None:
-            # TODO: Deprecate this setting (REDIS_START_URLS_BATCH_SIZE).
-            self.redis_batch_size = settings.getint(
-                'REDIS_START_URLS_BATCH_SIZE',
-                settings.getint('CONCURRENT_REQUESTS'),
-            )
+            self.redis_batch_size = settings.getint('CONCURRENT_REQUESTS', defaults.REDIS_CONCURRENT_REQUESTS)
 
         try:
             self.redis_batch_size = int(self.redis_batch_size)
