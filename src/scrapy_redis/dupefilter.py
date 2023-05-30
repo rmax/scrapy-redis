@@ -2,7 +2,8 @@ import logging
 import time
 
 from scrapy.dupefilters import BaseDupeFilter
-from scrapy.utils.request import request_fingerprint
+#from scrapy.utils.request import request_fingerprint
+from scrapy.utils.request import fingerprint
 
 from . import defaults
 from .connection import get_redis_from_settings
@@ -95,12 +96,12 @@ class RFPDupeFilter(BaseDupeFilter):
         bool
 
         """
-        fp = self.request_fingerprint(request)
+        fp = self.fingerprint(request)
         # This returns the number of values added, zero if already exists.
         added = self.server.sadd(self.key, fp)
         return added == 0
 
-    def request_fingerprint(self, request):
+    def fingerprint(self, request):
         """Returns a fingerprint for a given request.
 
         Parameters
@@ -112,7 +113,7 @@ class RFPDupeFilter(BaseDupeFilter):
         str
 
         """
-        return request_fingerprint(request)
+        return fingerprint(request)
 
     @classmethod
     def from_spider(cls, spider):
