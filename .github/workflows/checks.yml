@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11.3"]
+        python-version: ["3.12"]
         env: [security, flake8, pylint]
 
     steps:
