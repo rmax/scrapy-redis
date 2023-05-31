@@ -35,9 +35,9 @@ class TestRFPDupeFilter(object):
 
     def test_overridable_request_fingerprinter(self):
         req = Request('http://example.com')
-        self.df.request_fingerprinter = mock.Mock(wraps=self.df.request_fingerprinter)
+        self.df.request_fingerprint = mock.Mock(wraps=self.df.request_fingerprint)
         assert not self.df.request_seen(req)
-        self.df.request_fingerprinter.assert_called_with(req)
+        self.df.request_fingerprint.assert_called_with(req)
 
     def test_clear_deletes(self):
         self.df.clear()
