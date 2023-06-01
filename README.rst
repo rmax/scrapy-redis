@@ -14,7 +14,13 @@ Scrapy-Redis
 
 .. image:: https://github.com/rmax/scrapy-redis/actions/workflows/builds.yml/badge.svg?branch=master
         :target: https://github.com/rmax/scrapy-redis/actions/workflows/builds.yml
-
+        
+.. image:: https://github.com/rmax/scrapy-redis/actions/workflows/checks.yml/badge.svg?branch=master
+        :target: https://github.com/rmax/scrapy-redis/actions/workflows/checks.yml
+        
+.. image:: https://github.com/rmax/scrapy-redis/actions/workflows/tests.yml/badge.svg?branch=master
+        :target: https://github.com/rmax/scrapy-redis/actions/workflows/tests.yml
+        
 .. image:: https://codecov.io/github/rmax/scrapy-redis/coverage.svg?branch=master
         :alt: Coverage Status
         :target: https://codecov.io/github/rmax/scrapy-redis
