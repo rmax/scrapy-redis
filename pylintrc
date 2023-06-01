@@ -2,7 +2,7 @@
 persistent=no
 jobs=1  # >1 hides results
 suggestion-mode=yes  # guess common misconfiguration and emit user-friendly hints
-py-version = 3.7.0
+py-version = 3.11.3
 
 [MESSAGES CONTROL]
 disable=abstract-method,
