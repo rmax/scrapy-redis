@@ -1,5 +1,5 @@
 # This is GitHub Action for cross platform building
-name: CI
+name: Builds
 on:
   pull_request:
     branches: [master]
