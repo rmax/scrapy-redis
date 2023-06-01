@@ -1,5 +1,5 @@
 # This is GitHub Action for tests
-name: Test
+name: Tests
 on:
   pull_request:
     branches: [master]
