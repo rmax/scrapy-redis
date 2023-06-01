@@ -12,16 +12,12 @@ Scrapy-Redis
 .. image:: https://img.shields.io/pypi/pyversions/scrapy-redis.svg
         :target: https://pypi.python.org/pypi/scrapy-redis
 
-.. image:: https://img.shields.io/travis/rmax/scrapy-redis.svg
-        :target: https://travis-ci.org/rmax/scrapy-redis
+.. image:: https://github.com/rmax/scrapy-redis/actions/workflows/builds.yml/badge.svg?branch=master
+        :target: https://github.com/rmax/scrapy-redis/actions/workflows/builds.yml
 
 .. image:: https://codecov.io/github/rmax/scrapy-redis/coverage.svg?branch=master
         :alt: Coverage Status
         :target: https://codecov.io/github/rmax/scrapy-redis
-
-.. image:: https://requires.io/github/LuckyPigeon/scrapy-redis/requirements.svg?branch=master
-        :alt: Requirements Status
-        :target: https://requires.io/github/rmax/scrapy-redis/requirements/?branch=master
 
 .. image:: https://img.shields.io/badge/security-bandit-green.svg
         :alt: Security Status
