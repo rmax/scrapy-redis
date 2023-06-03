@@ -1,5 +1,5 @@
 # This is GitHub Action for linting and security check
-name: CI
+name: check
 on:
   pull_request:
     branches: [master]
