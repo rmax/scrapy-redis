@@ -30,7 +30,7 @@ class TestRFPDupeFilter(object):
 
     def test_request_seen(self):
         req = Request('http://example.com')
-        
+
         def same_request():
             assert not self.df.request_seen(req)
             assert self.df.request_seen(req)
@@ -48,7 +48,7 @@ class TestRFPDupeFilter(object):
         same_request()
         diff_method()
         diff_url()
-    
+
     def test_overridable_request_fingerprinter(self):
         req = Request('http://example.com')
         self.df.request_fingerprint = mock.Mock(wraps=self.df.request_fingerprint)
