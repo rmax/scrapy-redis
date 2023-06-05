@@ -116,9 +116,6 @@ class RFPDupeFilter(BaseDupeFilter):
         str
 
         """
-        return self.fingerprint(request)
-    
-    def fingerprint(self, request):
         fingerprint_data = {
             "method": to_unicode(request.method),
             "url": canonicalize_url(request.url),
@@ -126,8 +123,7 @@ class RFPDupeFilter(BaseDupeFilter):
         }
         fingerprint_json = json.dumps(fingerprint_data, sort_keys=True)
         return hashlib.sha1(fingerprint_json.encode()).hexdigest()
-
-
+    
     @classmethod
     def from_spider(cls, spider):
         settings = spider.settings
