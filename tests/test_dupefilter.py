@@ -11,8 +11,8 @@ def get_redis_mock():
 
     def sadd(key, fp, added=0, db={}):
         fingerprints = db.setdefault(key, set())
-        if key not in fingerprints:
-            fingerprints.add(key)
+        if fp not in fingerprints:
+            fingerprints.add(fp)
             added += 1
         return added
 
