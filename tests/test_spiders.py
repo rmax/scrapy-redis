@@ -56,6 +56,13 @@ class TestRedisMixin_setup_redis(object):
             self.myspider.setup_redis()
         assert "redis_batch_size" in str(excinfo.value)
 
+    def test_invalid_idle_time(self):
+        self.myspider.max_idle_time = 'x'
+        self.myspider.crawler = get_crawler()
+        with pytest.raises(ValueError) as excinfo:
+            self.myspider.setup_redis()
+        assert "max_idle_time" in str(excinfo.value)
+
     @mock.patch('scrapy_redis.spiders.connection')
     def test_via_from_crawler(self, connection):
         server = connection.from_settings.return_value = mock.Mock()
@@ -82,10 +89,12 @@ def test_from_crawler_with_spider_arguments(spider_cls):
         crawler, 'foo',
         redis_key='key:%(name)s',
         redis_batch_size='2000',
+        max_idle_time='100',
     )
     assert spider.name == 'foo'
     assert spider.redis_key == 'key:foo'
     assert spider.redis_batch_size == 2000
+    assert spider.max_idle_time == 100
 
 
 class MockRequest(mock.Mock):
@@ -100,7 +109,7 @@ class MockRequest(mock.Mock):
         return hash(self.url)
 
     def __repr__(self):
-        return '<%s(%s)>' % (self.__class__.__name__, self.url)
+        return f'<{self.__class__.__name__}({self.url})>'
 
 
 @pytest.mark.parametrize('spider_cls', [
@@ -123,7 +132,7 @@ def test_consume_urls_from_redis(start_urls_as_zset, start_urls_as_set, spider_c
     spider = spider_cls.from_crawler(crawler)
     with flushall(spider.server):
         urls = [
-            'http://example.com/%d' % i for i in range(batch_size * 2)
+            f'http://example.com/{i}' for i in range(batch_size * 2)
         ]
         reqs = []
         if start_urls_as_set:
@@ -140,7 +149,7 @@ def test_consume_urls_from_redis(start_urls_as_zset, start_urls_as_set, spider_c
         start_requests = list(spider.start_requests())
         if start_urls_as_zset or start_urls_as_set:
             assert len(start_requests) == batch_size
-            assert set(start_requests).issubset(reqs)
+            assert set(map(lambda x: x.url, start_requests)).issubset(map(lambda x: x.url, reqs))
         else:
             assert start_requests == reqs[:batch_size]
 

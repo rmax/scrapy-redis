@@ -17,6 +17,7 @@ REDIS_PARAMS = {
     'retry_on_timeout': True,
     'encoding': REDIS_ENCODING,
 }
+REDIS_CONCURRENT_REQUESTS = 16
 
 SCHEDULER_QUEUE_KEY = '%(spider)s:requests'
 SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.PriorityQueue'
@@ -26,3 +27,4 @@ SCHEDULER_PERSIST = False
 START_URLS_KEY = '%(name)s:start_urls'
 START_URLS_AS_SET = False
 START_URLS_AS_ZSET = False
+MAX_IDLE_TIME = 0

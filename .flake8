@@ -1,0 +1,9 @@
+
+[flake8]
+
+max-line-length = 119
+ignore = W503
+
+exclude =
+    tests/test_spiders.py E731
+    docs/conf.py E265

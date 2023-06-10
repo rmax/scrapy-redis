@@ -3,6 +3,8 @@ from .connection import from_settings as redis_from_settings
 from .defaults import STATS_KEY, SCHEDULER_PERSIST
 from datetime import datetime
 
+from .utils import convert_bytes_to_str
+
 
 class RedisStatsCollector(StatsCollector):
     """
@@ -43,7 +45,10 @@ class RedisStatsCollector(StatsCollector):
 
     def get_stats(self, spider=None):
         """Return the all of the values of hash stats"""
-        return self.server.hgetall(self._get_key(spider))
+        stats = self.server.hgetall(self._get_key(spider))
+        if stats:
+            return convert_bytes_to_str(stats)
+        return {}
 
     def set_value(self, key, value, spider=None):
         """Set the value according to hash key of stats"""

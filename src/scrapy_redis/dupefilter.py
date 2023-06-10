@@ -1,8 +1,12 @@
 import logging
+import hashlib
+import json
 import time
 
 from scrapy.dupefilters import BaseDupeFilter
 from scrapy.utils.request import request_fingerprint
+from scrapy.utils.python import to_unicode
+from w3lib.url import canonicalize_url
 
 from . import defaults
 from .connection import get_redis_from_settings
@@ -112,8 +116,14 @@ class RFPDupeFilter(BaseDupeFilter):
         str
 
         """
-        return request_fingerprint(request)
-
+        fingerprint_data = {
+            "method": to_unicode(request.method),
+            "url": canonicalize_url(request.url),
+            "body": (request.body or b"").hex(),
+        }
+        fingerprint_json = json.dumps(fingerprint_data, sort_keys=True)
+        return hashlib.sha1(fingerprint_json.encode()).hexdigest()
+    
     @classmethod
     def from_spider(cls, spider):
         settings = spider.settings

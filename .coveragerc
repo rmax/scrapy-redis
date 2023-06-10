@@ -3,6 +3,7 @@ source =
     src
 
 [run]
+omit = setup.py
 branch = true
 source =
     scrapy_redis
@@ -12,7 +13,7 @@ parallel = true
 [report]
 show_missing = true
 precision = 2
-omit = 
+omit = */__init__.py
 exclude_lines =
     pragma: no cover
     def __repr__

@@ -1,4 +1,7 @@
-from scrapy.utils.reqser import request_to_dict, request_from_dict
+try:
+    from scrapy.utils.request import request_from_dict
+except ImportError:
+    from scrapy.utils.reqser import request_to_dict, request_from_dict
 
 from . import picklecompat
 
@@ -26,11 +29,9 @@ class Base(object):
             # TODO: deprecate pickle.
             serializer = picklecompat
         if not hasattr(serializer, 'loads'):
-            raise TypeError("serializer does not implement 'loads' function: %r"
-                            % serializer)
+            raise TypeError(f"serializer does not implement 'loads' function: {serializer}")
         if not hasattr(serializer, 'dumps'):
-            raise TypeError("serializer '%s' does not implement 'dumps' function: %r"
-                            % serializer)
+            raise TypeError(f"serializer does not implement 'dumps' function: {serializer}")
 
         self.server = server
         self.spider = spider
@@ -39,13 +40,16 @@ class Base(object):
 
     def _encode_request(self, request):
         """Encode a request object"""
-        obj = request_to_dict(request, self.spider)
+        try:
+            obj = request.to_dict(spider=self.spider)
+        except AttributeError:
+            obj = request_to_dict(request, self.spider)
         return self.serializer.dumps(obj)
 
     def _decode_request(self, encoded_request):
         """Decode an request previously encoded"""
         obj = self.serializer.loads(encoded_request)
-        return request_from_dict(obj, self.spider)
+        return request_from_dict(obj, spider=self.spider)
 
     def __len__(self):
         """Return the length of the queue"""

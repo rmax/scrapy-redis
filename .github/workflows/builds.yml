@@ -1,0 +1,29 @@
+# This is GitHub Action for cross platform building
+name: build
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  builds:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.11.3"]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Run build
+      env: 
+        TOXENV: build
+      run: |
+        pip install -U tox
+        tox

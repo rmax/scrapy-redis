@@ -1,0 +1,28 @@
+# This is GitHub Action for tests
+name: test
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11.3"]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Run pytest
+      env: 
+        TOXENV: pytest
+      run: |
+        pip install -U tox
+        tox

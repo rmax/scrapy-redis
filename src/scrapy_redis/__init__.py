@@ -7,4 +7,4 @@ from .connection import (  # NOQA
 
 __author__ = 'Rolando Espinoza'
 __email__ = 'rolando at rmax.io'
-__version__ = '0.7.1'
+__version__ = '0.7.3'

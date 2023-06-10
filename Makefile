@@ -5,10 +5,13 @@
 .PHONY: release dist install build-inplace
 define BROWSER_PYSCRIPT
 import os, webbrowser, sys
+FAIL = "\033[91m"
+ENDC = "\033[0m"
+
 try:
-	from urllib import pathname2url
-except:
 	from urllib.request import pathname2url
+except:
+	print(FAIL + "Python2 is deprecated, please upgrade your python >= 3.7" + ENDC)
 
 webbrowser.open("file://" + pathname2url(os.path.abspath(sys.argv[1])))
 endef
@@ -91,13 +94,13 @@ develop: clean
 	pip install -e .
 
 test: develop
-	py.test
+	pytest --ignore=setup.py
 
 test-all:
 	tox -v
 
 coverage: develop
-	coverage run -m py.test
+	coverage run -m pytest --ignore=setup.py
 	coverage combine
 	coverage report
 	coverage html
