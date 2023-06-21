@@ -96,7 +96,6 @@ class RedisMixin(object):
 
         # The idle signal is called when the spider has no requests left,
         # that's when we will schedule new requests from redis queue
-        crawler.signals.connect(self.spider_idle, signal=signals.spider_idle)
         crawler.signals.connect(self.fill_requests_queue, signal=signals.request_left_downloader)
 
     def pop_list_queue(self, redis_key, batch_size):

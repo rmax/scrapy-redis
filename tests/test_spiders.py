@@ -70,7 +70,6 @@ class TestRedisMixin_setup_redis(object):
         myspider = MySpider.from_crawler(crawler)
         assert myspider.server is server
         connection.from_settings.assert_called_with(crawler.settings)
-        #crawler.signals.connect.assert_called_with(myspider.spider_idle, signal=signals.spider_idle)
         crawler.signals.connect.assert_called_with(myspider.fill_requests_queue, signal=signals.request_left_downloader)
         # Second call does nothing.
         server = myspider.server
