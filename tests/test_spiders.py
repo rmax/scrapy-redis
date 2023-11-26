@@ -165,9 +165,9 @@ def test_consume_urls_from_redis(start_urls_as_zset, start_urls_as_set, spider_c
 
         if start_urls_as_zset or start_urls_as_set:
             crawler.engine.crawl.assert_has_calls([
-                mock.call(req, spider=spider) for req in reqs if req not in start_requests
+                mock.call(req) for req in reqs if req not in start_requests
             ], any_order=True)
         else:
             crawler.engine.crawl.assert_has_calls([
-                mock.call(req, spider=spider) for req in reqs[batch_size:]
+                mock.call(req) for req in reqs[batch_size:]
             ])

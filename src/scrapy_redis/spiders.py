@@ -1,6 +1,6 @@
 import json
 from collections.abc import Iterable
-from scrapy import signals, FormRequest
+from scrapy import signals, FormRequest, version_info as scrapy_version
 from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import Spider, CrawlSpider
 from scrapy_redis.utils import TextColor
@@ -190,7 +190,11 @@ class RedisMixin(object):
         """Schedules a request if available"""
         # TODO: While there is capacity, schedule a batch of redis requests.
         for req in self.next_requests():
-            self.crawler.engine.crawl(req, spider=self)
+            # see https://github.com/scrapy/scrapy/issues/5994
+            if scrapy_version >= (2, 6):
+                self.crawler.engine.crawl(req)
+            else:
+                self.crawler.engine.crawl(req, spider=self)
 
     def spider_idle(self):
         """
