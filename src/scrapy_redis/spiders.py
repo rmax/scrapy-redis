@@ -96,7 +96,7 @@ class RedisMixin(object):
 
         # The idle signal is called when the spider has no requests left,
         # that's when we will schedule new requests from redis queue
-        crawler.signals.connect(self.spider_idle, signal=signals.spider_idle)
+        crawler.signals.connect(self.fill_requests_queue, signal=signals.request_left_downloader)
 
     def pop_list_queue(self, redis_key, batch_size):
         with self.server.pipeline() as pipe:
@@ -112,11 +112,22 @@ class RedisMixin(object):
             datas, _ = pipe.execute()
         return datas
 
+    def fill_requests_queue(self):
+        need_size = self.crawler.engine.downloader.total_concurrency - \
+            len(self.crawler.engine.downloader.active) - len(self.crawler.engine.slot.scheduler.queue)
+        if need_size > 0:
+            self.logger.debug("Need to fill %i request(s)", need_size)
+            for req in self.__next_requests(need_size):
+                self.crawler.engine.crawl(req, spider=self)
+
     def next_requests(self):
+        return self.__next_requests(self.redis_batch_size)
+
+    def __next_requests(self, redis_batch_size):
         """Returns a request to be scheduled or none."""
         # XXX: Do we need to use a timeout here?
         found = 0
-        datas = self.fetch_data(self.redis_key, self.redis_batch_size)
+        datas = self.fetch_data(self.redis_key, redis_batch_size)
         for data in datas:
             reqs = self.make_request_from_data(data)
             if isinstance(reqs, Iterable):
