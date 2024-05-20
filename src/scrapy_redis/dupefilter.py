@@ -4,7 +4,6 @@ import json
 import time
 
 from scrapy.dupefilters import BaseDupeFilter
-from scrapy.utils.request import request_fingerprint
 from scrapy.utils.python import to_unicode
 from w3lib.url import canonicalize_url
 
