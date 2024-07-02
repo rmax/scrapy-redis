@@ -1,5 +1,6 @@
 import contextlib
 import mock
+import os
 import pytest
 
 from scrapy import signals
@@ -10,6 +11,10 @@ from scrapy_redis.spiders import (
     RedisCrawlSpider,
     RedisSpider,
 )
+
+
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
 
 
 @contextlib.contextmanager
@@ -29,7 +34,10 @@ class MyCrawlSpider(RedisCrawlSpider):
 
 
 def get_crawler(**kwargs):
-    return mock.Mock(settings=Settings(), **kwargs)
+    return mock.Mock(settings=Settings({
+        "REDIS_HOST": REDIS_HOST,
+        "REDIS_PORT": REDIS_PORT,
+    }), **kwargs)
 
 
 class TestRedisMixin_setup_redis(object):
@@ -124,6 +132,8 @@ def test_consume_urls_from_redis(start_urls_as_zset, start_urls_as_set, spider_c
     redis_key = 'start:urls'
     crawler = get_crawler()
     crawler.settings.setdict({
+        'REDIS_HOST': REDIS_HOST,
+        'REDIS_PORT': REDIS_PORT,
         'REDIS_START_URLS_KEY': redis_key,
         'REDIS_START_URLS_AS_ZSET': start_urls_as_zset,
         'REDIS_START_URLS_AS_SET': start_urls_as_set,

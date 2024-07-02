@@ -25,5 +25,5 @@ jobs:
       env: 
         TOXENV: build
       run: |
-        pip install -U tox
+        pip install -r requirements-tests.txt
         tox
