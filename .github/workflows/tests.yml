@@ -12,17 +12,25 @@ jobs:
       matrix:
         python-version: ["3.11.3"]
 
+    services:
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    container: python:${{ matrix.python-version }}
+
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-
     - name: Run pytest
-      env: 
+      env:
+        REDIS_HOST: redis
         TOXENV: pytest
+        TOX_TESTENV_PASSENV: REDIS_HOST
       run: |
-        pip install -U tox
+        pip install -r requirements-tests.txt
         tox

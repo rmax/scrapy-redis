@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  python:
+    build: .
+    command: tox -e security,flake8,pytest
+    environment:
+      REDIS_HOST: redis  # Use service name for hostname within docker network
+      REDIS_PORT: 6379
+      TOX_TESTENV_PASSENV: "REDIS_HOST REDIS_PORT"
+    volumes:
+      - ./:/app  # Mount your project directory into the container
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:6.2-alpine
+    ports:
+      - "6379:6379"  # Map Redis port to host port
+
