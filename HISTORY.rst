@@ -4,6 +4,13 @@ History
 
 .. comment:: bumpversion marker
 
+0.8.0 (2024-07-03)
+------------------
+* Fixed request fingerprint method.
+* Fixed support for Scrapy 2.6+.
+* Fixed tox tests and github workflow.
+* Deprecated ``REDIS_START_URLS_BATCH_SIZE``.
+
 0.7.3 (2022-07-21)
 ------------------
 * Move docs to GitHub Wiki

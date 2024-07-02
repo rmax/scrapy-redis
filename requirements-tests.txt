@@ -1,6 +1,6 @@
 # This packages are required to run all the tests.
 flake8
 mock
-pytest
+pytest>=6.0,<7
 pytest-cov
-tox
+tox>=3.0,<4

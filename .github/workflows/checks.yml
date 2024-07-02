@@ -25,5 +25,5 @@ jobs:
       env: 
         TOXENV: ${{ matrix.env }}
       run: |
-        pip install -U tox
+        pip install -r requirements-tests.txt
         tox
