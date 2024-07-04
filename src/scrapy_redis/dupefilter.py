@@ -122,7 +122,7 @@ class RFPDupeFilter(BaseDupeFilter):
         }
         fingerprint_json = json.dumps(fingerprint_data, sort_keys=True)
         return hashlib.sha1(fingerprint_json.encode()).hexdigest()
-    
+
     @classmethod
     def from_spider(cls, spider):
         settings = spider.settings

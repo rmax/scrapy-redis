@@ -172,8 +172,10 @@ class RedisMixin(object):
         if is_dict(formatted_data):
             parameter = json.loads(formatted_data)
         else:
-            self.logger.warning(f"{TextColor.WARNING}WARNING: String request is deprecated, please use JSON data format. \
-                Detail information, please check https://github.com/rmax/scrapy-redis#features{TextColor.ENDC}")
+            self.logger.warning(
+                f"{TextColor.WARNING}WARNING: String request is deprecated, please use JSON data format. "
+                f"Detail information, please check https://github.com/rmax/scrapy-redis#features{TextColor.ENDC}"
+            )
             return FormRequest(formatted_data, dont_filter=True)
 
         if parameter.get('url', None) is None:
