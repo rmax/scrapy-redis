@@ -1,6 +1,6 @@
-import logging
 import hashlib
 import json
+import logging
 import time
 
 from scrapy.dupefilters import BaseDupeFilter
@@ -9,7 +9,6 @@ from w3lib.url import canonicalize_url
 
 from . import defaults
 from .connection import get_redis_from_settings
-
 
 logger = logging.getLogger(__name__)
 
@@ -66,8 +65,8 @@ class RFPDupeFilter(BaseDupeFilter):
         # class as standalone dupefilter with scrapy's default scheduler
         # if scrapy passes spider on open() method this wouldn't be needed
         # TODO: Use SCRAPY_JOB env as default and fallback to timestamp.
-        key = defaults.DUPEFILTER_KEY % {'timestamp': int(time.time())}
-        debug = settings.getbool('DUPEFILTER_DEBUG')
+        key = defaults.DUPEFILTER_KEY % {"timestamp": int(time.time())}
+        debug = settings.getbool("DUPEFILTER_DEBUG")
         return cls(server, key=key, debug=debug)
 
     @classmethod
@@ -127,12 +126,14 @@ class RFPDupeFilter(BaseDupeFilter):
     def from_spider(cls, spider):
         settings = spider.settings
         server = get_redis_from_settings(settings)
-        dupefilter_key = settings.get("SCHEDULER_DUPEFILTER_KEY", defaults.SCHEDULER_DUPEFILTER_KEY)
-        key = dupefilter_key % {'spider': spider.name}
-        debug = settings.getbool('DUPEFILTER_DEBUG')
+        dupefilter_key = settings.get(
+            "SCHEDULER_DUPEFILTER_KEY", defaults.SCHEDULER_DUPEFILTER_KEY
+        )
+        key = dupefilter_key % {"spider": spider.name}
+        debug = settings.getbool("DUPEFILTER_DEBUG")
         return cls(server, key=key, debug=debug)
 
-    def close(self, reason=''):
+    def close(self, reason=""):
         """Delete data on close. Called by Scrapy's scheduler.
 
         Parameters
@@ -157,10 +158,12 @@ class RFPDupeFilter(BaseDupeFilter):
         """
         if self.debug:
             msg = "Filtered duplicate request: %(request)s"
-            self.logger.debug(msg, {'request': request}, extra={'spider': spider})
+            self.logger.debug(msg, {"request": request}, extra={"spider": spider})
         elif self.logdupes:
-            msg = ("Filtered duplicate request %(request)s"
-                   " - no more duplicates will be shown"
-                   " (see DUPEFILTER_DEBUG to show all duplicates)")
-            self.logger.debug(msg, {'request': request}, extra={'spider': spider})
+            msg = (
+                "Filtered duplicate request %(request)s"
+                " - no more duplicates will be shown"
+                " (see DUPEFILTER_DEBUG to show all duplicates)"
+            )
+            self.logger.debug(msg, {"request": request}, extra={"spider": spider})
             self.logdupes = False

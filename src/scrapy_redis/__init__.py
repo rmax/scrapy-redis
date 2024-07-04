@@ -1,10 +1,5 @@
-# -*- coding: utf-8 -*-
-from .connection import (  # NOQA
-    get_redis,
-    get_redis_from_settings,
-)
+from .connection import get_redis, get_redis_from_settings  # NOQA
 
-
-__author__ = 'Rolando Espinoza'
-__email__ = 'rolando at rmax.io'
-__version__ = '0.8.0'
+__author__ = "R Max Espinoza"
+__email__ = "hey at rmax.dev"
+__version__ = "0.8.0"

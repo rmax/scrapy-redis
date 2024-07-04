@@ -5,10 +5,10 @@
 #
 #     http://doc.scrapy.org/topics/settings.html
 #
-SPIDER_MODULES = ['example.spiders']
-NEWSPIDER_MODULE = 'example.spiders'
+SPIDER_MODULES = ["example.spiders"]
+NEWSPIDER_MODULE = "example.spiders"
 
-USER_AGENT = 'scrapy-redis (+https://github.com/rolando/scrapy-redis)'
+USER_AGENT = "scrapy-redis (+https://github.com/rolando/scrapy-redis)"
 
 DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 SCHEDULER = "scrapy_redis.scheduler.Scheduler"
@@ -18,11 +18,11 @@ SCHEDULER_PERSIST = True
 # SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderStack"
 
 ITEM_PIPELINES = {
-    'example.pipelines.ExamplePipeline': 300,
-    'scrapy_redis.pipelines.RedisPipeline': 400,
+    "example.pipelines.ExamplePipeline": 300,
+    "scrapy_redis.pipelines.RedisPipeline": 400,
 }
 
-LOG_LEVEL = 'DEBUG'
+LOG_LEVEL = "DEBUG"
 
 # Introduce an artifical delay to make use of parallelism. to speed up the
 # crawl.
