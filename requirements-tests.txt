@@ -3,4 +3,4 @@ flake8
 mock
 pytest>=6.0,<7
 pytest-cov
-tox>=3.0,<4
+tox>=4.0,<5
