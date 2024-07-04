@@ -5,7 +5,7 @@
 from datetime import datetime
 
 
-class ExamplePipeline(object):
+class ExamplePipeline:
     def process_item(self, item, spider):
         item["crawled"] = datetime.utcnow()
         item["spider"] = spider.name

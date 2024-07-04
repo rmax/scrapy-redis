@@ -1,20 +1,16 @@
 import contextlib
-import mock
 import os
-import pytest
+from unittest import mock
 
+import pytest
 from scrapy import signals
 from scrapy.exceptions import DontCloseSpider
 from scrapy.settings import Settings
 
-from scrapy_redis.spiders import (
-    RedisCrawlSpider,
-    RedisSpider,
-)
+from scrapy_redis.spiders import RedisCrawlSpider, RedisSpider
 
-
-REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
-REDIS_PORT = int(os.environ.get('REDIS_PORT', 6379))
+REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
 
 
 @contextlib.contextmanager
@@ -26,21 +22,26 @@ def flushall(server):
 
 
 class MySpider(RedisSpider):
-    name = 'myspider'
+    name = "myspider"
 
 
 class MyCrawlSpider(RedisCrawlSpider):
-    name = 'myspider'
+    name = "myspider"
 
 
 def get_crawler(**kwargs):
-    return mock.Mock(settings=Settings({
-        "REDIS_HOST": REDIS_HOST,
-        "REDIS_PORT": REDIS_PORT,
-    }), **kwargs)
+    return mock.Mock(
+        settings=Settings(
+            {
+                "REDIS_HOST": REDIS_HOST,
+                "REDIS_PORT": REDIS_PORT,
+            }
+        ),
+        **kwargs,
+    )
 
 
-class TestRedisMixin_setup_redis(object):
+class TestRedisMixin_setup_redis:
 
     def setup(self):
         self.myspider = MySpider()
@@ -52,33 +53,35 @@ class TestRedisMixin_setup_redis(object):
 
     def test_requires_redis_key(self):
         self.myspider.crawler = get_crawler()
-        self.myspider.redis_key = ''
+        self.myspider.redis_key = ""
         with pytest.raises(ValueError) as excinfo:
             self.myspider.setup_redis()
         assert "redis_key" in str(excinfo.value)
 
     def test_invalid_batch_size(self):
-        self.myspider.redis_batch_size = 'x'
+        self.myspider.redis_batch_size = "x"
         self.myspider.crawler = get_crawler()
         with pytest.raises(ValueError) as excinfo:
             self.myspider.setup_redis()
         assert "redis_batch_size" in str(excinfo.value)
 
     def test_invalid_idle_time(self):
-        self.myspider.max_idle_time = 'x'
+        self.myspider.max_idle_time = "x"
         self.myspider.crawler = get_crawler()
         with pytest.raises(ValueError) as excinfo:
             self.myspider.setup_redis()
         assert "max_idle_time" in str(excinfo.value)
 
-    @mock.patch('scrapy_redis.spiders.connection')
+    @mock.patch("scrapy_redis.spiders.connection")
     def test_via_from_crawler(self, connection):
         server = connection.from_settings.return_value = mock.Mock()
         crawler = get_crawler()
         myspider = MySpider.from_crawler(crawler)
         assert myspider.server is server
         connection.from_settings.assert_called_with(crawler.settings)
-        crawler.signals.connect.assert_called_with(myspider.spider_idle, signal=signals.spider_idle)
+        crawler.signals.connect.assert_called_with(
+            myspider.spider_idle, signal=signals.spider_idle
+        )
         # Second call does nothing.
         server = myspider.server
         crawler.signals.connect.reset_mock()
@@ -87,27 +90,31 @@ class TestRedisMixin_setup_redis(object):
         assert crawler.signals.connect.call_count == 0
 
 
-@pytest.mark.parametrize('spider_cls', [
-    MySpider,
-    MyCrawlSpider,
-])
+@pytest.mark.parametrize(
+    "spider_cls",
+    [
+        MySpider,
+        MyCrawlSpider,
+    ],
+)
 def test_from_crawler_with_spider_arguments(spider_cls):
     crawler = get_crawler()
     spider = spider_cls.from_crawler(
-        crawler, 'foo',
-        redis_key='key:%(name)s',
-        redis_batch_size='2000',
-        max_idle_time='100',
+        crawler,
+        "foo",
+        redis_key="key:%(name)s",
+        redis_batch_size="2000",
+        max_idle_time="100",
     )
-    assert spider.name == 'foo'
-    assert spider.redis_key == 'key:foo'
+    assert spider.name == "foo"
+    assert spider.redis_key == "key:foo"
     assert spider.redis_batch_size == 2000
     assert spider.max_idle_time == 100
 
 
 class MockRequest(mock.Mock):
     def __init__(self, url, **kwargs):
-        super(MockRequest, self).__init__()
+        super().__init__()
         self.url = url
 
     def __eq__(self, other):
@@ -117,38 +124,44 @@ class MockRequest(mock.Mock):
         return hash(self.url)
 
     def __repr__(self):
-        return f'<{self.__class__.__name__}({self.url})>'
+        return f"<{self.__class__.__name__}({self.url})>"
 
 
-@pytest.mark.parametrize('spider_cls', [
-    MySpider,
-    MyCrawlSpider,
-])
-@pytest.mark.parametrize('start_urls_as_zset', [False, True])
-@pytest.mark.parametrize('start_urls_as_set', [False, True])
-@mock.patch('scrapy.spiders.Request', MockRequest)
+@pytest.mark.parametrize(
+    "spider_cls",
+    [
+        MySpider,
+        MyCrawlSpider,
+    ],
+)
+@pytest.mark.parametrize("start_urls_as_zset", [False, True])
+@pytest.mark.parametrize("start_urls_as_set", [False, True])
+@mock.patch("scrapy.spiders.Request", MockRequest)
 def test_consume_urls_from_redis(start_urls_as_zset, start_urls_as_set, spider_cls):
     batch_size = 5
-    redis_key = 'start:urls'
+    redis_key = "start:urls"
     crawler = get_crawler()
-    crawler.settings.setdict({
-        'REDIS_HOST': REDIS_HOST,
-        'REDIS_PORT': REDIS_PORT,
-        'REDIS_START_URLS_KEY': redis_key,
-        'REDIS_START_URLS_AS_ZSET': start_urls_as_zset,
-        'REDIS_START_URLS_AS_SET': start_urls_as_set,
-        'CONCURRENT_REQUESTS': batch_size,
-    })
+    crawler.settings.setdict(
+        {
+            "REDIS_HOST": REDIS_HOST,
+            "REDIS_PORT": REDIS_PORT,
+            "REDIS_START_URLS_KEY": redis_key,
+            "REDIS_START_URLS_AS_ZSET": start_urls_as_zset,
+            "REDIS_START_URLS_AS_SET": start_urls_as_set,
+            "CONCURRENT_REQUESTS": batch_size,
+        }
+    )
     spider = spider_cls.from_crawler(crawler)
     with flushall(spider.server):
-        urls = [
-            f'http://example.com/{i}' for i in range(batch_size * 2)
-        ]
+        urls = [f"http://example.com/{i}" for i in range(batch_size * 2)]
         reqs = []
         if start_urls_as_set:
             server_put = spider.server.sadd
         elif start_urls_as_zset:
-            server_put = lambda key, value: spider.server.zadd(key, {value: 0})
+
+            def server_put(key, value):
+                spider.server.zadd(key, {value: 0})
+
         else:
             server_put = spider.server.rpush
         for url in urls:
@@ -159,7 +172,7 @@ def test_consume_urls_from_redis(start_urls_as_zset, start_urls_as_set, spider_c
         start_requests = list(spider.start_requests())
         if start_urls_as_zset or start_urls_as_set:
             assert len(start_requests) == batch_size
-            assert set(map(lambda x: x.url, start_requests)).issubset(map(lambda x: x.url, reqs))
+            assert {r.url for r in start_requests}.issubset(r.url for r in reqs)
         else:
             assert start_requests == reqs[:batch_size]
 
@@ -174,10 +187,11 @@ def test_consume_urls_from_redis(start_urls_as_zset, start_urls_as_set, spider_c
         assert crawler.engine.crawl.call_count == batch_size
 
         if start_urls_as_zset or start_urls_as_set:
-            crawler.engine.crawl.assert_has_calls([
-                mock.call(req) for req in reqs if req not in start_requests
-            ], any_order=True)
+            crawler.engine.crawl.assert_has_calls(
+                [mock.call(req) for req in reqs if req not in start_requests],
+                any_order=True,
+            )
         else:
-            crawler.engine.crawl.assert_has_calls([
-                mock.call(req) for req in reqs[batch_size:]
-            ])
+            crawler.engine.crawl.assert_has_calls(
+                [mock.call(req) for req in reqs[batch_size:]]
+            )
