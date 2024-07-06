@@ -4,6 +4,10 @@ History
 
 .. bumpversion marker
 
+0.9.1 (2024-07-06)
+------------------
+* Fixed docs build.
+
 0.9.0 (2024-07-06)
 ------------------
 * Fixed ``Scheduler`` not compatible with BaseDupeFilter (#294)
