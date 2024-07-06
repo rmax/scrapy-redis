@@ -1,17 +1,21 @@
 import json
-from collections.abc import Iterable
-from scrapy import signals, FormRequest, version_info as scrapy_version
-from scrapy.exceptions import DontCloseSpider
-from scrapy.spiders import Spider, CrawlSpider
-from scrapy_redis.utils import TextColor
 import time
+from collections.abc import Iterable
+
+from scrapy import FormRequest, signals
+from scrapy import version_info as scrapy_version
+from scrapy.exceptions import DontCloseSpider
+from scrapy.spiders import CrawlSpider, Spider
+
+from scrapy_redis.utils import TextColor
 
 from . import connection, defaults
 from .utils import bytes_to_str, is_dict
 
 
-class RedisMixin(object):
+class RedisMixin:
     """Mixin class to implement reading urls from a redis queue."""
+
     redis_key = None
     redis_batch_size = None
     redis_encoding = None
@@ -39,7 +43,7 @@ class RedisMixin(object):
             # We allow optional crawler argument to keep backwards
             # compatibility.
             # XXX: Raise a deprecation warning.
-            crawler = getattr(self, 'crawler', None)
+            crawler = getattr(self, "crawler", None)
 
         if crawler is None:
             raise ValueError("crawler is required")
@@ -48,16 +52,19 @@ class RedisMixin(object):
 
         if self.redis_key is None:
             self.redis_key = settings.get(
-                'REDIS_START_URLS_KEY', defaults.START_URLS_KEY,
+                "REDIS_START_URLS_KEY",
+                defaults.START_URLS_KEY,
             )
 
-        self.redis_key = self.redis_key % {'name': self.name}
+        self.redis_key = self.redis_key % {"name": self.name}
 
         if not self.redis_key.strip():
             raise ValueError("redis_key must not be empty")
 
         if self.redis_batch_size is None:
-            self.redis_batch_size = settings.getint('CONCURRENT_REQUESTS', defaults.REDIS_CONCURRENT_REQUESTS)
+            self.redis_batch_size = settings.getint(
+                "CONCURRENT_REQUESTS", defaults.REDIS_CONCURRENT_REQUESTS
+            )
 
         try:
             self.redis_batch_size = int(self.redis_batch_size)
@@ -65,18 +72,22 @@ class RedisMixin(object):
             raise ValueError("redis_batch_size must be an integer")
 
         if self.redis_encoding is None:
-            self.redis_encoding = settings.get('REDIS_ENCODING', defaults.REDIS_ENCODING)
+            self.redis_encoding = settings.get(
+                "REDIS_ENCODING", defaults.REDIS_ENCODING
+            )
 
-        self.logger.info("Reading start URLs from redis key '%(redis_key)s' "
-                         "(batch size: %(redis_batch_size)s, encoding: %(redis_encoding)s)",
-                         self.__dict__)
+        self.logger.info(
+            "Reading start URLs from redis key '%(redis_key)s' "
+            "(batch size: %(redis_batch_size)s, encoding: %(redis_encoding)s)",
+            self.__dict__,
+        )
 
         self.server = connection.from_settings(crawler.settings)
 
-        if settings.getbool('REDIS_START_URLS_AS_SET', defaults.START_URLS_AS_SET):
+        if settings.getbool("REDIS_START_URLS_AS_SET", defaults.START_URLS_AS_SET):
             self.fetch_data = self.server.spop
             self.count_size = self.server.scard
-        elif settings.getbool('REDIS_START_URLS_AS_ZSET', defaults.START_URLS_AS_ZSET):
+        elif settings.getbool("REDIS_START_URLS_AS_ZSET", defaults.START_URLS_AS_ZSET):
             self.fetch_data = self.pop_priority_queue
             self.count_size = self.server.zcard
         else:
@@ -85,8 +96,7 @@ class RedisMixin(object):
 
         if self.max_idle_time is None:
             self.max_idle_time = settings.get(
-                "MAX_IDLE_TIME_BEFORE_CLOSE",
-                defaults.MAX_IDLE_TIME
+                "MAX_IDLE_TIME_BEFORE_CLOSE", defaults.MAX_IDLE_TIME
             )
 
         try:
@@ -124,7 +134,7 @@ class RedisMixin(object):
                     yield req
                     # XXX: should be here?
                     found += 1
-                    self.logger.info(f'start req url:{req.url}')
+                    self.logger.info(f"start req url:{req.url}")
             elif reqs:
                 yield reqs
                 found += 1
@@ -135,28 +145,29 @@ class RedisMixin(object):
             self.logger.debug(f"Read {found} requests from '{self.redis_key}'")
 
     def make_request_from_data(self, data):
-        """
-        Returns a `Request` instance for data coming from Redis.
+        """Returns a `Request` instance for data coming from Redis.
 
         Overriding this function to support the `json` requested `data` that contains
         `url` ,`meta` and other optional parameters. `meta` is a nested json which contains sub-data.
 
         Along with:
         After accessing the data, sending the FormRequest with `url`, `meta` and addition `formdata`, `method`
-        For example:
-        {
-            "url": "https://exaple.com",
-            "meta": {
-                'job-id':'123xsd',
-                'start-date':'dd/mm/yy'
-            },
-            "url_cookie_key":"fertxsas",
-            "method":"POST"
-        }
 
-        If `url` is empty, return []. So you should verify the `url` in the data.
+        For example:
+
+            {
+                "url": "https://example.com",
+                "meta": {
+                    "job-id":"123xsd",
+                    "start-date":"dd/mm/yy",
+                },
+                "url_cookie_key":"fertxsas",
+                "method":"POST",
+            }
+
+        If `url` is empty, return `[]`. So you should verify the `url` in the data.
         If `method` is empty, the request object will set method to 'GET', optional.
-        If `meta` is empty, the request object will set `meta` to {}, optional.
+        If `meta` is empty, the request object will set `meta` to an empty dictionary, optional.
 
         This json supported data can be accessed from 'scrapy.spider' through response.
         'request.url', 'request.meta', 'request.cookies', 'request.method'
@@ -172,19 +183,25 @@ class RedisMixin(object):
         if is_dict(formatted_data):
             parameter = json.loads(formatted_data)
         else:
-            self.logger.warning(f"{TextColor.WARNING}WARNING: String request is deprecated, please use JSON data format. \
-                Detail information, please check https://github.com/rmax/scrapy-redis#features{TextColor.ENDC}")
+            self.logger.warning(
+                f"{TextColor.WARNING}WARNING: String request is deprecated, please use JSON data format. "
+                f"Detail information, please check https://github.com/rmax/scrapy-redis#features{TextColor.ENDC}"
+            )
             return FormRequest(formatted_data, dont_filter=True)
 
-        if parameter.get('url', None) is None:
-            self.logger.warning(f"{TextColor.WARNING}The data from Redis has no url key in push data{TextColor.ENDC}")
+        if parameter.get("url", None) is None:
+            self.logger.warning(
+                f"{TextColor.WARNING}The data from Redis has no url key in push data{TextColor.ENDC}"
+            )
             return []
 
         url = parameter.pop("url")
         method = parameter.pop("method").upper() if "method" in parameter else "GET"
         metadata = parameter.pop("meta") if "meta" in parameter else {}
 
-        return FormRequest(url, dont_filter=True, method=method, formdata=parameter, meta=metadata)
+        return FormRequest(
+            url, dont_filter=True, method=method, formdata=parameter, meta=metadata
+        )
 
     def schedule_next_requests(self):
         """Schedules a request if available"""
@@ -241,7 +258,7 @@ class RedisSpider(RedisMixin, Spider):
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
-        obj = super(RedisSpider, cls).from_crawler(crawler, *args, **kwargs)
+        obj = super().from_crawler(crawler, *args, **kwargs)
         obj.setup_redis(crawler)
         return obj
 
@@ -273,6 +290,6 @@ class RedisCrawlSpider(RedisMixin, CrawlSpider):
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
-        obj = super(RedisCrawlSpider, cls).from_crawler(crawler, *args, **kwargs)
+        obj = super().from_crawler(crawler, *args, **kwargs)
         obj.setup_redis(crawler)
         return obj

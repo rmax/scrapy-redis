@@ -45,7 +45,7 @@ across multiple spider instances, highly suitable for broad crawls.
 
 2. Run the crawler for first time then stop it
 
-.. code-block:: python
+.. code-block:: bash
 
     cd example-project
     scrapy crawl dmoz
@@ -54,21 +54,21 @@ across multiple spider instances, highly suitable for broad crawls.
 
 3. Run the crawler again to resume stopped crawling
 
-.. code-block:: python
+.. code-block:: bash
 
     scrapy crawl dmoz
     ... [dmoz] DEBUG: Resuming crawl (9019 requests scheduled)
 
 4. Start one or more additional scrapy crawlers
 
-.. code-block:: python
+.. code-block:: bash
 
     scrapy crawl dmoz
     ... [dmoz] DEBUG: Resuming crawl (8712 requests scheduled)
 
 5. Start one or more post-processing workers
 
-.. code-block:: python
+.. code-block:: bash
 
     python process_items.py dmoz:items -v
     ...
@@ -91,8 +91,9 @@ For example, create a file ``myspider.py`` with the code below:
 
     from scrapy_redis.spiders import RedisSpider
 
+
     class MySpider(RedisSpider):
-        name = 'myspider'
+        name = "myspider"
 
         def parse(self, response):
             # do stuff
@@ -103,13 +104,13 @@ Then:
 
 1. run the spider
 
-.. code-block:: python
+.. code-block:: bash
 
     scrapy runspider myspider.py
 
 2. push json data to redis
 
-.. code-block:: python
+.. code-block:: bash
 
     redis-cli lpush myspider '{"url": "https://exaple.com", "meta": {"job-id":"123xsd", "start-date":"dd/mm/yy"}, "url_cookie_key":"fertxsas" }'
 
@@ -127,6 +128,8 @@ Processing items
 ----------------
 
 The ``process_items.py`` provides an example of consuming the items queue::
+
+.. code-block:: bash
 
     python process_items.py --help
 

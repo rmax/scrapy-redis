@@ -3,9 +3,9 @@
 # See documentation in:
 # http://doc.scrapy.org/topics/items.html
 
-from scrapy.item import Item, Field
+from scrapy.item import Field, Item
 from scrapy.loader import ItemLoader
-from scrapy.loader.processors import MapCompose, TakeFirst, Join
+from scrapy.loader.processors import Join, MapCompose, TakeFirst
 
 
 class ExampleItem(Item):

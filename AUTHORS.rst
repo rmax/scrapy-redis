@@ -5,7 +5,7 @@ Credits
 Development Lead
 ----------------
 
-* Rolando Espinoza <rolando at rmax.io>
+* R Max Espinoza <hey at rmax.dev>
 
 Contributors
 ------------

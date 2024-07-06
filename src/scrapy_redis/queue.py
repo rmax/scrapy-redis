@@ -6,7 +6,7 @@ except ImportError:
 from . import picklecompat
 
 
-class Base(object):
+class Base:
     """Per-spider base queue class"""
 
     def __init__(self, server, spider, key, serializer=None):
@@ -28,14 +28,18 @@ class Base(object):
             # Backward compatibility.
             # TODO: deprecate pickle.
             serializer = picklecompat
-        if not hasattr(serializer, 'loads'):
-            raise TypeError(f"serializer does not implement 'loads' function: {serializer}")
-        if not hasattr(serializer, 'dumps'):
-            raise TypeError(f"serializer does not implement 'dumps' function: {serializer}")
+        if not hasattr(serializer, "loads"):
+            raise TypeError(
+                f"serializer does not implement 'loads' function: {serializer}"
+            )
+        if not hasattr(serializer, "dumps"):
+            raise TypeError(
+                f"serializer does not implement 'dumps' function: {serializer}"
+            )
 
         self.server = server
         self.spider = spider
-        self.key = key % {'spider': spider.name}
+        self.key = key % {"spider": spider.name}
         self.serializer = serializer
 
     def _encode_request(self, request):
@@ -105,7 +109,7 @@ class PriorityQueue(Base):
         # We don't use zadd method as the order of arguments change depending on
         # whether the class is Redis or StrictRedis, and the option of using
         # kwargs only accepts strings, not bytes.
-        self.server.execute_command('ZADD', self.key, score, data)
+        self.server.execute_command("ZADD", self.key, score, data)
 
     def pop(self, timeout=0):
         """

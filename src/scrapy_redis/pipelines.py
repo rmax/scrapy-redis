@@ -4,11 +4,10 @@ from twisted.internet.threads import deferToThread
 
 from . import connection, defaults
 
-
 default_serialize = ScrapyJSONEncoder().encode
 
 
-class RedisPipeline(object):
+class RedisPipeline:
     """Pushes serialized item into a redis list/queue
 
     Settings
@@ -20,9 +19,9 @@ class RedisPipeline(object):
 
     """
 
-    def __init__(self, server,
-                 key=defaults.PIPELINE_KEY,
-                 serialize_func=default_serialize):
+    def __init__(
+        self, server, key=defaults.PIPELINE_KEY, serialize_func=default_serialize
+    ):
         """Initialize pipeline.
 
         Parameters
@@ -42,14 +41,12 @@ class RedisPipeline(object):
     @classmethod
     def from_settings(cls, settings):
         params = {
-            'server': connection.from_settings(settings),
+            "server": connection.from_settings(settings),
         }
-        if settings.get('REDIS_ITEMS_KEY'):
-            params['key'] = settings['REDIS_ITEMS_KEY']
-        if settings.get('REDIS_ITEMS_SERIALIZER'):
-            params['serialize_func'] = load_object(
-                settings['REDIS_ITEMS_SERIALIZER']
-            )
+        if settings.get("REDIS_ITEMS_KEY"):
+            params["key"] = settings["REDIS_ITEMS_KEY"]
+        if settings.get("REDIS_ITEMS_SERIALIZER"):
+            params["serialize_func"] = load_object(settings["REDIS_ITEMS_SERIALIZER"])
 
         return cls(**params)
 
@@ -73,4 +70,4 @@ class RedisPipeline(object):
         and/or spider.
 
         """
-        return self.key % {'spider': spider.name}
+        return self.key % {"spider": spider.name}

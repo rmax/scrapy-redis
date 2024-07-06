@@ -1,23 +1,17 @@
-import sys
-
-import six
-
 from scrapy.utils.misc import load_object
 
 from . import defaults
 
-
 # Shortcut maps 'setting name' -> 'parmater name'.
 SETTINGS_PARAMS_MAP = {
-    'REDIS_URL': 'url',
-    'REDIS_HOST': 'host',
-    'REDIS_PORT': 'port',
-    'REDIS_DB': 'db',
-    'REDIS_ENCODING': 'encoding',
+    "REDIS_URL": "url",
+    "REDIS_HOST": "host",
+    "REDIS_PORT": "port",
+    "REDIS_DB": "db",
+    "REDIS_ENCODING": "encoding",
 }
 
-if sys.version_info > (3,):
-    SETTINGS_PARAMS_MAP['REDIS_DECODE_RESPONSES'] = 'decode_responses'
+SETTINGS_PARAMS_MAP["REDIS_DECODE_RESPONSES"] = "decode_responses"
 
 
 def get_redis_from_settings(settings):
@@ -59,7 +53,7 @@ def get_redis_from_settings(settings):
 
     """
     params = defaults.REDIS_PARAMS.copy()
-    params.update(settings.getdict('REDIS_PARAMS'))
+    params.update(settings.getdict("REDIS_PARAMS"))
     # XXX: Deprecate REDIS_* settings.
     for source, dest in SETTINGS_PARAMS_MAP.items():
         val = settings.get(source)
@@ -67,8 +61,8 @@ def get_redis_from_settings(settings):
             params[dest] = val
 
     # Allow ``redis_cls`` to be a path to a class.
-    if isinstance(params.get('redis_cls'), six.string_types):
-        params['redis_cls'] = load_object(params['redis_cls'])
+    if isinstance(params.get("redis_cls"), str):
+        params["redis_cls"] = load_object(params["redis_cls"])
 
     return get_redis(**params)
 
@@ -95,8 +89,8 @@ def get_redis(**kwargs):
         Redis client instance.
 
     """
-    redis_cls = kwargs.pop('redis_cls', defaults.REDIS_CLS)
-    url = kwargs.pop('url', None)
+    redis_cls = kwargs.pop("redis_cls", defaults.REDIS_CLS)
+    url = kwargs.pop("url", None)
     if url:
         return redis_cls.from_url(url, **kwargs)
     else:
