@@ -1,5 +1,5 @@
-scrapy_redis
-============
+API Reference
+=============
 
 .. toctree::
    :maxdepth: 4

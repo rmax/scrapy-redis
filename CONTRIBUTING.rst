@@ -18,7 +18,7 @@ New to here
 Any issue with good first issue tag on it is a great place to start! Feel free to ask any questions here.
 
 Don't know how to start
-~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 
 Review codebases and PRs can give you quite a knowledge to know what's going on here!
 
@@ -39,8 +39,8 @@ Fix Bugs
 Look through the GitHub issues for bugs. Anything tagged with "bug"
 is open to whoever wants to implement it.
 
-Implement Features & imporvments
-~~~~~~~~~~~~~~~~~~
+Implement Features & improvments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Look through the GitHub issues for features. Anything tagged with "feature" or "improvments"
 is open to whoever wants to implement it.
@@ -70,7 +70,7 @@ Get Started!
 Ready to contribute? Here's how to set up `scrapy-redis` for local development.
 
 Setup environment
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 1. Fork the `scrapy-redis` repo on GitHub.
 2. Clone your fork locally::
@@ -93,7 +93,7 @@ Setup environment
    Now you can make your changes locally.
 
 Setup testing environment
-~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
 
@@ -128,9 +128,7 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 2.6, 2.7, 3.3, 3.4 and 3.5, and for PyPy. Check
-   https://travis-ci.org/rolando/scrapy-redis/pull_requests
-   and make sure that the tests pass for all supported Python versions.
+3. Make sure that the tests pass for all supported Python versions.
 
 Tips
 ----

@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 Welcome to Scrapy-Redis's documentation!
-======================================
+========================================
 
 Contents:
 
@@ -13,7 +13,10 @@ Contents:
 
    readme
    installation
+   modules
+   contributing
    history
+   authors
 
 Indices and tables
 ==================
