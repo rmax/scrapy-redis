@@ -2,7 +2,7 @@
 History
 =======
 
-.. comment:: bumpversion marker
+.. bumpversion marker
 
 0.9.0 (2024-07-06)
 ------------------

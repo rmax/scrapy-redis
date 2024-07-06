@@ -155,6 +155,8 @@ class RedisMixin:
 
         For example:
 
+        .. code:: json
+
             {
                 "url": "https://example.com",
                 "meta": {
