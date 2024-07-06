@@ -37,6 +37,7 @@ class Scheduler:
         flush_on_start=False,
         queue_key=defaults.SCHEDULER_QUEUE_KEY,
         queue_cls=defaults.SCHEDULER_QUEUE_CLASS,
+        dupefilter=None,
         dupefilter_key=defaults.SCHEDULER_DUPEFILTER_KEY,
         dupefilter_cls=defaults.SCHEDULER_DUPEFILTER_CLASS,
         idle_before_close=0,
@@ -56,6 +57,8 @@ class Scheduler:
             Requests queue key.
         queue_cls : str
             Importable path to the queue class.
+        dupefilter: Dupefilter
+            Custom dupefilter instance.
         dupefilter_key : str
             Duplicates filter key.
         dupefilter_cls : str
@@ -72,6 +75,7 @@ class Scheduler:
         self.flush_on_start = flush_on_start
         self.queue_key = queue_key
         self.queue_cls = queue_cls
+        self.df = dupefilter
         self.dupefilter_cls = dupefilter_cls
         self.dupefilter_key = dupefilter_key
         self.idle_before_close = idle_before_close
@@ -105,6 +109,10 @@ class Scheduler:
             if val:
                 kwargs[name] = val
 
+        dupefilter_cls = load_object(kwargs["dupefilter_cls"])
+        if not hasattr(dupefilter_cls, "from_spider"):
+            kwargs["dupefilter"] = dupefilter_cls.from_settings(settings)
+
         # Support serializer as a path to a module.
         if isinstance(kwargs.get("serializer"), str):
             kwargs["serializer"] = importlib.import_module(kwargs["serializer"])
@@ -137,7 +145,8 @@ class Scheduler:
                 f"Failed to instantiate queue class '{self.queue_cls}': {e}"
             )
 
-        self.df = load_object(self.dupefilter_cls).from_spider(spider)
+        if not self.df:
+            self.df = load_object(self.dupefilter_cls).from_spider(spider)
 
         if self.flush_on_start:
             self.flush()
