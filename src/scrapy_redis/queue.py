@@ -24,6 +24,7 @@ class Base(object):
         queue_key = '%(spider)s:queue',
         length_key = '%(spider)s:queue_length',
         dropped_key = '%(spider)s:dropped',
+        ignored_key = '%(spider)s:ignored',
         completed_key = '%(spider)s:completed',
         flush_buffer_size=100,
         flush_interval=2,
@@ -37,6 +38,7 @@ class Base(object):
         self.queue_key = queue_key % {"spider": spider.name}
         self.length_key = length_key % {"spider": spider.name}
         self.dropped_key = dropped_key % {"spider": spider.name}
+        self.ignored_key = ignored_key % {"spider": spider.name}
         self.completed_key = completed_key % {"spider": spider.name}
         self.serializer = picklecompat
         self.request_fingerprint = request_fingerprint
@@ -218,6 +220,9 @@ class PriorityQueue(Base):
     
     def _dropped_key(self, crawl_id):
         return f"{self.dropped_key}:{crawl_id}"
+
+    def _ignored_key(self, crawl_id):
+        return f"{self.ignored_key}:{crawl_id}"
     
     def _completed_key(self, crawl_id):
         return f"{self.completed_key}:{crawl_id}"
@@ -557,5 +562,34 @@ class PriorityQueue(Base):
         key = self._dropped_key(crawl_id)
         raw_requests = self.server.hvals(key)
         return [self._decode_request(raw) for raw in raw_requests if raw]
+
+    def ignored_requests(self, crawl_id: str) -> list[Request]:
+        """
+        Return a list of requests that were ignored due to content not allowed, other reasons.
+        """
+        key = self._ignored_key(crawl_id)
+        raw_requests = self.server.lrange(key, 0, -1)
+        return [self._decode_request(raw) for raw in raw_requests if raw]
+
+    def push_ignored_request(self, request, reason=None, limit=10):
+        """
+        Push an ignored request to the queue (limited count).
+        """
+        crawl_id = request.meta.get("crawl_id")
+        if not crawl_id:
+            return
+
+        key = self._ignored_key(crawl_id)
+        
+        # Check limit
+        if self.server.llen(key) >= limit:
+            return
+            
+        # Add reason to meta if provided
+        if reason:
+            request.meta['ignored_reason'] = reason
+            
+        data = self._encode_request(request)
+        self.server.rpush(key, data)
 
 SpiderPriorityQueue = PriorityQueue
