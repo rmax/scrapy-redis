@@ -167,7 +167,7 @@ class Scheduler:
             self.df.log(request, self.spider)
             return False
         if self.stats:
-            self.stats.inc_value("scheduler/enqueued/redis", spider=self.spider)
+            self.stats.inc_value("scheduler/enqueued/redis")
         self.queue.push(request)
         return True
 
@@ -175,7 +175,7 @@ class Scheduler:
         block_pop_timeout = self.idle_before_close
         request = self.queue.pop(block_pop_timeout)
         if request and self.stats:
-            self.stats.inc_value("scheduler/dequeued/redis", spider=self.spider)
+            self.stats.inc_value("scheduler/dequeued/redis")
         return request
 
     def has_pending_requests(self):
