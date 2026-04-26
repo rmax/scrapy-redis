@@ -65,3 +65,4 @@ target/
 # Extra
 .DS_Store
 .vscode
+.idea
