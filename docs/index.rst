@@ -14,6 +14,8 @@ Contents:
    readme
    installation
    modules
+   coding-standards
+   security-guide
    contributing
    history
    authors
