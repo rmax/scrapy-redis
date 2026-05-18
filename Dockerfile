@@ -13,4 +13,3 @@ COPY . .
 
 # Run Tox tests
 CMD ["tox"]
-
