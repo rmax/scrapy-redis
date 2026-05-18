@@ -351,8 +351,8 @@ class RedisSpider(RedisMixin, Spider):
     redis_encoding : str (default: REDIS_ENCODING)
         Encoding to use when decoding messages from redis queue.
 
-    Settings
-    --------
+    Redis Settings
+    --------------
     REDIS_START_URLS_KEY : str (default: "<spider.name>:start_urls")
         Default Redis key where to fetch start URLs from..
     REDIS_START_URLS_BATCH_SIZE : int (deprecated by CONCURRENT_REQUESTS)
@@ -384,8 +384,8 @@ class RedisCrawlSpider(RedisMixin, CrawlSpider):
     redis_encoding : str (default: REDIS_ENCODING)
         Encoding to use when decoding messages from redis queue.
 
-    Settings
-    --------
+    Crawl Spider Settings
+    ---------------------
     REDIS_START_URLS_KEY : str (default: "<spider.name>:start_urls")
         Default Redis key where to fetch start URLs from..
     REDIS_START_URLS_BATCH_SIZE : int (deprecated by CONCURRENT_REQUESTS)
