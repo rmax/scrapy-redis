@@ -14,13 +14,13 @@ Scrapy-Redis
 
 .. image:: https://github.com/rmax/scrapy-redis/actions/workflows/builds.yml/badge.svg
         :target: https://github.com/rmax/scrapy-redis/actions/workflows/builds.yml
-        
+
 .. image:: https://github.com/rmax/scrapy-redis/actions/workflows/checks.yml/badge.svg
         :target: https://github.com/rmax/scrapy-redis/actions/workflows/checks.yml
-        
+
 .. image:: https://github.com/rmax/scrapy-redis/actions/workflows/tests.yml/badge.svg
         :target: https://github.com/rmax/scrapy-redis/actions/workflows/tests.yml
-        
+
 .. image:: https://codecov.io/github/rmax/scrapy-redis/coverage.svg?branch=master
         :alt: Coverage Status
         :target: https://codecov.io/github/rmax/scrapy-redis
@@ -28,7 +28,7 @@ Scrapy-Redis
 .. image:: https://img.shields.io/badge/security-bandit-green.svg
         :alt: Security Status
         :target: https://github.com/rmax/scrapy-redis
-    
+
 Redis-based components for Scrapy.
 
 * Usage: https://github.com/rmax/scrapy-redis/wiki/Usage
@@ -67,7 +67,7 @@ Features
 
     this data can be accessed in `scrapy spider` through response.
     like: `request.url`, `request.meta`, `request.cookies`
-    
+
 .. note:: This features cover the basic case of distributing the workload across multiple workers. If you need more features like URL expiration, advanced URL prioritization, etc., we suggest you to take a look at the Frontera_ project.
 
 Requirements
@@ -81,7 +81,7 @@ Requirements
 Installation
 ------------
 
-From pip 
+From pip
 
 .. code-block:: bash
 
@@ -96,7 +96,7 @@ From GitHub
     python setup.py install
 
 .. note:: For using this json supported data feature, please make sure you have not installed the scrapy-redis through pip. If you already did it, you first uninstall that one.
-  
+
 .. code-block:: bash
 
     pip uninstall scrapy-redis

@@ -103,7 +103,7 @@ Setup testing environment
        tox
 
 2. Note that if the error of `No module named scrapy_redis` shows, please check the install `scrapy-redis` of your branch by::
-   
+
        pip install .
 
 3. Or change the import lines::
