@@ -8,6 +8,7 @@ SETTINGS_PARAMS_MAP = {
     "REDIS_HOST": "host",
     "REDIS_PORT": "port",
     "REDIS_DB": "db",
+    "REDIS_PASSWORD": "password",
     "REDIS_ENCODING": "encoding",
 }
 
