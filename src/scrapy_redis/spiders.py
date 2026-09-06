@@ -1,3 +1,4 @@
+import asyncio
 import json
 import time
 from collections.abc import Iterable
@@ -33,6 +34,14 @@ class RedisMixin:
     def start_requests(self):
         """Returns a batch of start requests from redis."""
         return self.next_requests()
+
+    async def start(self):
+        requests = await asyncio.to_thread(
+            lambda: list(self.next_requests())
+        )
+
+        for request in requests:
+            yield request
 
     def setup_redis(self, crawler=None):
         """Setup redis connection and idle signal.
