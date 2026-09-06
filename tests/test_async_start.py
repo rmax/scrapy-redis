@@ -1,6 +1,5 @@
+import asyncio
 import scrapy
-import pytest
-
 from scrapy_redis.spiders import RedisMixin
 
 
@@ -12,11 +11,16 @@ class TestSpider(RedisMixin, scrapy.Spider):
         yield scrapy.Request("https://example.com/2")
 
 
-@pytest.mark.asyncio
-async def test_async_start():
+async def collect_start_requests(spider):
+    return [request async for request in spider.start()]
+
+
+def test_async_start():
     spider = TestSpider()
 
-    requests = [request async for request in spider.start()]
+    requests = asyncio.run(
+        collect_start_requests(spider)
+    )
 
     assert len(requests) == 2
     assert requests[0].url == "https://example.com/1"

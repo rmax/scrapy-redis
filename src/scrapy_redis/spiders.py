@@ -36,8 +36,12 @@ class RedisMixin:
         return self.next_requests()
 
     async def start(self):
-        requests = await asyncio.to_thread(
-            lambda: list(self.next_requests())
+        """For scrapy >= 2.13"""
+        loop = asyncio.get_running_loop()
+
+        requests = await loop.run_in_executor(
+            None,
+            lambda: list(self.next_requests()),
         )
 
         for request in requests:
