@@ -101,6 +101,24 @@ From GitHub
 
     pip uninstall scrapy-redis
 
+Settings
+--------
+
+Connection pooling
+~~~~~~~~~~~~~~~~~~
+
+Components of one crawler share a single Redis connection pool when using the
+default client class and plain connection parameters. Pools are scoped per
+``Settings`` object (crawler). Configurations with custom client classes or
+client-only parameters (``ssl``, ``unix_socket_path``,
+``single_connection_client``) keep the previous per-component behavior.
+
+* ``REDIS_MAX_CONNECTIONS``: Maximum connections in the shared pool (default:
+  no override is applied — redis-py's own pool default, effectively unlimited
+  on redis-py 4.x/5.x). It raises ``ConnectionError`` when exhausted; supply a
+  ``BlockingConnectionPool`` via ``REDIS_PARAMS.connection_pool``
+  (``REDIS_PARAMS["connection_pool"]``) for waiting semantics.
+
 Alternative Choice
 ---------------------------
 

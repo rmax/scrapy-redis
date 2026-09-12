@@ -4,6 +4,11 @@ History
 
 .. bumpversion marker
 
+Unreleased
+----------
+* Added per-crawler Redis connection pool sharing across components.
+* Added ``REDIS_MAX_CONNECTIONS`` setting.
+
 0.9.1 (2024-07-06)
 ------------------
 * Fixed docs build.
