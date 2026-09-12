@@ -4,6 +4,11 @@ History
 
 .. bumpversion marker
 
+Unreleased
+----------
+
+* Added opt-in exponential backoff for idle queue polling (``REDIS_IDLE_BACKOFF_*``); non-blocking and deadline-gated.
+
 0.9.1 (2024-07-06)
 ------------------
 * Fixed docs build.

@@ -333,6 +333,231 @@ def test_consume_urls_from_redis(start_urls_as_zset, start_urls_as_set, spider_c
             )
 
 
+class TestRedisIdleBackoff:
+
+    def setup(self):
+        self.server = FakeRedisServer()
+        self.crawler = get_crawler()
+        self.crawler.settings.setdict(
+            {
+                "REDIS_IDLE_BACKOFF_ENABLED": True,
+                "REDIS_IDLE_BACKOFF_MIN": 1.0,
+                "REDIS_IDLE_BACKOFF_MAX": 30.0,
+                "REDIS_IDLE_BACKOFF_FACTOR": 2.0,
+            }
+        )
+
+    def make_spider(self, **kwargs):
+        with patched_redis(self.server):
+            return MySpider.from_crawler(self.crawler, **kwargs)
+
+    def poll_at(self, spider, monotonic_time):
+        with mock.patch(
+            "scrapy_redis.spiders.time.monotonic", return_value=monotonic_time
+        ):
+            with pytest.raises(DontCloseSpider):
+                spider.spider_idle()
+
+    def test_empty_queue_gates_immediately_following_poll(self):
+        spider = self.make_spider()
+
+        with mock.patch.object(spider, "count_size", wraps=spider.count_size) as count_size:
+            with mock.patch.object(spider, "fetch_data", wraps=spider.fetch_data) as fetch_data:
+                with mock.patch.object(
+                    self.server, "pipeline", wraps=self.server.pipeline
+                ) as pipeline:
+                    with mock.patch(
+                        "scrapy_redis.spiders.time.monotonic", return_value=0
+                    ):
+                        with pytest.raises(DontCloseSpider):
+                            spider.spider_idle()
+
+                        assert spider._idle_backoff_delay == 1.0
+                        assert spider._idle_poll_deadline == 1.0
+
+                        count_size.reset_mock()
+                        fetch_data.reset_mock()
+                        pipeline.reset_mock()
+
+                        with pytest.raises(DontCloseSpider):
+                            spider.spider_idle()
+
+                    count_size.assert_not_called()
+                    fetch_data.assert_not_called()
+                    pipeline.assert_not_called()
+
+    def test_empty_queue_backoff_doubles_and_caps(self):
+        spider = self.make_spider()
+        delays = []
+        deadlines = []
+
+        for monotonic_time in (0, 1, 3, 7, 15, 31, 61):
+            self.poll_at(spider, monotonic_time)
+            delays.append(spider._idle_backoff_delay)
+            deadlines.append(spider._idle_poll_deadline)
+
+        assert delays == [1.0, 2.0, 4.0, 8.0, 16.0, 30.0, 30.0]
+        assert deadlines == [1.0, 3.0, 7.0, 15.0, 31.0, 61.0, 91.0]
+
+    def test_scheduled_requests_reset_backoff(self):
+        spider = self.make_spider()
+        self.poll_at(spider, 0)
+
+        self.server.rpush(spider.redis_key, "http://example.com/new")
+        self.poll_at(spider, 1)
+
+        assert spider.crawler.engine.crawl.call_count == 1
+        assert spider._idle_backoff_delay == 0
+        assert spider._idle_poll_deadline == 0.0
+
+        self.poll_at(spider, 2)
+        assert spider._idle_backoff_delay == 1.0
+        assert spider._idle_poll_deadline == 3.0
+
+    def test_unschedulable_item_does_not_reset_backoff(self):
+        spider = self.make_spider()
+        self.poll_at(spider, 0)
+
+        self.server.rpush(spider.redis_key, '{"not_url": "ignored"}')
+        self.poll_at(spider, 1)
+
+        assert spider.crawler.engine.crawl.call_count == 0
+        assert spider._idle_backoff_delay == 2.0
+        assert spider._idle_poll_deadline == 3.0
+
+    def test_gated_poll_honors_idle_timeout_without_redis_calls(self):
+        spider = self.make_spider(max_idle_time=5)
+        spider.spider_idle_start_time = 0
+
+        with mock.patch.object(spider, "count_size", wraps=spider.count_size) as count_size:
+            with mock.patch.object(spider, "fetch_data", wraps=spider.fetch_data) as fetch_data:
+                with mock.patch.object(
+                    self.server, "pipeline", wraps=self.server.pipeline
+                ) as pipeline:
+                    with mock.patch(
+                        "scrapy_redis.spiders.time.monotonic", return_value=0
+                    ):
+                        with mock.patch("scrapy_redis.spiders.time.time", return_value=0):
+                            with pytest.raises(DontCloseSpider):
+                                spider.spider_idle()
+
+                    count_size.reset_mock()
+                    fetch_data.reset_mock()
+                    pipeline.reset_mock()
+
+                    with mock.patch(
+                        "scrapy_redis.spiders.time.monotonic", return_value=0.5
+                    ):
+                        with mock.patch("scrapy_redis.spiders.time.time", return_value=10):
+                            assert spider.spider_idle() is None
+
+                    count_size.assert_not_called()
+                    fetch_data.assert_not_called()
+                    pipeline.assert_not_called()
+
+    def test_disabled_backoff_keeps_polling_command_sequence(self):
+        self.crawler.settings.set("REDIS_IDLE_BACKOFF_ENABLED", False)
+        spider = self.make_spider()
+
+        with mock.patch.object(spider, "count_size", wraps=spider.count_size) as count_size:
+            with mock.patch.object(spider, "fetch_data", wraps=spider.fetch_data) as fetch_data:
+                with mock.patch.object(
+                    self.server, "pipeline", wraps=self.server.pipeline
+                ) as pipeline:
+                    with pytest.raises(DontCloseSpider):
+                        spider.spider_idle()
+                    with pytest.raises(DontCloseSpider):
+                        spider.spider_idle()
+
+        assert count_size.call_count == 2
+        assert fetch_data.call_count == 2
+        assert pipeline.call_count == 2
+
+
+@pytest.mark.parametrize(
+    ("settings", "message"),
+    [
+        (
+            {"REDIS_IDLE_BACKOFF_MIN": 31.0},
+            "REDIS_IDLE_BACKOFF_MIN",
+        ),
+        (
+            {"REDIS_IDLE_BACKOFF_MIN": -1.0},
+            "REDIS_IDLE_BACKOFF_MIN",
+        ),
+        (
+            {"REDIS_IDLE_BACKOFF_MIN": float("nan")},
+            "finite",
+        ),
+        (
+            {"REDIS_IDLE_BACKOFF_FACTOR": 0.5},
+            "REDIS_IDLE_BACKOFF_FACTOR",
+        ),
+    ],
+)
+def test_idle_backoff_validation(settings, message):
+    crawler = get_crawler()
+    crawler.settings.setdict(
+        {
+            "REDIS_IDLE_BACKOFF_ENABLED": True,
+            "REDIS_IDLE_BACKOFF_MIN": 1.0,
+            "REDIS_IDLE_BACKOFF_MAX": 30.0,
+            "REDIS_IDLE_BACKOFF_FACTOR": 2.0,
+            **settings,
+        }
+    )
+
+    with patched_redis(FakeRedisServer()):
+        with pytest.raises(ValueError, match=message):
+            MySpider.from_crawler(crawler)
+
+
+def test_disabled_backoff_does_not_parse_other_settings():
+    crawler = get_crawler()
+    crawler.settings.setdict(
+        {
+            "REDIS_IDLE_BACKOFF_ENABLED": False,
+            "REDIS_IDLE_BACKOFF_MIN": "not-a-number",
+            "REDIS_IDLE_BACKOFF_MAX": "not-a-number",
+            "REDIS_IDLE_BACKOFF_FACTOR": "not-a-number",
+        }
+    )
+
+    with patched_redis(FakeRedisServer()):
+        spider = MySpider.from_crawler(crawler)
+
+    assert spider.redis_idle_backoff is False
+    assert spider.redis_idle_backoff_min is None
+    assert spider.redis_idle_backoff_max is None
+    assert spider.redis_idle_backoff_factor is None
+
+
+def test_idle_backoff_spider_kwargs_override_settings():
+    crawler = get_crawler()
+    crawler.settings.setdict(
+        {
+            "REDIS_IDLE_BACKOFF_ENABLED": False,
+            "REDIS_IDLE_BACKOFF_MIN": 10.0,
+            "REDIS_IDLE_BACKOFF_MAX": 20.0,
+            "REDIS_IDLE_BACKOFF_FACTOR": 3.0,
+        }
+    )
+
+    with patched_redis(FakeRedisServer()):
+        spider = MySpider.from_crawler(
+            crawler,
+            redis_idle_backoff=True,
+            redis_idle_backoff_min=1,
+            redis_idle_backoff_max=2,
+            redis_idle_backoff_factor=4,
+        )
+
+    assert spider.redis_idle_backoff is True
+    assert spider.redis_idle_backoff_min == 1.0
+    assert spider.redis_idle_backoff_max == 2.0
+    assert spider.redis_idle_backoff_factor == 4.0
+
+
 class TestRedisMixinMultiKey:
 
     def setup(self):

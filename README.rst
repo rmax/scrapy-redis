@@ -101,6 +101,24 @@ From GitHub
 
     pip uninstall scrapy-redis
 
+Settings
+--------
+
+Idle Redis queue polling can be reduced with opt-in, deadline-gated exponential
+backoff:
+
+* ``REDIS_IDLE_BACKOFF_ENABLED`` (default ``False``) enables idle-poll backoff.
+* ``REDIS_IDLE_BACKOFF_MIN`` (default ``1.0``) is the initial delay in seconds.
+* ``REDIS_IDLE_BACKOFF_MAX`` (default ``30.0``) caps the delay in seconds.
+* ``REDIS_IDLE_BACKOFF_FACTOR`` (default ``2.0``) multiplies the delay after
+  each empty poll.
+
+When enabled, the spider never blocks the reactor: while waiting for the next
+poll deadline it skips all Redis calls. The close deadline is still checked on
+every idle callback. The tradeoff is that new work may take up to the
+backoff cap to be picked up, while idle Redis load is reduced when many
+workers share a queue.
+
 Alternative Choice
 ---------------------------
 
