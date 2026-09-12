@@ -1,5 +1,7 @@
 import gc
+import os
 from unittest import mock
+import tempfile
 import weakref
 
 import pytest
@@ -165,7 +167,7 @@ def test_components_share_one_pool_for_one_settings_object():
     [
         {"single_connection_client": True},
         {"ssl": True, "ssl_cert_reqs": "none"},
-        {"unix_socket_path": "/tmp/x.sock"},
+        {"unix_socket_path": os.path.join(tempfile.gettempdir(), "x.sock")},
     ],
 )
 def test_client_only_params_use_the_legacy_path(client_only_params):
