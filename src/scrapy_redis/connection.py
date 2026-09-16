@@ -59,6 +59,10 @@ def _get_params_from_settings(settings):
         val = settings.get(source)
         if val:
             params[dest] = val
+    if params.get("protocol") is None:
+        # Normalize None to absence to avoid duplicate pools; concrete protocols
+        # stay in the pool key.
+        params.pop("protocol", None)
     return params
 
 

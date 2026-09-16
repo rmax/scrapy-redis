@@ -275,3 +275,35 @@ def test_connection_pool_escape_hatch_keeps_url_out_of_client_kwargs():
     client = from_settings(settings)
 
     assert client.connection_pool is pool
+
+
+def test_different_protocols_do_not_share_a_pool():
+    first_settings = Settings({"REDIS_PARAMS": {"protocol": 2}})
+    second_settings = Settings({"REDIS_PARAMS": {"protocol": 3}})
+
+    first = connection.get_connection_pool_from_settings(first_settings)
+    second = connection.get_connection_pool_from_settings(second_settings)
+
+    assert first is not second
+    with connection._POOLS_LOCK:
+        first_key = next(iter(connection._POOLS_REGISTRY[id(first_settings)][1]))
+        second_key = next(iter(connection._POOLS_REGISTRY[id(second_settings)][1]))
+    assert first_key != second_key
+
+
+def test_protocol_none_and_absent_share_a_pool():
+    settings = Settings({"REDIS_PARAMS": {"protocol": None}})
+
+    explicit_none = connection.get_connection_pool_from_settings(settings)
+    settings["REDIS_PARAMS"] = {}
+    absent = connection.get_connection_pool_from_settings(settings)
+
+    assert explicit_none is absent
+
+
+def test_protocol_is_present_in_connection_kwargs():
+    settings = Settings({"REDIS_PARAMS": {"protocol": 2}})
+
+    pool = connection.get_connection_pool_from_settings(settings)
+
+    assert pool.connection_kwargs["protocol"] == 2
