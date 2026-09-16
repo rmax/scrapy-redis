@@ -16,6 +16,7 @@ REDIS_PARAMS = {
     "retry_on_timeout": True,
     "encoding": REDIS_ENCODING,
 }
+REDIS_PROTOCOL = None
 REDIS_MAX_CONNECTIONS = None
 REDIS_CONCURRENT_REQUESTS = 16
 

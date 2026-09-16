@@ -307,3 +307,62 @@ def test_protocol_is_present_in_connection_kwargs():
     pool = connection.get_connection_pool_from_settings(settings)
 
     assert pool.connection_kwargs["protocol"] == 2
+
+
+def test_redis_protocol_default_is_omitted():
+    settings = Settings()
+
+    with mock.patch.object(connection, "_redis_major_version") as version_mock:
+        params = connection._get_params_from_settings(settings)
+        pool = connection.get_connection_pool_from_settings(settings)
+
+    version_mock.assert_not_called()
+    assert "protocol" not in params
+    assert "protocol" not in pool.connection_kwargs
+    with connection._POOLS_LOCK:
+        pool_key = next(iter(connection._POOLS_REGISTRY[id(settings)][1]))
+    assert "protocol" not in repr(pool_key)
+
+
+def test_redis_protocol_two_flows_to_pool(monkeypatch):
+    monkeypatch.setattr(connection, "_redis_major_version", lambda: 5)
+    settings = Settings({"REDIS_PROTOCOL": 2})
+
+    pool = connection.get_connection_pool_from_settings(settings)
+
+    assert pool.connection_kwargs["protocol"] == 2
+
+
+def test_redis_protocol_setting_precedes_redis_params(monkeypatch):
+    monkeypatch.setattr(connection, "_redis_major_version", lambda: 5)
+    settings = Settings(
+        {"REDIS_PROTOCOL": 2, "REDIS_PARAMS": {"protocol": 3}}
+    )
+
+    pool = connection.get_connection_pool_from_settings(settings)
+
+    assert pool.connection_kwargs["protocol"] == 2
+
+
+@pytest.mark.parametrize("protocol", [True, 1, 4, "2"])
+def test_redis_protocol_rejects_invalid_values(protocol):
+    settings = Settings({"REDIS_PROTOCOL": protocol})
+
+    with pytest.raises(ValueError, match=r"integer.*2.*3"):
+        connection.get_connection_pool_from_settings(settings)
+
+
+def test_redis_protocol_requires_redis_py_five(monkeypatch):
+    monkeypatch.setattr(connection, "_redis_major_version", lambda: 4)
+    settings = Settings({"REDIS_PROTOCOL": 2})
+
+    with pytest.raises(ValueError, match=r"REDIS_PROTOCOL requires redis-py >= 5\.0"):
+        connection.get_connection_pool_from_settings(settings)
+
+
+def test_redis_params_protocol_remains_supported():
+    settings = Settings({"REDIS_PARAMS": {"protocol": 2}})
+
+    pool = connection.get_connection_pool_from_settings(settings)
+
+    assert pool.connection_kwargs["protocol"] == 2
