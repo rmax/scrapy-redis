@@ -6,8 +6,9 @@ History
 
 Unreleased
 ----------
-
 * Added opt-in exponential backoff for idle queue polling (``REDIS_IDLE_BACKOFF_*``); non-blocking and deadline-gated.
+* Added per-crawler Redis connection pool sharing across components.
+* Added ``REDIS_MAX_CONNECTIONS`` setting.
 
 0.9.1 (2024-07-06)
 ------------------

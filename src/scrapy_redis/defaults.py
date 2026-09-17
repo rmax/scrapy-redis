@@ -16,6 +16,7 @@ REDIS_PARAMS = {
     "retry_on_timeout": True,
     "encoding": REDIS_ENCODING,
 }
+REDIS_MAX_CONNECTIONS = None
 REDIS_CONCURRENT_REQUESTS = 16
 
 SCHEDULER_QUEUE_KEY = "%(spider)s:requests"
