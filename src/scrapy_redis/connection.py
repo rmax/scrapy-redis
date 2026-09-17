@@ -1,3 +1,4 @@
+from importlib.metadata import version
 import threading
 import weakref
 
@@ -51,6 +52,24 @@ def _make_pool_key(url, params):
     return _canonicalize(url), _canonicalize(params)
 
 
+def _redis_major_version() -> int:
+    return int(version("redis").partition(".")[0])
+
+
+def _apply_protocol(settings, params) -> None:
+    proto = settings.get("REDIS_PROTOCOL", defaults.REDIS_PROTOCOL)
+    if proto is None:
+        if params.get("protocol") is None:
+            params.pop("protocol", None)
+        return
+
+    if isinstance(proto, bool) or not isinstance(proto, int) or proto not in (2, 3):
+        raise ValueError("REDIS_PROTOCOL must be an integer, either 2 or 3")
+    if _redis_major_version() < 5:
+        raise ValueError("REDIS_PROTOCOL requires redis-py >= 5.0")
+    params["protocol"] = proto
+
+
 def _get_params_from_settings(settings):
     params = defaults.REDIS_PARAMS.copy()
     params.update(settings.getdict("REDIS_PARAMS"))
@@ -59,10 +78,7 @@ def _get_params_from_settings(settings):
         val = settings.get(source)
         if val:
             params[dest] = val
-    if params.get("protocol") is None:
-        # Normalize None to absence to avoid duplicate pools; concrete protocols
-        # stay in the pool key.
-        params.pop("protocol", None)
+    _apply_protocol(settings, params)
     return params
 
 
@@ -167,6 +183,9 @@ def get_redis_from_settings(settings):
         Data encoding.
     REDIS_PARAMS : dict, optional
         Additional client parameters.
+    REDIS_PROTOCOL : {2, 3}, optional
+        Connection protocol. Defaults to ``None`` and requires redis-py >= 5;
+        takes precedence over ``REDIS_PARAMS["protocol"]``.
     REDIS_MAX_CONNECTIONS : int, optional
         Maximum connections in the shared pool. At exhaustion, redis-py raises
         ``ConnectionError("Too many connections")``; waiting semantics require
