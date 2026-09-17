@@ -1,4 +1,5 @@
 import json
+import math
 import time
 from collections.abc import Iterable
 
@@ -20,6 +21,10 @@ class RedisMixin:
     redis_batch_size = None
     redis_encoding = None
     redis_key_check_interval = None
+    redis_idle_backoff = None
+    redis_idle_backoff_min = None
+    redis_idle_backoff_max = None
+    redis_idle_backoff_factor = None
 
     # Redis client placeholder.
     server = None
@@ -29,10 +34,78 @@ class RedisMixin:
     max_idle_time = None
     _redis_keys = None
     _last_priority_scan = 0
+    _idle_backoff_delay = 0
+    _idle_poll_deadline = 0.0
 
     def start_requests(self):
         """Returns a batch of start requests from redis."""
         return self.next_requests()
+
+    def _setup_idle_backoff(self, crawler):
+        settings = crawler.settings
+
+        if self.redis_idle_backoff is None:
+            self.redis_idle_backoff = settings.getbool(
+                "REDIS_IDLE_BACKOFF_ENABLED",
+                defaults.REDIS_IDLE_BACKOFF_ENABLED,
+            )
+
+        if not self.redis_idle_backoff:
+            return
+
+        backoff_settings = (
+            (
+                "redis_idle_backoff_min",
+                "REDIS_IDLE_BACKOFF_MIN",
+                defaults.REDIS_IDLE_BACKOFF_MIN,
+            ),
+            (
+                "redis_idle_backoff_max",
+                "REDIS_IDLE_BACKOFF_MAX",
+                defaults.REDIS_IDLE_BACKOFF_MAX,
+            ),
+            (
+                "redis_idle_backoff_factor",
+                "REDIS_IDLE_BACKOFF_FACTOR",
+                defaults.REDIS_IDLE_BACKOFF_FACTOR,
+            ),
+        )
+        for attribute, setting, default in backoff_settings:
+            value = getattr(self, attribute)
+            if value is None:
+                try:
+                    value = settings.getfloat(setting, default)
+                except (OverflowError, TypeError, ValueError) as exc:
+                    raise ValueError(f"{setting} must be a finite number") from exc
+            else:
+                try:
+                    value = float(value)
+                except (OverflowError, TypeError, ValueError) as exc:
+                    raise ValueError(f"{setting} must be a finite number") from exc
+            setattr(self, attribute, value)
+
+        if not all(
+            math.isfinite(value)
+            for value in (
+                self.redis_idle_backoff_min,
+                self.redis_idle_backoff_max,
+                self.redis_idle_backoff_factor,
+            )
+        ):
+            raise ValueError(
+                "REDIS_IDLE_BACKOFF_MIN, REDIS_IDLE_BACKOFF_MAX, and "
+                "REDIS_IDLE_BACKOFF_FACTOR must be finite"
+            )
+        if self.redis_idle_backoff_min < 0:
+            raise ValueError("REDIS_IDLE_BACKOFF_MIN must be greater than or equal to 0")
+        if self.redis_idle_backoff_max < 0:
+            raise ValueError("REDIS_IDLE_BACKOFF_MAX must be greater than or equal to 0")
+        if self.redis_idle_backoff_min > self.redis_idle_backoff_max:
+            raise ValueError(
+                "REDIS_IDLE_BACKOFF_MIN must be less than or equal to REDIS_IDLE_BACKOFF_MAX"
+            )
+        if self.redis_idle_backoff_factor < 1:
+            raise ValueError("REDIS_IDLE_BACKOFF_FACTOR must be greater than or equal to 1")
 
     def setup_redis(self, crawler=None):
         """Setup redis connection and idle signal.
@@ -313,12 +386,15 @@ class RedisMixin:
         """Schedules a request if available"""
         # TODO: While there is capacity, schedule a batch of redis requests.
         self._maybe_check_priority_scan()
+        scheduled = 0
         for req in self.next_requests():
             # see https://github.com/scrapy/scrapy/issues/5994
             if scrapy_version >= (2, 6):
                 self.crawler.engine.crawl(req)
             else:
                 self.crawler.engine.crawl(req, spider=self)
+            scheduled += 1
+        return scheduled
 
     def spider_idle(self):
         """
@@ -326,12 +402,41 @@ class RedisMixin:
         or close spider when waiting seconds > MAX_IDLE_TIME_BEFORE_CLOSE.
         MAX_IDLE_TIME_BEFORE_CLOSE will not affect SCHEDULER_IDLE_BEFORE_CLOSE.
         """
+        if self.redis_idle_backoff and time.monotonic() < self._idle_poll_deadline:
+            # Gated: perform no Redis calls; still honor the close deadline.
+            idle_time = int(time.time()) - self.spider_idle_start_time
+            if self.max_idle_time != 0 and idle_time >= self.max_idle_time:
+                return
+            raise DontCloseSpider
+
         self._maybe_check_priority_scan()
 
-        if self.server is not None and self._any_key_has_items():
+        has_items = self.server is not None and self._any_key_has_items()
+        if has_items:
             self.spider_idle_start_time = int(time.time())
 
-        self.schedule_next_requests()
+        scheduled = self.schedule_next_requests()
+        if self.redis_idle_backoff:
+            if scheduled > 0:
+                self._idle_backoff_delay = 0
+                self._idle_poll_deadline = 0.0
+            else:
+                if self._idle_backoff_delay <= 0:
+                    self._idle_backoff_delay = min(
+                        self.redis_idle_backoff_min,
+                        self.redis_idle_backoff_max,
+                    )
+                else:
+                    self._idle_backoff_delay = min(
+                        self._idle_backoff_delay * self.redis_idle_backoff_factor,
+                        self.redis_idle_backoff_max,
+                    )
+                self._idle_poll_deadline = time.monotonic() + self._idle_backoff_delay
+                self.logger.debug(
+                    "Redis queue empty; next poll in %.1fs (cap %.1fs)",
+                    self._idle_backoff_delay,
+                    self.redis_idle_backoff_max,
+                )
 
         idle_time = int(time.time()) - self.spider_idle_start_time
         if self.max_idle_time != 0 and idle_time >= self.max_idle_time:
@@ -368,6 +473,7 @@ class RedisSpider(RedisMixin, Spider):
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         obj = super().from_crawler(crawler, *args, **kwargs)
+        obj._setup_idle_backoff(crawler)
         obj.setup_redis(crawler)
         return obj
 
@@ -400,5 +506,6 @@ class RedisCrawlSpider(RedisMixin, CrawlSpider):
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         obj = super().from_crawler(crawler, *args, **kwargs)
+        obj._setup_idle_backoff(crawler)
         obj.setup_redis(crawler)
         return obj
