@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from scrapy.statscollectors import StatsCollector
 
@@ -39,7 +39,11 @@ class RedisStatsCollector(StatsCollector):
     def get_value(self, key, default=None, spider=None):
         """Return the value of hash stats"""
         if self.server.hexists(self._get_key(spider), key):
-            return int(self.server.hget(self._get_key(spider), key))
+            raw = convert_bytes_to_str(self.server.hget(self._get_key(spider), key))
+            try:
+                return int(raw)
+            except (TypeError, ValueError):
+                return datetime.fromtimestamp(float(raw), tz=timezone.utc)
         else:
             return default
 
