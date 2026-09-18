@@ -1,4 +1,3 @@
-import asyncio
 import json
 import math
 import time
@@ -43,15 +42,8 @@ class RedisMixin:
         return self.next_requests()
 
     async def start(self):
-        """For scrapy >= 2.13"""
-        loop = asyncio.get_running_loop()
-
-        requests = await loop.run_in_executor(
-            None,
-            lambda: list(self.next_requests()),
-        )
-
-        for request in requests:
+        """Yield start requests from Redis for Scrapy >= 2.13."""
+        for request in self.next_requests():
             yield request
 
     def _setup_idle_backoff(self, crawler):
