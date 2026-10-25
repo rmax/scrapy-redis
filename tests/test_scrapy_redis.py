@@ -5,6 +5,7 @@ import redis
 from scrapy import Request, Spider
 from scrapy.settings import Settings
 from scrapy.utils.test import get_crawler
+from scrapy.utils.reactor import install_reactor
 
 from scrapy_redis import connection
 from scrapy_redis.dupefilter import RFPDupeFilter
@@ -14,6 +15,8 @@ from scrapy_redis.scheduler import Scheduler
 # allow test settings from environment
 REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
+
+install_reactor("twisted.internet.asyncioreactor.AsyncioSelectorReactor")
 
 
 def get_spider(*args, **kwargs):
