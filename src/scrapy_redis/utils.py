@@ -5,18 +5,18 @@ import six
 
 
 class TextColor:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKCYAN = "\033[96m"
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    ENDC = "\033[0m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
 
 
-def bytes_to_str(s, encoding='utf-8'):
+def bytes_to_str(s, encoding="utf-8"):
     """Returns a str if a bytes object is given."""
     if six.PY3 and isinstance(s, bytes):
         return s.decode(encoding)
@@ -32,9 +32,9 @@ def is_dict(string_content):
     return True
 
 
-def convert_bytes_to_str(data, encoding='utf-8'):
+def convert_bytes_to_str(data, encoding="utf-8"):
     """Convert a dict's keys & values from `bytes` to `str`
-        or convert bytes to str"""
+    or convert bytes to str"""
     if isinstance(data, bytes):
         return data.decode(encoding)
     if isinstance(data, dict):

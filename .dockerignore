@@ -41,3 +41,6 @@ nosetests.xml
 
 # JetBrains PyCharm IDE
 /.idea/
+
+.venv
+.tags

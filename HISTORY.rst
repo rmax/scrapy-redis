@@ -2,7 +2,33 @@
 History
 =======
 
-.. comment:: bumpversion marker
+.. bumpversion marker
+
+Unreleased
+----------
+* Added opt-in exponential backoff for idle queue polling (``REDIS_IDLE_BACKOFF_*``); non-blocking and deadline-gated.
+* Added per-crawler Redis connection pool sharing across components.
+* Added ``REDIS_MAX_CONNECTIONS`` setting.
+* Added opt-in ``REDIS_PROTOCOL`` (default ``None``) for redis-py >= 5.
+* Documented RESP3 connection-setup and retry considerations.
+* Normalized ``protocol=None`` for shared-pool identity.
+
+0.9.1 (2024-07-06)
+------------------
+* Fixed docs build.
+
+0.9.0 (2024-07-06)
+------------------
+* Fixed ``Scheduler`` not compatible with BaseDupeFilter (#294)
+* Added precommit hooks.
+* Switched to Python 3.12 as default build version.
+
+0.8.0 (2024-07-03)
+------------------
+* Fixed request fingerprint method.
+* Fixed support for Scrapy 2.6+.
+* Fixed tox tests and github workflow.
+* Deprecated ``REDIS_START_URLS_BATCH_SIZE``.
 
 0.7.3 (2022-07-21)
 ------------------

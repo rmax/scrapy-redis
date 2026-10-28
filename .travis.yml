@@ -19,7 +19,7 @@ before_install:
   - lsb_release -a
 
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
-install: 
+install:
   - pip install -U pip wheel
   - pip install -U tox twine coverage
   - virtualenv --version

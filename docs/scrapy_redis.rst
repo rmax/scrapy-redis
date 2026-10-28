@@ -49,6 +49,7 @@ scrapy_redis.spiders module
 
 .. automodule:: scrapy_redis.spiders
     :members:
+    :exclude-members: Settings
     :undoc-members:
     :show-inheritance:
 

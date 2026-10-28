@@ -1,4 +1,4 @@
-import mock
+from unittest import mock
 
 from scrapy import Spider
 from scrapy.http import Request
@@ -6,23 +6,23 @@ from scrapy.http import Request
 from scrapy_redis.queue import Base
 
 
-class TestBaseQueue(object):
+class TestBaseQueue:
 
     queue_cls = Base
 
     def setup(self):
         self.server = mock.Mock()
-        self.spider = Spider(name='foo')
+        self.spider = Spider(name="foo")
         self.spider.parse_method = lambda x: x
-        self.key = 'key'
+        self.key = "key"
         self.q = self.queue_cls(self.server, self.spider, self.key)
 
     def test_encode_decode_requests(self, q=None):
         if q is None:
             q = self.q
-        req = Request('http://example.com',
-                      callback=self.spider.parse,
-                      meta={'foo': 'bar'})
+        req = Request(
+            "http://example.com", callback=self.spider.parse, meta={"foo": "bar"}
+        )
         out = q._decode_request(q._encode_request(req))
         assert req.url == out.url
         assert req.meta == out.meta
