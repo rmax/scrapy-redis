@@ -217,11 +217,9 @@ class TestRedisMixinSetupRedis:
         myspider = MySpider.from_crawler(crawler)
         assert myspider.server is server
         connection.from_settings.assert_called_with(crawler.settings)
-        crawler.signals.connect.assert_called_with(myspider.fill_requests_queue, signal=signals.request_left_downloader)
+        crawler.signals.connect.assert_any_call(myspider.fill_requests_queue, signal=signals.request_left_downloader)
+        crawler.signals.connect.assert_any_call(myspider.spider_idle, signal=signals.spider_idle)
         # Second call does nothing.
-        crawler.signals.connect.assert_called_with(
-            myspider.spider_idle, signal=signals.spider_idle
-        )
         server = myspider.server
         crawler.signals.connect.reset_mock()
         myspider.setup_redis()
