@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=77", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scrapy-redis"
+dynamic = ["version", "readme", "dependencies"]
+description = "Redis-based components for Scrapy."
+license = "MIT"
+authors = [
+    { name = "R Max Espinoza", email = "hey@rmax.dev" },
+    { name = "Jeremy Chou"   , email = "lucky90322@gmail.com" },
+]
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Framework :: Scrapy",
+]
+
+[project.urls]
+Homepage = "https://github.com/rmax/scrapy-redis"
+
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
+readme = { file = ["README.rst", "HISTORY.rst"], content-type = "text/x-rst" }
+dependencies = { file = ["requirements.txt"] }
