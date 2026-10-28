@@ -41,6 +41,11 @@ class RedisMixin:
         """Returns a batch of start requests from redis."""
         return self.next_requests()
 
+    async def start(self):
+        """Yield start requests from Redis for Scrapy >= 2.13."""
+        for request in self.next_requests():
+            yield request
+
     def _setup_idle_backoff(self, crawler):
         settings = crawler.settings
 
