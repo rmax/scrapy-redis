@@ -33,6 +33,9 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - name: Mark workspace as safe for git
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
     - name: Run pytest
       env:
         REDIS_HOST: redis
