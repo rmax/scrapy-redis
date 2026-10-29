@@ -75,6 +75,25 @@ class TestFromSettings:
         for key, value in self.expected_params.items():
             assert connection_kwargs[key] is value
 
+    def test_redis_password(self):
+        self.settings["REDIS_PASSWORD"] = "secret"
+        server = from_settings(self.settings)
+        connection_kwargs = server.connection_pool.connection_kwargs
+        assert connection_kwargs["password"] == "secret"
+
+    def test_redis_password_with_url(self):
+        self.settings["REDIS_URL"] = "redis://localhost:6379"
+        self.settings["REDIS_PASSWORD"] = "secret"
+        server = from_settings(self.settings)
+        connection_kwargs = server.connection_pool.connection_kwargs
+        assert connection_kwargs["password"] == "secret"
+
+    def test_redis_password_empty_is_ignored(self):
+        self.settings["REDIS_PASSWORD"] = ""
+        server = from_settings(self.settings)
+        connection_kwargs = server.connection_pool.connection_kwargs
+        assert connection_kwargs.get("password") is None
+
 
 def test_get_server_from_settings_alias():
     assert from_settings is get_redis_from_settings
