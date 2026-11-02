@@ -10,7 +10,7 @@ class TestBaseQueue:
 
     queue_cls = Base
 
-    def setup(self):
+    def setup_method(self):
         self.server = mock.Mock()
         self.spider = Spider(name="foo")
         self.spider.parse_method = lambda x: x
