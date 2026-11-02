@@ -12,6 +12,8 @@ Unreleased
 * Added opt-in ``REDIS_PROTOCOL`` (default ``None``) for redis-py >= 5.
 * Documented RESP3 connection-setup and retry considerations.
 * Normalized ``protocol=None`` for shared-pool identity.
+* Fixed the ``retry_on_timeout`` deprecation warning on redis-py >= 6 while
+  keeping the default retry on timeouts (``retry_on_error`` is used there).
 
 0.9.1 (2024-07-06)
 ------------------
