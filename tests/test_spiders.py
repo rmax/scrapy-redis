@@ -174,7 +174,7 @@ def patched_redis(server):
 
 class TestRedisMixinSetupRedis:
 
-    def setup(self):
+    def setup_method(self):
         self.myspider = MySpider()
 
     def test_crawler_required(self):
@@ -335,7 +335,7 @@ def test_consume_urls_from_redis(start_urls_as_zset, start_urls_as_set, spider_c
 
 class TestRedisIdleBackoff:
 
-    def setup(self):
+    def setup_method(self):
         self.server = FakeRedisServer()
         self.crawler = get_crawler()
         self.crawler.settings.setdict(
@@ -560,7 +560,7 @@ def test_idle_backoff_spider_kwargs_override_settings():
 
 class TestRedisMixinMultiKey:
 
-    def setup(self):
+    def setup_method(self):
         self.server = FakeRedisServer()
         self.crawler = get_crawler()
         self.crawler.settings.setdict(
