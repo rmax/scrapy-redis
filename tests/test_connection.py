@@ -41,7 +41,7 @@ class TestGetRedis:
 
 class TestFromSettings:
 
-    def setup(self):
+    def setup_method(self):
         self.expected_params = {
             "timeout": 0,
             "flag": False,
