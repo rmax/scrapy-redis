@@ -1,3 +1,5 @@
+from importlib.metadata import version
+
 import redis
 
 # For standalone use.
@@ -13,9 +15,16 @@ REDIS_ENCODING = "utf-8"
 REDIS_PARAMS = {
     "socket_timeout": 30,
     "socket_connect_timeout": 30,
-    "retry_on_timeout": True,
     "encoding": REDIS_ENCODING,
 }
+# Retry a command once when it times out. redis-py 6 deprecated ``retry_on_timeout``
+# in favour of listing TimeoutError in ``retry_on_error``, which gives connections the
+# same retry policy. Connections from a ConnectionPool (the shared pool, REDIS_URL)
+# rely on it: without either setting they do not retry timeouts at all.
+if int(version("redis").partition(".")[0]) >= 6:
+    REDIS_PARAMS["retry_on_error"] = (redis.exceptions.TimeoutError,)
+else:
+    REDIS_PARAMS["retry_on_timeout"] = True
 REDIS_PROTOCOL = None
 REDIS_MAX_CONNECTIONS = None
 REDIS_CONCURRENT_REQUESTS = 16
