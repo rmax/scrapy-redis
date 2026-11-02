@@ -2,6 +2,7 @@ import gc
 import os
 from unittest import mock
 import tempfile
+import warnings
 import weakref
 
 import pytest
@@ -294,6 +295,54 @@ def test_connection_pool_escape_hatch_keeps_url_out_of_client_kwargs():
     client = from_settings(settings)
 
     assert client.connection_pool is pool
+
+
+@pytest.mark.parametrize(
+    "redis_params",
+    [{}, {"single_connection_client": True}, {"connection_pool": redis.ConnectionPool()}],
+    ids=["shared-pool", "own-client", "connection-pool"],
+)
+def test_default_params_do_not_warn(redis_params):
+    settings = Settings({"REDIS_PARAMS": redis_params})
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+        from_settings(settings)
+
+
+def timing_out_command(failures):
+    """A command that raises redis' TimeoutError on its first ``failures`` calls."""
+    calls = []
+
+    def command():
+        calls.append(None)
+        if len(calls) <= failures:
+            raise redis.exceptions.TimeoutError("simulated timeout")
+        return "PONG"
+
+    return command
+
+
+@pytest.mark.parametrize(
+    "settings_dict", [{}, {"REDIS_URL": "redis://localhost:6379/0"}], ids=["host", "url"]
+)
+def test_shared_pool_connections_retry_a_timeout_once(settings_dict):
+    pool = connection.get_connection_pool_from_settings(Settings(settings_dict))
+    conn = pool.make_connection()
+
+    assert conn.retry.call_with_retry(timing_out_command(1), lambda error: None) == "PONG"
+    with pytest.raises(redis.exceptions.TimeoutError):
+        conn.retry.call_with_retry(timing_out_command(2), lambda error: None)
+
+
+@pytest.mark.parametrize("retry_on_timeout", [True, False])
+def test_explicit_retry_on_timeout_replaces_the_default(retry_on_timeout):
+    settings = Settings({"REDIS_PARAMS": {"retry_on_timeout": retry_on_timeout}})
+
+    params = connection._get_params_from_settings(settings)
+
+    assert params["retry_on_timeout"] is retry_on_timeout
+    assert "retry_on_error" not in params
 
 
 def test_different_protocols_do_not_share_a_pool():
