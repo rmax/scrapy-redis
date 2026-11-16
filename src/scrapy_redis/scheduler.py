@@ -1,8 +1,12 @@
 import importlib
+import logging
+from collections import deque
 
 from scrapy.utils.misc import load_object
 
 from . import connection, defaults
+
+logger = logging.getLogger(__name__)
 
 
 # TODO: add SCRAPY_JOB support.
@@ -27,6 +31,10 @@ class Scheduler:
         Scheduler dupefilter class.
     SCHEDULER_SERIALIZER : str
         Scheduler serializer.
+
+    Requests that can't be serialized (e.g. their callback is not a spider
+    method) are kept in a local in-memory queue instead of Redis. They are
+    only processed by the worker that created them and are never persisted.
 
     """
 
@@ -81,9 +89,11 @@ class Scheduler:
         self.idle_before_close = idle_before_close
         self.serializer = serializer
         self.stats = None
+        self.local_queue = deque()
+        self._logunser = True
 
     def __len__(self):
-        return len(self.queue)
+        return len(self.local_queue) + len(self.queue)
 
     @classmethod
     def from_settings(cls, settings):
@@ -161,17 +171,44 @@ class Scheduler:
     def flush(self):
         self.df.clear()
         self.queue.clear()
+        self.local_queue.clear()
 
     def enqueue_request(self, request):
         if not request.dont_filter and self.df.request_seen(request):
             self.df.log(request, self.spider)
             return False
+        try:
+            self.queue.push(request)
+        except ValueError as e:
+            self._push_local(request, e)
+            return True
         if self.stats:
             self.stats.inc_value("scheduler/enqueued/redis")
-        self.queue.push(request)
         return True
 
+    def _push_local(self, request, reason):
+        if self._logunser:
+            logger.warning(
+                "Unable to serialize request: %(request)s - reason: %(reason)s"
+                " - keeping it in the local memory queue, no more"
+                " unserializable requests will be logged (stats being"
+                " collected)",
+                {"request": request, "reason": reason},
+                exc_info=True,
+                extra={"spider": self.spider},
+            )
+            self._logunser = False
+        self.local_queue.append(request)
+        if self.stats:
+            self.stats.inc_value("scheduler/unserializable")
+            self.stats.inc_value("scheduler/enqueued/memory")
+
     def next_request(self):
+        if self.local_queue:
+            request = self.local_queue.popleft()
+            if self.stats:
+                self.stats.inc_value("scheduler/dequeued/memory")
+            return request
         block_pop_timeout = self.idle_before_close
         request = self.queue.pop(block_pop_timeout)
         if request and self.stats:

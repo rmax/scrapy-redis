@@ -194,6 +194,18 @@ The connection-related behavior by redis-py version is summarized below:
    * - 8.x
      - RESP3 is the default.
 
+Unserializable requests
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Requests that can't be stored in Redis, e.g. because their callback or errback
+is not a spider method or their ``meta`` can't be pickled, are kept in a local
+in-memory queue instead, the same way Scrapy's own scheduler handles them. The
+first one is logged as a warning and the ``scheduler/unserializable`` stat
+counts all of them.
+
+These requests are only processed by the worker that created them and are not
+persisted, so ``SCHEDULER_PERSIST`` doesn't apply to them.
+
 Alternative Choice
 ---------------------------
 

@@ -12,6 +12,7 @@ Unreleased
 * Added opt-in ``REDIS_PROTOCOL`` (default ``None``) for redis-py >= 5.
 * Documented RESP3 connection-setup and retry considerations.
 * Normalized ``protocol=None`` for shared-pool identity.
+* Kept unserializable requests in a local memory queue instead of crashing the scheduler (#328).
 
 0.9.1 (2024-07-06)
 ------------------
