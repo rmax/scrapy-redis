@@ -12,6 +12,7 @@ Unreleased
 * Added opt-in ``REDIS_PROTOCOL`` (default ``None``) for redis-py >= 5.
 * Documented RESP3 connection-setup and retry considerations.
 * Normalized ``protocol=None`` for shared-pool identity.
+* Fixed a deadlock in the shared pool registry when the garbage collector frees an old ``Settings`` object while a pool is being created (#337).
 
 0.9.1 (2024-07-06)
 ------------------

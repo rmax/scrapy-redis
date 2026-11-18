@@ -2,6 +2,7 @@ import gc
 import os
 from unittest import mock
 import tempfile
+import threading
 import weakref
 
 import pytest
@@ -137,6 +138,50 @@ def test_pool_registry_is_removed_when_settings_are_collected():
     assert settings_ref() is None
     with connection._POOLS_LOCK:
         assert settings_id not in connection._POOLS_REGISTRY
+
+
+def test_gc_cleanup_during_pool_creation_does_not_deadlock(monkeypatch):
+    # The cyclic GC can free an old Settings object while a new pool is being
+    # built under the registry lock. Its weakref cleanup then takes the same
+    # lock from the same thread, which used to hang forever.
+    # Keep automatic collections out of the way so the old Settings object is
+    # only freed by the explicit collect inside the locked section.
+    gc_was_enabled = gc.isenabled()
+    gc.disable()
+    try:
+        old_settings = Settings()
+        old_settings.cycle = old_settings
+        old_id = id(old_settings)
+        connection.get_connection_pool_from_settings(old_settings)
+        del old_settings
+
+        real_pool = redis.ConnectionPool
+
+        def pool_with_gc(*args, **kwargs):
+            gc.collect()
+            return real_pool(*args, **kwargs)
+
+        monkeypatch.setattr(connection.redis, "ConnectionPool", pool_with_gc)
+
+        settings = Settings()
+        result = {}
+
+        def build():
+            result["pool"] = connection.get_connection_pool_from_settings(settings)
+
+        worker = threading.Thread(target=build, daemon=True)
+        worker.start()
+        worker.join(timeout=10)
+    finally:
+        if gc_was_enabled:
+            gc.enable()
+
+    assert not worker.is_alive(), "pool creation deadlocked on _POOLS_LOCK"
+    assert isinstance(result["pool"], real_pool)
+    assert connection.get_connection_pool_from_settings(settings) is result["pool"]
+    with connection._POOLS_LOCK:
+        assert old_id not in connection._POOLS_REGISTRY
+        assert id(settings) in connection._POOLS_REGISTRY
 
 
 def test_pool_key_is_type_aware_and_nested():
