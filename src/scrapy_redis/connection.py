@@ -13,6 +13,7 @@ SETTINGS_PARAMS_MAP = {
     "REDIS_HOST": "host",
     "REDIS_PORT": "port",
     "REDIS_DB": "db",
+    "REDIS_PASSWORD": "password",
     "REDIS_ENCODING": "encoding",
 }
 
@@ -179,6 +180,8 @@ def get_redis_from_settings(settings):
         Server port.
     REDIS_DB : int, optional
         Server database
+    REDIS_PASSWORD: str, optional
+        Server password
     REDIS_ENCODING : str, optional
         Data encoding.
     REDIS_PARAMS : dict, optional

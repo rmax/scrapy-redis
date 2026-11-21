@@ -10,4 +10,5 @@ Development Lead
 Contributors
 ------------
 
-None yet. Why not be the first?
+* Jeremy Chou (LuckyPigeon) <lucky90322@gmail.com>
+
