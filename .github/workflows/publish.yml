@@ -1,0 +1,155 @@
+# Publishes a release to PyPI when a v* tag is pushed.
+#
+# Flow: checks + tests -> build sdist/wheel -> smoke install -> PyPI (trusted
+# publishing, no token) -> GitHub Release with notes from HISTORY.rst.
+#
+# One-time setup (repo owner): create a "pypi" environment in the repo settings
+# and add this workflow as a trusted publisher for scrapy-redis on PyPI
+# (owner rmax, repo scrapy-redis, workflow publish.yml, environment pypi).
+name: publish
+on:
+  push:
+    tags: ["v*"]
+
+permissions: {}
+
+jobs:
+  checks:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/checks.yml
+
+  tests:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/tests.yml
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      with:
+        fetch-depth: 0
+        persist-credentials: false
+
+    - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+      with:
+        python-version: "3.12"
+
+    - name: Check tag matches VERSION
+      id: version
+      run: |
+        version="${GITHUB_REF_NAME#v}"
+        if [ "$version" != "$(cat VERSION)" ]; then
+          echo "::error::Tag $GITHUB_REF_NAME doesn't match VERSION file ($(cat VERSION))"
+          exit 1
+        fi
+        echo "version=$version" >> "$GITHUB_OUTPUT"
+
+    - name: Check tagged commit is on master
+      run: |
+        if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/master; then
+          echo "::error::$GITHUB_REF_NAME points to a commit that isn't on master"
+          exit 1
+        fi
+
+    - name: Extract release notes from HISTORY.rst
+      run: python .github/scripts/history_notes.py "$GITHUB_REF_NAME" > release-notes.md
+
+    - name: Build sdist and wheel
+      run: |
+        python -m pip install --upgrade build twine
+        python -m build
+        python -m twine check --strict dist/*
+        ls -l dist
+
+    - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+      with:
+        name: dist
+        path: dist/
+        if-no-files-found: error
+
+    - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+      with:
+        name: release-notes
+        path: release-notes.md
+        if-no-files-found: error
+
+  smoke:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+    - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+      with:
+        python-version: "3.12"
+
+    - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8.0.2
+      with:
+        name: dist
+        path: dist/
+
+    - name: Install wheel and sdist in fresh venvs
+      env:
+        VERSION: ${{ needs.build.outputs.version }}
+      run: |
+        for dist in dist/*.whl dist/*.tar.gz; do
+          echo "::group::$dist"
+          rm -rf /tmp/venv
+          python -m venv /tmp/venv
+          /tmp/venv/bin/pip install "$dist"
+          # Run from /tmp so the import can't pick up a source checkout.
+          (cd /tmp && /tmp/venv/bin/python -c '
+        import os
+        import scrapy_redis
+        from scrapy_redis import connection, dupefilter, pipelines, queue, scheduler, spiders, stats  # noqa: F401
+        assert scrapy_redis.__version__ == os.environ["VERSION"], scrapy_redis.__version__
+        print("ok", scrapy_redis.__file__, scrapy_redis.__version__)
+        ')
+          echo "::endgroup::"
+        done
+
+  pypi:
+    needs: [checks, tests, build, smoke]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/scrapy-redis/${{ needs.build.outputs.version }}/
+    permissions:
+      id-token: write
+    steps:
+    - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8.0.2
+      with:
+        name: dist
+        path: dist/
+
+    - uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086  # v1.14.3
+
+  github-release:
+    needs: [build, pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333  # v8.0.2
+      with:
+        path: artifacts/
+
+    - name: Create GitHub Release
+      env:
+        GH_TOKEN: ${{ github.token }}
+        VERSION: ${{ needs.build.outputs.version }}
+      run: |
+        flags=()
+        # 0.7.1-rc1 style versions go out as pre-releases.
+        case "$VERSION" in *[a-z]*) flags+=(--prerelease) ;; esac
+        gh release create "$GITHUB_REF_NAME" artifacts/dist/* \
+          --repo "$GITHUB_REPOSITORY" \
+          --verify-tag \
+          --title "$GITHUB_REF_NAME" \
+          --notes-file artifacts/release-notes/release-notes.md \
+          "${flags[@]}"
