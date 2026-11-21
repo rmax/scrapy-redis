@@ -19,6 +19,10 @@ REDIS_PORT = int(os.environ.get("REDIS_PORT", 6379))
 install_reactor("twisted.internet.asyncioreactor.AsyncioSelectorReactor")
 
 
+def module_level_cb(response):
+    pass
+
+
 def get_spider(*args, **kwargs):
     crawler = get_crawler(
         spidercls=kwargs.pop("spidercls", None),
@@ -223,6 +227,46 @@ class SchedulerTest(RedisTestMixin, TestCase):
         self.scheduler.close("finish")
 
         self.assertEqual(len(self.scheduler), 0)
+
+    def test_scheduler_unserializable_requests(self):
+        self.scheduler.open(self.spider)
+        stats = self.spider.crawler.stats
+
+        normal = Request("http://example.com/page1")
+        unser1 = Request("http://example.com/page2", callback=module_level_cb)
+        unser2 = Request("http://example.com/page3", meta={"fn": lambda x: x})
+
+        with self.assertLogs("scrapy_redis.scheduler", level="WARNING") as logs:
+            self.assertTrue(self.scheduler.enqueue_request(normal))
+            self.assertTrue(self.scheduler.enqueue_request(unser1))
+            self.assertTrue(self.scheduler.enqueue_request(unser2))
+
+        # only one warning per scheduler
+        self.assertEqual(len(logs.records), 1)
+        self.assertIn("page2", logs.output[0])
+
+        self.assertEqual(len(self.scheduler.queue), 1)
+        self.assertEqual(len(self.scheduler.local_queue), 2)
+        self.assertEqual(len(self.scheduler), 3)
+        self.assertTrue(self.scheduler.has_pending_requests())
+
+        self.assertEqual(stats.get_value("scheduler/enqueued/redis"), 1)
+        self.assertEqual(stats.get_value("scheduler/unserializable"), 2)
+        self.assertEqual(stats.get_value("scheduler/enqueued/memory"), 2)
+
+        # local requests come first and keep their callback
+        out = self.scheduler.next_request()
+        self.assertIs(out, unser1)
+        self.assertIs(out.callback, module_level_cb)
+        self.assertIs(self.scheduler.next_request(), unser2)
+        self.assertEqual(self.scheduler.next_request().url, normal.url)
+        self.assertIsNone(self.scheduler.next_request())
+
+        self.assertEqual(stats.get_value("scheduler/dequeued/memory"), 2)
+        self.assertEqual(stats.get_value("scheduler/dequeued/redis"), 1)
+        self.assertFalse(self.scheduler.has_pending_requests())
+
+        self.scheduler.close("finish")
 
 
 class ConnectionTest(TestCase):
