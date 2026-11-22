@@ -73,7 +73,11 @@ def _apply_protocol(settings, params) -> None:
 
 def _get_params_from_settings(settings):
     params = defaults.REDIS_PARAMS.copy()
-    params.update(settings.getdict("REDIS_PARAMS"))
+    user_params = settings.getdict("REDIS_PARAMS")
+    if "retry_on_timeout" in user_params:
+        # An explicit retry_on_timeout still decides whether timeouts are retried.
+        params.pop("retry_on_error", None)
+    params.update(user_params)
     # XXX: Deprecate REDIS_* settings.
     for source, dest in SETTINGS_PARAMS_MAP.items():
         val = settings.get(source)

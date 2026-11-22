@@ -23,7 +23,7 @@ def get_redis_mock():
 
 class TestRFPDupeFilter:
 
-    def setup(self):
+    def setup_method(self):
         self.server = get_redis_mock()
         self.key = "dupefilter:1"
         self.df = RFPDupeFilter(self.server, self.key)
@@ -86,7 +86,7 @@ def test_log_dupes():
 @mock.patch("scrapy_redis.dupefilter.get_redis_from_settings")
 class TestFromMethods:
 
-    def setup(self):
+    def setup_method(self):
         self.settings = Settings(
             {
                 "DUPEFILTER_DEBUG": True,

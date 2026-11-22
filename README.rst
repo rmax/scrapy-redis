@@ -166,11 +166,14 @@ both settings specify a protocol. As optional advanced tuning on redis-py >=
 This can reduce connection-setup work, but loses useful client-identification
 metadata in exchange.
 
-The library's historical ``retry_on_timeout=True`` default is deprecated and
-has no effect on redis-py >= 6. On those versions, the effective retry policy
-comes from redis-py's ``retry`` object and its defaults. Measure the resulting
-behavior before lowering retries, especially under connection churn or
-saturation.
+By default a command is retried once when it times out. On redis-py >= 6,
+which deprecated ``retry_on_timeout``, the default is
+``retry_on_error=(redis.exceptions.TimeoutError,)``; older versions get
+``retry_on_timeout=True``. Connections from the shared pool rely on this:
+redis-py's default ``retry`` object only applies to clients that create their
+own pool. Setting ``retry_on_timeout`` in ``REDIS_PARAMS`` replaces the
+default. Measure the resulting behavior before lowering retries, especially
+under connection churn or saturation.
 
 In testing with Redis 8.0.2, ``CLIENT MAINT_NOTIFICATIONS`` was rejected during
 RESP3 connection setup. This observation is scoped to the tested Redis 8.0.2
