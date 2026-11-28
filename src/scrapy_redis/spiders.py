@@ -484,6 +484,7 @@ class RedisSpider(RedisMixin, Spider):
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
+        """Create a spider and initialize its Redis queue and idle backoff."""
         obj = super().from_crawler(crawler, *args, **kwargs)
         obj._setup_idle_backoff(crawler)
         obj.setup_redis(crawler)
@@ -517,6 +518,7 @@ class RedisCrawlSpider(RedisMixin, CrawlSpider):
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
+        """Create a spider and initialize its Redis queue and idle backoff."""
         obj = super().from_crawler(crawler, *args, **kwargs)
         obj._setup_idle_backoff(crawler)
         obj.setup_redis(crawler)
