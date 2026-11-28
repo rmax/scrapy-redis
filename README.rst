@@ -2,9 +2,9 @@
 Scrapy-Redis
 ============
 
-.. image:: https://readthedocs.org/projects/scrapy-redis/badge/?version=latest
+.. image:: https://img.shields.io/readthedocs/scrapy-redis/latest
         :alt: Documentation Status
-        :target: https://readthedocs.org/projects/scrapy-redis/?badge=latest
+        :target: https://scrapy-redis.readthedocs.io/en/latest/?badge=latest
 
 .. image:: https://img.shields.io/pypi/v/scrapy-redis.svg
         :target: https://pypi.python.org/pypi/scrapy-redis
@@ -73,10 +73,10 @@ Features
 Requirements
 ------------
 
-* Python 3.7+
+* Python >= 3.10
 * Redis >= 5.0
-* ``Scrapy`` >=  2.0
-* ``redis-py`` >= 4.2
+* ``Scrapy`` >=  2.13
+* ``redis-py`` >= 5.0
 
 Installation
 ------------
@@ -93,7 +93,7 @@ From GitHub
 
     git clone https://github.com/darkrho/scrapy-redis.git
     cd scrapy-redis
-    python setup.py install
+    pip install -e .
 
 .. note:: For using this json supported data feature, please make sure you have not installed the scrapy-redis through pip. If you already did it, you first uninstall that one.
 
@@ -184,8 +184,6 @@ The connection-related behavior by redis-py version is summarized below:
 
    * - redis-py
      - Connection setup notes
-   * - 4.2–4.x
-     - No ``protocol`` or ``driver_info`` knobs.
    * - 5.x
      - Both knobs are available; RESP2 is the default.
    * - 6.x–7.x
