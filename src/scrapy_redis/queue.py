@@ -1,3 +1,5 @@
+import pickle
+
 try:
     from scrapy.utils.request import request_from_dict
 except ImportError:
@@ -43,12 +45,24 @@ class Base:
         self.serializer = serializer
 
     def _encode_request(self, request):
-        """Encode a request object"""
+        """Encode a request object.
+
+        Raises ``ValueError`` if the request can't be serialized or couldn't
+        be restored from Redis later, so nothing broken ends up in the queue.
+        """
         try:
             obj = request.to_dict(spider=self.spider)
         except AttributeError:
             obj = request_to_dict(request, self.spider)
-        return self.serializer.dumps(obj)
+        try:
+            # Make sure a worker will be able to rebuild the request.
+            request_from_dict(obj, spider=self.spider)
+        except Exception as e:
+            raise ValueError(f"Request can't be deserialized: {e}") from e
+        try:
+            return self.serializer.dumps(obj)
+        except (pickle.PicklingError, AttributeError, TypeError, ValueError) as e:
+            raise ValueError(f"Request can't be serialized: {e}") from e
 
     def _decode_request(self, encoded_request):
         """Decode an request previously encoded"""
