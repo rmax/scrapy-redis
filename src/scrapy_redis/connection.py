@@ -20,7 +20,9 @@ SETTINGS_PARAMS_MAP = {
 SETTINGS_PARAMS_MAP["REDIS_DECODE_RESPONSES"] = "decode_responses"
 
 _POOLS_REGISTRY: dict = {}
-_POOLS_LOCK = threading.Lock()
+# Reentrant on purpose: the weakref cleanup below can run inside a locked
+# section when the cyclic GC frees an old Settings object mid-allocation (#337).
+_POOLS_LOCK = threading.RLock()
 
 
 def _canonicalize(value):
